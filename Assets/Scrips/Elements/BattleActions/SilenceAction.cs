@@ -32,7 +32,9 @@ namespace Elements
       // double pp = _valueDictionary[eValueNumber.VALUE_3] * (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target);
       double pp = BattleUtil.CalcDodgeByLevelDiffUseParam(_skill.Level, _source, _target, IsExEquipSkillAction, (float)_valueDictionary[eValueNumber.VALUE_3]);
       var randomData = new RandomData(_source, _target.Owner, ActionId, 14, (float)pp);
-      if (BattleManager.Random(0.0f, 1f, ref randomData) < pp)
+      bool forceHit = _target.Owner.ConsumeForceHit(ActionType, ActionDetail1)
+          || ((eSilenceType)ActionDetail1 == eSilenceType.UB && ActionDetail2 == 1);
+      if (BattleManager.Random(0.0f, 1f, ref randomData) < pp || forceHit)
       {
         UnitCtrl.eAbnormalState _abnormalState = UnitCtrl.eAbnormalState.SILENCE;
         switch ((eSilenceType)ActionDetail1)
@@ -43,9 +45,12 @@ namespace Elements
           case eSilenceType.UB:
             _abnormalState = UnitCtrl.eAbnormalState.UB_SILENCE;
             break;
+          case eSilenceType.BERSERK:
+            _abnormalState = UnitCtrl.eAbnormalState.BERSERK;
+            break;
         }
         AppendIsAlreadyExeced(_target.Owner, _num);
-        _target.Owner.SetAbnormalState(_source, _abnormalState, AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_1] : 90f, this, _skill);
+        _target.Owner.SetAbnormalState(_source, _abnormalState, AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_1] : 90f, this, _skill, _isIgnoreDebuffImmune: IsIgnoreDebuffImmune());
       }
       else
       {
@@ -66,10 +71,17 @@ namespace Elements
       Value[eValueNumber.VALUE_3] = MasterData.action_value_3 + MasterData.action_value_4 * _level;
     }
 
+    /// <summary>action_value_6 ≈ 1 时无视「debuff 免疫」强制生效（对应官方 SilenceAction.IsIgnoreDebuffImmune）。</summary>
+    public override bool IsIgnoreDebuffImmune()
+    {
+      return BattleUtil.Approximately(Value[eValueNumber.VALUE_6], 1.0);
+    }
+
     private enum eSilenceType
     {
       NORMAL,
       UB,
+      BERSERK,
     }
   }
 }

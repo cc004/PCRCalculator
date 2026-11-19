@@ -36147,7 +36147,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "Boss\u6570\u636E\u7248\u672C\uFF08\u56FD\u670D\uFF09\uFF1A"
+  m_Text: "\u6570\u636E\u5E93\u7248\u672C\uFF1A"
 --- !u!222 &651551913
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -40834,13 +40834,13 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2035126171}
+  m_Father: {fileID: 1178447375}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 172.8, y: 128.4}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 4}
   m_SizeDelta: {x: 42, y: 42}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 1, y: 0}
 --- !u!114 &721744879
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -61341,15 +61341,14 @@ MonoBehaviour:
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
   m_SelectionColor: {r: 0.65882355, g: 0.80784315, b: 1, a: 0.7529412}
-  m_Text: "2024\u5E7408\u6708 S78\u5904\u5973\u5EA710058000\n2024\u5E7409\u6708 S79\u5929\u79E4\u5EA710058800\u8DF3\u8FC7\n2024\u5E7410\u6708
-    S80\u5929\u874E\u5EA710059500\u8DF3\u8FC7\n2024\u5E7411\u6708 S81\u5C04\u624B\u5EA710060200\n2024\u5E7412\u6708
-    S82\u6469\u7FAF\u5EA710060800\u8DF3\u8FC7\n---2025\u5E74----\n2025\u5E7401\u6708
-    S83\u6C34\u74F6\u5EA710061500\n2025\u5E7402\u6708 S84\u53CC\u9C7C\u5EA710062200\n2025\u5E7403\u6708
-    S85\u767D\u7F8A\u5EA710062600\n2025\u5E7404\u6708 S86\u91D1\u725B\u5EA710063000\u8DF3\u8FC7\n2025\u5E7405\u6708
-    S87\u53CC\u5B50\u5EA710063700\n2025\u5E7406\u6708 S88\u5DE8\u87F9\u5EA710064200\u8DF3\u8FC7\n2025\u5E7407\u6708
-    S89\u72EE\u5B50\u5EA710064700\n2025\u5E7408\u6708 S90\u5904\u5973\u5EA710065100\n2025\u5E7409\u6708
-    S91\u5929\u79E4\u5EA710065500\n2025\u5E7410\u6708 S92\u5929\u874E\u5EA710066000\n2025\u5E7411\u6708
-    S93\u5C04\u624B\u5EA710066500\n2025\u5E7412\u6708 S94\u6469\u7FAF\u5EA710067000"
+  m_Text: "2025\u5e7411\u6708
+    S93\u5c04\u624b\u5ea710066500\n2025\u5e7412\u6708 S94\u6469\u7faf\u5ea710067000\n---2026\u5e74----\n2026\u5e7401\u6708
+    S95\u6c34\u74f6\u5ea710067500\n2026\u5e7402\u6708 S96\u53cc\u9c7c\u5ea710067910\n2026\u5e7403\u6708
+    S97\u767d\u7f8a\u5ea710068300\n2026\u5e7404\u6708 S98\u91d1\u725b\u5ea710068800\n2026\u5e7405\u6708
+    S99\u53cc\u5b50\u5ea710069200\n2026\u5e7406\u6708 S100\u5de8\u87f9\u5ea710069600\n2026\u5e7407\u6708
+    S101\u72ee\u5b50\u5ea710070000\n2026\u5e7408\u6708 S102\u5904\u5973\u5ea710070400\n2026\u5e7409\u6708
+    S103\u5929\u79e4\u5ea710070900\n2026\u5e7410\u6708 S104\u5929\u874e\u5ea710071300\n2026\u5e7411\u6708
+    S105\u5c04\u624b\u5ea710071700\n2026\u5e7412\u6708 S106\u6469\u7faf\u5ea7?"
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
@@ -68955,6 +68954,7 @@ RectTransform:
   m_Children:
   - {fileID: 1455078439}
   - {fileID: 106219242}
+  - {fileID: 721744878}
   m_Father: {fileID: 651551911}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -88122,7 +88122,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u542F\u52A8\u65F6\u4F7F\u7528\u6700\u65B0prod\u7248\u672C\u53F7"
+  m_Text: "\u542F\u52A8\u65F6\u4F7F\u7528\u6700\u65B0\u65E5\u670D\u6570\u636E\u5E93\u7248\u672C\u53F7"
 --- !u!222 &1480857453
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -121920,7 +121920,6 @@ RectTransform:
   - {fileID: 1915966421}
   - {fileID: 651551911}
   - {fileID: 2134228233}
-  - {fileID: 721744878}
   - {fileID: 1477918601}
   - {fileID: 467167927}
   - {fileID: 1851330076}
@@ -127083,7 +127082,7 @@ GameObject:
   - component: {fileID: 2134228235}
   - component: {fileID: 2134228234}
   m_Layer: 5
-  m_Name: "prod\u5F53\u524D\u6700\u65B0\u7248\u672C\u53F7"
+  m_Name: "\u65E5\u670D\u6570\u636E\u5E93\u6700\u65B0\u7248\u672C\u53F7"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -127142,7 +127141,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "Prod\u5F53\u524D\u6700\u65B0\u7248\u672C\u53F7    \uFF1A"
+  m_Text: "\u6570\u636E\u5E93\u6700\u65B0\u7248\u672C\u53F7    \uFF1A"
 --- !u!222 &2134228235
 CanvasRenderer:
   m_ObjectHideFlags: 0

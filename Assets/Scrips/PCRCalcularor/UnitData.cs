@@ -116,7 +116,7 @@ namespace PCRCaculator
             }
             if (a.uniqueEqLv > 0 && unitId <= 200000 && MainManager.Instance.UniqueEquipmentDataDic.TryGetValue(a.unitId, out var value3))
             {
-                result += BaseData.CeilToInt(value3.CalcUniqueValue(a.uniqueEqLv));
+                result += BaseData.CeilToInt(value3.CalcUniqueValue(a.uniqueEqLv, a.uniqueEqPlus));
             }
             if (a.uniqueEq2Lv >= 0 && unitId <= 200000 && MainManager.Instance.UniqueEquipment2DataDic.TryGetValue(a.unitId, out var value4))
             {
@@ -240,7 +240,7 @@ namespace PCRCaculator
                 {
                     if (MainManager.Instance.UniqueEquipmentDataDic.TryGetValue(a.unitId, out var equipmentData))
                     {
-                        d1 += BaseData.CeilToInt(equipmentData.CalcUniqueValue(a.uniqueEqLv));
+                        d1 += BaseData.CeilToInt(equipmentData.CalcUniqueValue(a.uniqueEqLv, a.uniqueEqPlus));
                     }
                 }
                 //计算专武2加成
@@ -303,55 +303,30 @@ namespace PCRCaculator
                     var def = equip.GetDefaultBaseData();
                     var max = equip.GetMaxBaseData();
 
+                    SQL.ex_equip_5_exceed_limit_status exceed = null;
+                    equip.exceedStatus?.TryGetValue(a.ExceedRank(i), out exceed);
+                    var types = equip.status.Keys.ToArray();
+                    int[] subs = null;
+                    a.exEquipSubs?.TryGetValue(i, out subs);
                     for (int j = 0; j < 17; ++j)
                     {
-                        var isRateParam = ExtraEquipDefine.IsRateParam((eParamType)(j + 1));
-                        var d = def.dataint[j] / 100.0;
-                        var m = max.dataint[j] / 100.0;
-
-                        // 处理status加成
-                        if (equip.status.Count > 0)
+                        var type = (eParamType)(j + 1);
+                        int value = exceed != null ? exceed.GetValue(j + 1) : (int)Math.Ceiling(
+                            (def.dataint[j] + (equip.levelMax > 0 ? (max.dataint[j] - def.dataint[j])
+                                * (double)a.exEquipLevel[i] / equip.levelMax : 0)) / 100.0);
+                        for (int k = 0; subs != null && k + 1 < subs.Length; k += 2)
                         {
-                            for (int k = 0; k < 4; ++k)
-                            {
-                                int statusIndex = a.exEquipSubs[i][k * 2];
-                                int statusLevel = a.exEquipSubs[i][k * 2 + 1];
-                                var paramTypes = new List<eParamType>(equip.status.Keys);
-
-                                if (statusIndex < 0 || statusIndex >= paramTypes.Count ||
-                                    statusLevel < 0 || statusLevel >= equip.status[paramTypes[statusIndex]].Length)
-                                {
-                                    continue;
-                                }
-
-                                if (paramTypes[statusIndex] == (eParamType)(j + 1))
-                                {
-                                    var present2 = equip.status[paramTypes[statusIndex]][statusLevel];
-                                    if (isRateParam)
-                                    {
-                                        ex_param.dataint[j] += (int)Math.Ceiling((double)temp.dataint[j] * present2 / 1000000.0) * 100;
-                                    }
-                                    else
-                                    {
-                                        ex_param.dataint[j] += present2 * 100;
-                                    }
-                                }
-                            }
+                            int index = subs[k], level = subs[k + 1];
+                            if (index >= 0 && index < types.Length && types[index] == type
+                                && level >= 0 && level < equip.status[type].Length)
+                                value += equip.status[type][level];
                         }
 
-                        // 处理基础加成
-                        var present = isRateParam ?
-                            (equip.levelMax > 0 ? Math.Ceiling(d + (m - d) * ((double)a.exEquipLevel[i] / equip.levelMax)) : Math.Ceiling(d)) :
-                            (int)(equip.levelMax > 0 ? Math.Ceiling(d + (m - d) * ((double)a.exEquipLevel[i] / equip.levelMax)) : Math.Ceiling(d));
-
-                        if (isRateParam)
-                        {
-                            ex_param.dataint[j] += (int)Math.Ceiling((double)temp.dataint[j] * present / 1000000.0) * 100;
-                        }
-                        else
-                        {
-                            ex_param.dataint[j] += (int)present * 100;
-                        }
+                        // 同槽属性合并后按槽结算。
+                        int bonus = ExtraEquipDefine.IsRateParam(type)
+                            ? (int)Math.Ceiling((double)temp.dataint[j] * value / 1000000.0)
+                            : value;
+                        ex_param.dataint[j] += bonus * 100;
                     }
                 }
                 temp += ex_param;
@@ -629,6 +604,9 @@ namespace PCRCaculator
         public bool uniqueEqPlus = false; // SP+
         public bool uniqueEq2Plus = false; // SP+
         public int[] exEquip = new int[] { 0, 0, 0 };
+        public int[] exEquipExceedRank = new int[3];
+        public int ExceedRank(int slot) => exEquipExceedRank != null && slot < exEquipExceedRank.Length
+            ? Math.Max(0, Math.Min(5, exEquipExceedRank[slot])) : 0;
         public int[] exEquipLevel = new int[] { 0, 0, 0 };
         public Dictionary<int, int[]> exEquipSubs = new Dictionary<int, int[]>        
         {
@@ -643,6 +621,7 @@ namespace PCRCaculator
         private int _prefabId;
         public const int JitaUnitId = 105701;
         public const int JitaSixStarBattlePrefabId = 170301;
+        public const int JitaAlternateBattlePrefabId = 170101;
         public const int JitaSixStarIconId = 105761;
 
         public int PrefabId
@@ -655,9 +634,17 @@ namespace PCRCaculator
         {
             if (unitId == JitaUnitId)
             {
-                if (rarity == 6 && (prefabId == 0 || prefabId == unitId || prefabId == JitaSixStarBattlePrefabId))
-                    return JitaSixStarBattlePrefabId;
-                if (rarity != 6 && prefabId == JitaSixStarBattlePrefabId)
+                bool battleForm = prefabId == JitaSixStarBattlePrefabId || prefabId == JitaAlternateBattlePrefabId;
+                if (rarity == 6 && (prefabId == 0 || prefabId == unitId || battleForm))
+                {
+                    var patterns = MainManager.Instance?.databaseCache?.allUnitAttackPatternDic;
+                    if (patterns?.ContainsKey(UnitUtility.GetDefaultActionPatternId(JitaSixStarBattlePrefabId)) == true)
+                        return JitaSixStarBattlePrefabId;
+                    if (patterns?.ContainsKey(UnitUtility.GetDefaultActionPatternId(JitaAlternateBattlePrefabId)) == true)
+                        return JitaAlternateBattlePrefabId;
+                    return battleForm ? prefabId : JitaSixStarBattlePrefabId;
+                }
+                if (rarity != 6 && battleForm)
                     return unitId;
             }
 
@@ -834,112 +821,72 @@ namespace PCRCaculator
                 uniqueEq2Lv = MainManager.Instance.JudgeWeatherAllowUniqueEq2(unitId) ? 5 : -1;
                 uniqueEqPlus = CanEquipUniqueEqPlus();
                 MainManager.Instance.UnitExEquips.TryGetValue(unitId, out var temp);
-                //会战ex装备
-                if (battle_mode == 0 && ex_equip_full)
-                {
-                    for (int i = 0; i < 3; i++)
-                    {
-                        var validEquip = temp[i]
-                            .Where(e => e.Value.clan_battle_equip_flag && e.Value.rarity == 3)
-                            .FirstOrDefault();
-
-                        exEquip[i] = validEquip.Value != null ? validEquip.Key : 0;
-                        if (validEquip.Value != null)
-                        {
-                            exEquipLevel[i] = 5;
-                        }
-                    }
-                }
-                else if (battle_mode != 0 && ex_equip_full)
-                {
-                    
-                    var equipSource = (battle_mode == 2 &&
-                                      playerSetting.UnitExEquipDefault.TryGetValue(unitId, out int[] unitDefaultExEquip))
-                                      ? unitDefaultExEquip
-                                      : null;
-
-                    if (equipSource != null)
-                    {
-                        for (int i = 0; i < 3; i++)
-                        {
-                            int equipId = equipSource.Length > i ? equipSource[i] : 0;
-                            if (equipId == 0) continue;
-                            if (temp == null || temp.Length <= i || !temp[i].ContainsKey(equipId))
-                            {
-                                equipSource = null;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (equipSource != null)
-                    {
-                        // jjc装备
-                        for (int i = 0; i < 3; i++)
-                        {
-                            exEquip[i] = equipSource[i];
-                            exEquipLevel[i] = exEquip[i] != 0 ? (exEquip[i] == 4106402 ? 3 : 5) : 0;
-                            //彩装
-                            if (exEquip[i] / 100 % 10 == 5)
-                            {
-                                // 角色专属词条
-                                if (playerSetting.TryGetUnitExEquipSubsDefault(unitId, exEquip[i], out var defaultExEquipSubs))
-                                {
-                                    exEquipSubs[i] = defaultExEquipSubs;
-                                }
-                                // 其余彩装词条，武器防具满贯，饰品攻击
-                                else if (temp != null && temp.Length > i && temp[i].TryGetValue(exEquip[i], out var exEquipData))
-                                {
-                                    int typeIndex = 0;
-                                    var statusKeys = exEquipData.status.Keys.ToList();
-                                    for (int index = 0; index < statusKeys.Count; index++)
-                                    {
-                                        var key = statusKeys[index];
-                                        bool isAtkType = key == eParamType.MAGIC_ATK || key == eParamType.ATK;
-                                        bool isPenetrateType = key == eParamType.PHYSICAL_PENETRATE || key == eParamType.MAGIC_PENETRATE;
-
-                                        if ((exEquipData.category > 300 && isAtkType) || (exEquipData.category <= 300 && isPenetrateType))
-                                        {
-                                            typeIndex = index;
-                                            break;
-                                        }
-                                    }
-                                    exEquipSubs[i] = new int[] { typeIndex, 4, typeIndex, 4, typeIndex, 4, typeIndex, 4 };
-                                }
-                                else
-                                {
-                                    // 如果无法获取装备数据，使用默认满贯配置
-                                    exEquipSubs[i] = new int[] { 5, 4, 5, 4, 5, 4, 5, 4 };
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // 使用拉满装备
-                        for (int i = 0; i < 3; i++)
-                        {
-                            var validEquip = temp[i]
-                                .Where(e => e.Value.ex_equipment_id != 0 &&
-                                            playerSetting.ExEquipDefault.ContainsKey(e.Value.category) &&
-                                            playerSetting.ExEquipDefault[e.Value.category] == e.Key)
-                                .FirstOrDefault();
-
-                            exEquip[i] = validEquip.Value != null ? validEquip.Key : 0;
-                            exEquipLevel[i] = exEquip[i] != 0 ? (exEquip[i] == 4106402 ? 3 : 5) : 0;
-                        }
-                    }
-                }
-                else if (ex_equip_full)
-                {
-                    exEquip = new int[] { 0, 0, 0 };
-                }
+                if (ex_equip_full)
+                    SetMaxExEquipment(temp, un.detailData, battle_mode);
             }
             else
             {
                 Debug.LogError("未找到" + unitId + "的对应角色数据！");
             }
         }
+        private void SetMaxExEquipment(Dictionary<int, SQL.ex_equipment_data>[] slots, UnitDetailData unit, int battleMode)
+        {
+            exEquip = new int[3];
+            exEquipLevel = new int[3];
+            exEquipExceedRank = new int[3];
+            exEquipSubs = new Dictionary<int, int[]>();
+            for (int slot = 0; slot < 3; slot++)
+            {
+                var equip = slots == null ? null : SelectMaxExEquipment(slots[slot].Values, slot, unit, battleMode);
+                int typeIndex = -1, tier = -1;
+                if (equip != null)
+                {
+                    exEquip[slot] = equip.ex_equipment_id;
+                    exEquipLevel[slot] = equip.levelMax;
+                    exEquipExceedRank[slot] = equip.exceedStatus?.Keys.Max() ?? 0;
+                    if (equip.status.Count > 0)
+                    {
+                        var stat = equip.DefaultSubStat(unit.atkType == 2);
+                        typeIndex = equip.status.Keys.ToList().IndexOf(stat);
+                        tier = equip.status[stat].Length - 1;
+                    }
+                }
+                exEquipSubs[slot] = new[] { typeIndex, tier, typeIndex, tier, typeIndex, tier, typeIndex, tier };
+            }
+        }
+
+        private SQL.ex_equipment_data SelectMaxExEquipment(IEnumerable<SQL.ex_equipment_data> pool,
+            int slot, UnitDetailData unit, int battleMode)
+        {
+            if (battleMode == 0)
+                return pool.Where(e => e.clan_battle_equip_flag).OrderByDescending(e => e.rarity)
+                    .ThenBy(e => e.ex_equipment_id).FirstOrDefault();
+
+            var normal = pool.Where(e => !e.clan_battle_equip_flag);
+            var rainbow = normal.Where(e => e.rarity == 5);
+            IOrderedEnumerable<SQL.ex_equipment_data> ranked;
+            if (slot == 2)
+                ranked = rainbow.OrderByDescending(e => e.HasAttackBuff())
+                    .ThenByDescending(e => e.exceedStatus?.ContainsKey(5) == true)
+                    .ThenByDescending(e => unit.talent_id?.Contains(e.talent_id) == true);
+            else
+                ranked = rainbow.OrderByDescending(e => {
+                    var stat = e.DefaultSubStat(unit.atkType == 2);
+                    return stat == eParamType.PHYSICAL_PENETRATE || stat == eParamType.MAGIC_PENETRATE
+                        ? e.status[stat].Last() : 0;
+                }).ThenByDescending(e => e.exceedStatus?.ContainsKey(5) == true);
+
+            var equip = ranked.ThenBy(e => e.ex_equipment_id).FirstOrDefault();
+            if (equip != null) return equip;
+
+            var settings = MainManager.Instance.PlayerSetting;
+            int[] preset = null;
+            if (battleMode == 2) settings.UnitExEquipDefault.TryGetValue(unitId, out preset);
+            return normal.OrderByDescending(e => preset != null && slot < preset.Length && e.ex_equipment_id == preset[slot])
+                .ThenByDescending(e => settings.ExEquipDefault.TryGetValue(e.category, out int id) && e.ex_equipment_id == id)
+                .ThenByDescending(e => e.rarity).ThenBy(e => e.ex_equipment_id).FirstOrDefault();
+        }
+
         public int GetMaxRarity()
         {
             if (MainManager.Instance.PlayerSetting.allowRarity6 && MainManager.Instance.UnitRarityDic.TryGetValue(unitId, out var data))
@@ -976,6 +923,7 @@ namespace PCRCaculator
                 uniqueEqPlus = this.uniqueEqPlus,
                 uniqueEq2Plus = this.uniqueEq2Plus,
                 exEquip = this.exEquip?.ToArray(),
+                exEquipExceedRank = new[] { ExceedRank(0), ExceedRank(1), ExceedRank(2) },
                 exEquipLevel = this.exEquipLevel?.ToArray(),
                 exEquipSubs = this.exEquipSubs?.ToDictionary(kv => kv.Key, kv => kv.Value?.ToArray()),
                 name = this.name,
@@ -1119,7 +1067,7 @@ namespace PCRCaculator
                 int currentLevel = exEquipLevel[i];
                 string exEquipStr = currentEquip.ToString();
                 string value = currentEquip == 0 ? "-" :
-                    (exEquipStr.Length >= 3 && exEquipStr[^3] == '5' ? $"R{currentLevel}" :
+                    (exEquipStr.Length >= 3 && exEquipStr[^3] == '5' ? $"R{ExceedRank(i)}" :
                     (exEquipStr.Length >= 3 && exEquipStr[^3] == '4' ? $"P{currentLevel}" :
                     (exEquipStr.Length >= 3 && exEquipStr[^3] == '3' ? $"G{currentLevel}" :
                     (exEquipStr.Length >= 3 && exEquipStr[^3] == '2' ? $"S{currentLevel}" : "-"))));
@@ -1213,6 +1161,7 @@ namespace PCRCaculator
                 hashCode = (hashCode * 397) ^ exEquip[0];
                 hashCode = (hashCode * 397) ^ exEquip[1];
                 hashCode = (hashCode * 397) ^ exEquip[2];
+                for (int slot = 0; slot < 3; slot++) hashCode = (hashCode * 397) ^ ExceedRank(slot);
                 hashCode = (hashCode * 397) ^ exEquipLevel[0];
                 hashCode = (hashCode * 397) ^ exEquipLevel[1];
                 hashCode = (hashCode * 397) ^ exEquipLevel[2];
@@ -2269,6 +2218,12 @@ namespace PCRCaculator
         public long[] dataint;//数据为*100后的整数，计算升级数据等时用整数计算避免浮点数误差累积。(用decimal不就好了）
         public long realhp = 0;
         [JsonIgnore]
+        public long CurrentHp
+        {
+            get => dataint[0] / 100;
+            set => dataint[0] = checked(value * 100);
+        }
+        [JsonIgnore]
         public long RealHp => realhp == 0 ? Mathf.RoundToInt(Hp) : realhp;
         [JsonIgnore]
         public float Hp
@@ -2328,7 +2283,7 @@ namespace PCRCaculator
             double o, double p, double q)
         {
             dataint = new long[17] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-            Hp = (float)a; Atk = (float)b; Def = (float)c; Magic_str = (float)d; Magic_def = (float)e; Physical_critical = (float)f;
+            dataint[0] = (long)Math.Round(a * 100); Atk = (float)b; Def = (float)c; Magic_str = (float)d; Magic_def = (float)e; Physical_critical = (float)f;
             Magic_critical = (float)g; Dodge = (float)h; Life_steal = (float)i; Wave_hp_recovery = (float)j;
             Wave_energy_recovery = (float)k; Physical_penetrate = (float)l; Magic_penetrate = (float)m; Energy_recovery_rate = (float)n;
             Hp_recovery_rate = (float)o; Enerey_reduce_rate = (float)p; Accuracy = (float)q;
@@ -2469,20 +2424,12 @@ namespace PCRCaculator
             }
             return a;
         }
-        private static int round(float _f)
-        {
-            if (_f - (float)(int)_f >= 0.5f || Mathf.Approximately((float)(int)_f + 0.5f, _f))
-            {
-                return (int)_f + 1;
-            }
-            return (int)_f;
-        }
-
         public static BaseData Round(BaseData a)
         {
             for (int i = 0; i < a.dataint.Length; i++)
             {
-                a.dataint[i] = 100 * round(a.dataint[i] / 100.0f);
+                long hundredths = a.dataint[i];
+                a.dataint[i] = (hundredths / 100 + (hundredths % 100 >= 50 ? 1 : 0)) * 100;
             }
             return a;
         }
@@ -2542,6 +2489,7 @@ namespace PCRCaculator
         public Dictionary<int, int> talentSkill = new();
         public Dictionary<int, int> teamSkill = new();
         public List<int> labyrinthRelicIds = new List<int>();
+        public List<int> invasionRelicIds = new List<int>();
         public List<int> labyrinthEnhancedNodeIds = new List<int>();
         public int labyrinthAlphaRupee;
         public Dictionary<eStateIconType, bool> ShowBuffDic = new Dictionary<eStateIconType, bool>();

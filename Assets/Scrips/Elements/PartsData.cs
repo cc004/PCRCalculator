@@ -89,12 +89,6 @@ namespace Elements
 
         private Dictionary<UnitCtrl.BuffParamKind, LongWithEx> additionalBuffDictionary { get; set; } = new Dictionary<UnitCtrl.BuffParamKind, LongWithEx>();
 
-        private long getAdditionalBuff(UnitCtrl.BuffParamKind _kind)
-        {
-            LongWithEx num;
-            return (!additionalBuffDictionary.TryGetValue(_kind, out num) ? 0 : num);
-        }
-
         private LongWithEx getAdditionalBuffEx(UnitCtrl.BuffParamKind _kind)
         {
             LongWithEx num;
@@ -209,29 +203,29 @@ namespace Elements
 
         public override Vector3 GetColliderSize() => new Vector3(BodyWidthValue / 540f, 0.0f, 0.0f);
 
-        public override LongWithEx GetDefZero() => Def.Max(0) + getAdditionalBuff(UnitCtrl.BuffParamKind.DEF);
+        public override LongWithEx GetDefZero() => BattleUtil.GetEffectiveParameter(Def, getAdditionalBuffEx(UnitCtrl.BuffParamKind.DEF));
 
-        public override LongWithEx GetMagicDefZero() => MagicDef.Max(0) + getAdditionalBuff(UnitCtrl.BuffParamKind.MAGIC_DEF);
+        public override LongWithEx GetMagicDefZero() => BattleUtil.GetEffectiveParameter(MagicDef, getAdditionalBuffEx(UnitCtrl.BuffParamKind.MAGIC_DEF));
 
-        private long getDodgeZero() => Math.Max(0, Dodge) + getAdditionalBuff(UnitCtrl.BuffParamKind.DODGE);
+        private long getDodgeZero() => BattleUtil.GetEffectiveParameter(Dodge, getAdditionalBuffEx(UnitCtrl.BuffParamKind.DODGE));
 
-        public override long GetAtkZero() => Math.Max(0, (int)Atk) + getAdditionalBuff(UnitCtrl.BuffParamKind.ATK);
+        public override long GetAtkZero() => GetAtkZeroEx();
 
-        public override long GetMagicStrZero() => Math.Max(0, (int)MagicStr) + getAdditionalBuff(UnitCtrl.BuffParamKind.MAGIC_STR);
+        public override long GetMagicStrZero() => GetMagicStrZeroEx();
 
-        public override LongWithEx GetAtkZeroEx() => Atk.Max(0) + getAdditionalBuffEx(UnitCtrl.BuffParamKind.ATK);
+        public override LongWithEx GetAtkZeroEx() => BattleUtil.GetEffectiveParameter(Atk, getAdditionalBuffEx(UnitCtrl.BuffParamKind.ATK));
 
-        public override LongWithEx GetMagicStrZeroEx() => MagicStr.Max(0) + getAdditionalBuffEx(UnitCtrl.BuffParamKind.MAGIC_STR);
+        public override LongWithEx GetMagicStrZeroEx() => BattleUtil.GetEffectiveParameter(MagicStr, getAdditionalBuffEx(UnitCtrl.BuffParamKind.MAGIC_STR));
 
-        public override long GetAccuracyZero() => Math.Max(0, Accuracy) + getAdditionalBuff(UnitCtrl.BuffParamKind.ACCURACY);
+        public override long GetAccuracyZero() => BattleUtil.GetEffectiveParameter(Accuracy, getAdditionalBuffEx(UnitCtrl.BuffParamKind.ACCURACY));
 
-        public override long GetPhysicalCriticalZero() => Math.Max(0, PhysicalCritical) + getAdditionalBuff(UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL);
+        public override long GetPhysicalCriticalZero() => BattleUtil.GetEffectiveParameter(PhysicalCritical, getAdditionalBuffEx(UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL));
 
-        public override long GetMagicCriticalZero() => Math.Max(0, MagicCritical) + getAdditionalBuff(UnitCtrl.BuffParamKind.MAGIC_CRITICAL);
+        public override long GetMagicCriticalZero() => BattleUtil.GetEffectiveParameter(MagicCritical, getAdditionalBuffEx(UnitCtrl.BuffParamKind.MAGIC_CRITICAL));
 
-        public override long GetLifeStealZero() => Math.Max(0, LifeSteal) + getAdditionalBuff(UnitCtrl.BuffParamKind.LIFE_STEAL);
+        public override long GetLifeStealZero() => BattleUtil.GetEffectiveParameter(LifeSteal, getAdditionalBuffEx(UnitCtrl.BuffParamKind.LIFE_STEAL));
 
-        public override long GetHpRecoverRateZero() => Math.Max(0, HpRecoveryRate);
+        public override long GetHpRecoverRateZero() => Math.Min(BattleUtil.MaxBattleParameter, Math.Max(0, HpRecoveryRate));
 
         public override int GetLevel() => Level;
 
@@ -293,7 +287,7 @@ namespace Elements
                 switch (_kind)
                 {
                     case UnitCtrl.BuffParamKind.ATK:
-                        Atk = (int)(Atk + _value);
+                        Atk += _value;
                         break;
                     case UnitCtrl.BuffParamKind.DEF:
                         Def = (Def + _value);
@@ -302,7 +296,7 @@ namespace Elements
                         Owner.NoSkipOnBaseValueChanged?.Invoke(Owner.UnitId + 10 * Index, 1, Def, BattleHeaderController.CurrentFrameCount, des);
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_STR:
-                        MagicStr = (int)(MagicStr + _value);
+                        MagicStr += _value;
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_DEF:
                         MagicDef = (MagicDef + _value);
@@ -311,19 +305,19 @@ namespace Elements
                         Owner.NoSkipOnBaseValueChanged?.Invoke(Owner.UnitId + 10 * Index, 2, MagicDef, BattleHeaderController.CurrentFrameCount, des2);
                         break;
                     case UnitCtrl.BuffParamKind.DODGE:
-                        Dodge = (int)((int)Dodge + _value);
+                        Dodge += (long)_value;
                         break;
                     case UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL:
-                        PhysicalCritical = (int)((int)PhysicalCritical + _value);
+                        PhysicalCritical += (long)_value;
                         break;
                     case UnitCtrl.BuffParamKind.MAGIC_CRITICAL:
-                        MagicCritical = (int)((int)MagicCritical + _value);
+                        MagicCritical += (long)_value;
                         break;
                     case UnitCtrl.BuffParamKind.LIFE_STEAL:
-                        LifeSteal = (int)((int)LifeSteal + _value);
+                        LifeSteal += (long)_value;
                         break;
                     case UnitCtrl.BuffParamKind.ACCURACY:
-                        Accuracy = (int)((int)Accuracy + _value);
+                        Accuracy += (long)_value;
                         break;
                     case UnitCtrl.BuffParamKind.ENERGY_RECOVER_RATE:
                     case UnitCtrl.BuffParamKind.MOVE_SPEED:
@@ -502,7 +496,7 @@ namespace Elements
         }
         public override LongWithEx GetDefZeroForDamagedEnergy()
         {
-            return Math.Max(0, this.DefForDamagedEnergy) + this.getAdditionalBuff(UnitCtrl.BuffParamKind.DEF);
+            return BattleUtil.GetEffectiveParameter(DefForDamagedEnergy, getAdditionalBuffEx(UnitCtrl.BuffParamKind.DEF));
         }
 
         private LongWithEx DefForDamagedEnergy = 0;
@@ -512,7 +506,7 @@ namespace Elements
 
         public override LongWithEx GetMagicDefZeroForDamagedEnergy()
         {
-            return Math.Max(0, this.MagicDefForDamagedEnergy) + this.getAdditionalBuff(UnitCtrl.BuffParamKind.MAGIC_DEF);
+            return BattleUtil.GetEffectiveParameter(MagicDefForDamagedEnergy, getAdditionalBuffEx(UnitCtrl.BuffParamKind.MAGIC_DEF));
         }
     }
 }

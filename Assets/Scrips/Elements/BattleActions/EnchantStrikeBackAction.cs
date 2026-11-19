@@ -114,13 +114,18 @@ namespace Elements
             strikeBackDataSet.SkillEffect = skillEffectCtrl1;
             // int count = effectController.Children.Count;
             int count = 5;
-            if (_source.UnitId == 105601) // 流夏
+            // The game reads the capacity from the effect prefab independently of VALUE_3.
+            if (ActionDetail2 == 9 || ActionDetail2 == 10 || ActionDetail2 == 8)
+                count = 2;
+            else if (ActionDetail2 == 11)
+                count = 3;
+            else if (ActionDetail2 == 6 || _source.UnitId == 105601) // 流夏
                 count = 1;
             else if (_source.UnitId == 109301) // 露
                 count = 5;
             else if (_source.UnitId == 114501) // 圣电
                 count = 5;
-            int number = Mathf.Min((int)_valueDictionary[eValueNumber.VALUE_3], count - strikeBackDataSet.DataList.Count);
+            int number = Mathf.Min(BattleUtil.DoubleToInt(_valueDictionary[eValueNumber.VALUE_3]), count - strikeBackDataSet.DataList.Count);
             //effectController.AddEffect(number);
             for (int index = 0; index < number; ++index)
             {

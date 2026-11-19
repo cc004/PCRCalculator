@@ -461,10 +461,10 @@ namespace Elements
             debuffResistIdDictionary.AddIfNoContains(_resistId, new Dictionary<UnitCtrl.BuffParamKind, int>());
             if (_resistId != 0)
             {
-                ResistVariationData resistVariationData = StaticAilmentData.resistVariationDataDic[_resistId];
+                var reductions = MainManager.Instance.databaseCache.resistVariationData[_resistId];
                 for (int i = 0; i < 4; i++)
                 {
-                    debuffResistIdDictionary[_resistId][(UnitCtrl.BuffParamKind)(i + 1)] = resistVariationData.DebuffDecrement[i];
+                    debuffResistIdDictionary[_resistId][(UnitCtrl.BuffParamKind)(i + 1)] = reductions[i];
                 }
             }
         }

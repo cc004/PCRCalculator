@@ -24,7 +24,8 @@ namespace PCRCaculator
 
     public static class DatabaseCacheContract
     {
-        public const int CurrentSchemaVersion = 14;
+        // 15: DatabaseCache 增加 talentLevelLimit / roleMasterySlotLevelLimit / roleMasteryEnhanceLevelLimit
+        public const int CurrentSchemaVersion = 25;
 
         public static T ResolveSharedDatabase<T>(T primary, Func<T> createSeparate, bool sharesPrimary)
             where T : class
@@ -48,11 +49,11 @@ namespace PCRCaculator
             if (!cache.cacheBuildComplete)
                 return Reject("缓存未标记为完整构建", out reason);
             if (cache.playerProcessLimit < PlayerSetting.MinimumPlayerProcess)
-                return Reject("缓存缺少 BossVersionJP 的有效装备进度上限", out reason);
+                return Reject("缓存缺少 日服数据库 的有效装备进度上限", out reason);
             if (cache.playerLevelLimit <= 0)
-                return Reject("缓存缺少 BossVersionJP 的有效玩家等级上限", out reason);
+                return Reject("缓存缺少 日服数据库 的有效玩家等级上限", out reason);
             if (cache.uniqueEqLevelLimit <= 0)
-                return Reject("缓存缺少 BossVersionJP 的有效专武 1 等级上限", out reason);
+                return Reject("缓存缺少 日服数据库 的有效专武 1 等级上限", out reason);
             if (string.IsNullOrWhiteSpace(cache.databaseSourceFingerprint))
                 return Reject("缓存缺少数据库来源指纹", out reason);
             if (string.IsNullOrWhiteSpace(expectedSourceFingerprint))

@@ -91,10 +91,9 @@ namespace PCRCaculator.Update
                     Log.SetLog($"当前版本{nowToolVer}是最新版。");
                 }
 
-                long ver = MainManager.Instance.Version.CharacterVersionJP;
-                long verold = MainManager.Instance.Version.BossVersionJP;
+                long ver = MainManager.Instance.Version.JpDatabaseVersion;
 
-                if (ver != HashData.AssestVer || verold != HashData.AssestVerOld)
+                if (ver != HashData.AssestVer)
                 {
                     Log.SetLog($"正在更新资源版本 {ver}->{HashData.AssestVer}并删除缓存...");
                     ABExTool.FreeDeleteAndReset(HashData.AssestVer, HashData.AssestVerOld);

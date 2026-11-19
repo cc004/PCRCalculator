@@ -55,8 +55,14 @@ namespace Elements
             {
                 _energy = Math.Max(_energy, -owner.GetAbnormalStateMainValue(UnitCtrl.eAbnormalStateCategory.ENERGY_DAMAGE_REDUCE_LIMIT));
             }
-            _target.Owner.ChargeEnergy(eSetEnergyType.BY_CHANGE_ENERGY, _energy, ActionDetail1 == 1 || ActionDetail1 == 4, _source, _effectType: EffectType,action:action, _useRecoveryRate: ActionDetail1 != 4);
+            _target.Owner.ChargeEnergy(eSetEnergyType.BY_CHANGE_ENERGY, _energy, hasRecoveryEffect(ActionDetail1), _source, _effectType: EffectType,action:action, _useRecoveryRate: ActionDetail1 != 4);
     }
+
+    /// <summary>
+    /// 官方 Elements.ChargeEnergyAction.hasRecoveryEffect(eChargeType)（RVA 0x37F7A00）：
+    /// return _chargeType == 1 || _chargeType == 4;  —— 只有这两种才是「恢复」TP（会走 TP 恢复率）。
+    /// </summary>
+    private static bool hasRecoveryEffect(int _chargeType) => _chargeType == 1 || _chargeType == 4;
 
     public override void SetLevel(float _level)
     {

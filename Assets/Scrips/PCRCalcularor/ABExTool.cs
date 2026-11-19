@@ -505,7 +505,12 @@ namespace PCRCaculator
         {
             var ver = MainManager.Instance.Version;
 
-            // AB 清单也统一到日服数据库版本：角色库与 Boss 库不再各自维护版本号。
+            // 台服 master 与日服资源清单使用不同的版本号。
+            if (ver.JpDatabaseVersion <= 0 && ver.JpDatabaseSource == (int)PCRCaculator.DataSources.JpDatabaseMirror.Taiwan)
+            {
+                ver.JpDatabaseVersion = await PCRCaculator.DataSources.JpDatabaseDownloader.FetchLatestVersionAsync();
+                SaveManager.Save(ver);
+            }
             mgrCharacter = mgrDataJP;
             await Task.Run(() => mgrDataJP.Initialize(ver.JpDatabaseVersion.ToString()));
             VerifyPersistentBundleCaches();
@@ -2006,6 +2011,32 @@ namespace PCRCaculator
 #endif
         }
 
+        /// <summary>
+        /// 取一个 AB 包的字节：有缓存读缓存，没有就下载并校验 md5。取不到（manifest 里没有 / 下载失败）返回 null。
+        /// 供 BuffIconAtlasUpdater 这类需要在运行期替换内置图集的功能使用。
+        /// </summary>
+        public static byte[] GetCachedBundleBytes(string fullname)
+        {
+            if (string.IsNullOrEmpty(fullname))
+                return null;
+
+            if (!TryGetManifestContent(fullname, mgrCharacter, out _))
+            {
+                Debug.Log($"asset bundle {fullname} is not in the current manifest");
+                return null;
+            }
+
+            try
+            {
+                return ReadOrRepairBundleCacheFile(fullname, mgrCharacter);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"failed to read asset bundle {fullname}: {ex.Message}");
+                return null;
+            }
+        }
+
 #if UNITY_5_3_OR_NEWER
         private static bool spriteWarmupStarted;
         /// <summary>预热阶段后台下载的总时限（秒）；超时就把剩下的留给按需加载。</summary>
@@ -2411,6 +2442,16 @@ namespace PCRCaculator
 #endif
         }
 #endif
+
+        public static int GetSummonSkinId(int prefabId, int rarity)
+        {
+            int skinId = Elements.UnitUtility.GetSkinId(prefabId, rarity);
+            if (TryGetManifestContent($"spine_sdnormal_{skinId}.unity3d", mgrCharacter, out _))
+                return skinId;
+            int defaultSkin = Elements.UnitUtility.GetSkinId(prefabId, 3);
+            return TryGetManifestContent($"spine_sdnormal_{defaultSkin}.unity3d", mgrCharacter, out _)
+                ? defaultSkin : skinId;
+        }
 
         public static int GetPrefabId(int unitid)
         {

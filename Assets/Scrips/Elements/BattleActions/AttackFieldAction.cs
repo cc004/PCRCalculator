@@ -82,7 +82,7 @@ namespace Elements
             attackFieldData.EffectId = ActionDetail2;
             attackFieldData.TargetList = new List<BasePartsData>();
             attackFieldData.TargetSet = new HashSet<BasePartsData>();
-            attackFieldData.Value = num;
+            attackFieldData.Value = num * _source.GetSkillDamageRateMultiplier(_skill);
             attackFieldData.DamageType = eDamageType;
             attackFieldData.ActionId = ActionId;
             attackFieldData.Skill = _skill;

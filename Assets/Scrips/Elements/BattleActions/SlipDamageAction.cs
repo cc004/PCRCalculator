@@ -105,7 +105,8 @@ namespace Elements
         flag = BattleUtil.LessThanOrApproximately(_valueDictionary[eValueNumber.VALUE_7] / 100f, (double)targetOwner.Hp / targetOwner.MaxHp);
       }
       //end add
-      if (!flag && num < (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target))
+      bool forceHit = targetOwner.ConsumeForceHit(ActionType, ActionDetail1);
+      if (!flag && (num < pp || forceHit))
       {
         AppendIsAlreadyExeced(_target.Owner, _num);
         //_target.Owner.SetAbnormalState(_source, abnormalStateDic[(eSlipDamageType)ActionDetail1], AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_3] : 90f, this, _skill, (int)_valueDictionary[eValueNumber.VALUE_1], _valueDictionary[eValueNumber.VALUE_5], _reduceEnergyRate: 0.0f);

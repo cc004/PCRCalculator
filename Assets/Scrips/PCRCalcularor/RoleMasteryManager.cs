@@ -68,6 +68,8 @@ namespace PCRCaculator
                 .OrderBy(data => data.slot_id)
                 .ToList();
 
+            ApplyBatchSliderLimits(masteryDataList);
+
             for (int i = 0; i < masteryDataList.Count && i < roleSlotPrefabs.Count; i++)
             {
                 var masteryData = masteryDataList[i];
@@ -98,6 +100,9 @@ namespace PCRCaculator
             int level = Mathf.RoundToInt(roleLevelBatchSlider.value);
             roleLevelBatchText.text = level.ToString();
 
+            // 星级上限取决于当前等级（不同等级的强化层数不一定相同），等级变了要重新取数据库上限
+            ApplyStarBatchLimit();
+
             // 当等级为0时，星级必须为0
             if (level == 0)
             {
@@ -121,6 +126,107 @@ namespace PCRCaculator
             roleStarBatchText.text = star.ToString();
         }
 
+        /// <summary>
+        /// 批量滑块的上限改成从数据库读取：
+        /// 等级上限 = 当前职能所有槽位里最大的 slot_level；星级上限 = 当前等级下最大的 enhance_level。
+        /// 数据库里取不到时退回 MainManager 缓存的全局上限，仍为 0 就保留场景里原有的值。
+        /// </summary>
+        private void ApplyBatchSliderLimits(List<unit_role_mastery_id> masteryDataList)
+        {
+            int slotLevelLimit = GetMaxSlotLevel(masteryDataList);
+            if (slotLevelLimit <= 0 && MainManager.Instance != null)
+                slotLevelLimit = MainManager.Instance.RoleMasterySlotLevelLimit;
+
+            if (roleLevelBatchSlider != null && slotLevelLimit > 0)
+            {
+                roleLevelBatchSlider.maxValue = slotLevelLimit;
+                if (roleLevelBatchSlider.value > slotLevelLimit)
+                    roleLevelBatchSlider.value = slotLevelLimit;
+                if (roleLevelBatchText != null)
+                    roleLevelBatchText.text = Mathf.RoundToInt(roleLevelBatchSlider.value).ToString();
+            }
+
+            ApplyStarBatchLimit();
+        }
+
+        /// <summary>星级（强化等级）滑块上限 = 当前等级下数据库里的最大 enhance_level。</summary>
+        private void ApplyStarBatchLimit()
+        {
+            if (roleStarBatchSlider == null)
+                return;
+
+            int slotLevel = roleLevelBatchSlider != null ? Mathf.RoundToInt(roleLevelBatchSlider.value) : 0;
+            int enhanceLevelLimit = slotLevel > 0 ? GetMaxEnhanceLevel(slotLevel) : 0;
+            if (enhanceLevelLimit <= 0 && MainManager.Instance != null)
+                enhanceLevelLimit = MainManager.Instance.RoleMasteryEnhanceLevelLimit;
+
+            if (enhanceLevelLimit <= 0)
+                return;
+
+            roleStarBatchSlider.maxValue = enhanceLevelLimit;
+            if (roleStarBatchSlider.value > enhanceLevelLimit)
+                roleStarBatchSlider.value = enhanceLevelLimit;
+            if (roleStarBatchText != null)
+                roleStarBatchText.text = Mathf.RoundToInt(roleStarBatchSlider.value).ToString();
+        }
+
+        private static int GetMaxSlotLevel(IEnumerable<unit_role_mastery_id> masteryDataList)
+        {
+            var dic = MainManager.Instance?.UnitRoleMasterySlotEnhanceDataDic;
+            if (dic == null || masteryDataList == null)
+                return 0;
+
+            int max = 0;
+            foreach (var data in masteryDataList)
+            {
+                if (data == null || !dic.TryGetValue(data.mastery_id, out var slotEnhance) || slotEnhance?.slot_level_info == null)
+                    continue;
+
+                foreach (var level in slotEnhance.slot_level_info.Keys)
+                    if (level > max) max = level;
+            }
+
+            return max;
+        }
+
+        private static int GetMaxEnhanceLevel(int slotLevel)
+        {
+            var dic = MainManager.Instance?.UnitRoleMasterySlotEnhanceDataDic;
+            if (dic == null || slotLevel <= 0)
+                return 0;
+
+            int max = 0;
+            foreach (var slotEnhance in dic.Values)
+            {
+                if (slotEnhance?.slot_level_info == null ||
+                    !slotEnhance.slot_level_info.TryGetValue(slotLevel, out var levelInfo) ||
+                    levelInfo?.enhance_level_info == null)
+                    continue;
+
+                foreach (var star in levelInfo.enhance_level_info.Keys)
+                    if (star > max) max = star;
+            }
+
+            return max;
+        }
+
+        /// <summary>把星级夹到该槽位在该等级下的数据库上限，避免批量设置越界。</summary>
+        private static int ClampStarToDatabase(int masteryId, int slotLevel, int star)
+        {
+            if (star <= 0 || slotLevel <= 0)
+                return 0;
+
+            var dic = MainManager.Instance?.UnitRoleMasterySlotEnhanceDataDic;
+            if (dic == null || !dic.TryGetValue(masteryId, out var slotEnhance) || slotEnhance?.slot_level_info == null)
+                return star;
+
+            if (!slotEnhance.slot_level_info.TryGetValue(slotLevel, out var levelInfo) ||
+                levelInfo?.enhance_level_info == null || levelInfo.enhance_level_info.Count == 0)
+                return 0;
+
+            return Mathf.Clamp(star, 0, levelInfo.enhance_level_info.Keys.Max());
+        }
+
         public void RoleSingleBatch()
         {
             // 获取当前滑块的值作为批量设置的等级和星级
@@ -140,7 +246,7 @@ namespace PCRCaculator
             foreach (var masteryData in masteryDataList)
             {
                 int masteryId = masteryData.mastery_id;
-                roleMastery[masteryId] = (batchLevel, batchStar);
+                roleMastery[masteryId] = (batchLevel, ClampStarToDatabase(masteryId, batchLevel, batchStar));
             }
 
             RefreshRoleSlotData();
@@ -157,7 +263,7 @@ namespace PCRCaculator
             foreach (var masteryData in UnitRoleMasteryIdDic.Values)
             {
                 int masteryId = masteryData.mastery_id;
-                roleMastery[masteryId] = (batchLevel, batchStar);
+                roleMastery[masteryId] = (batchLevel, ClampStarToDatabase(masteryId, batchLevel, batchStar));
             }
 
             RefreshRoleSlotData();
@@ -175,30 +281,9 @@ namespace PCRCaculator
 
         public void SaveRoleMastery(bool global = false)
         {
-            foreach (GameObject roleSlotPrefabObj in roleSlotPrefabs)
-            {
-                if (roleSlotPrefabObj == null) continue;
-
-                RoleSlotPrefab roleSlotUI = roleSlotPrefabObj.GetComponent<RoleSlotPrefab>();
-                if (roleSlotUI == null) continue;
-
-                int masteryId = roleSlotUI.MasteryId;
-                int slotLevel = roleSlotUI.roleSlotLevelSlider != null
-                    ? Mathf.RoundToInt(roleSlotUI.roleSlotLevelSlider.value) : 0;
-
-                if (roleMastery.ContainsKey(masteryId))
-                {
-                    roleMastery[masteryId] = (slotLevel, roleMastery[masteryId].enhanceLevel);
-                }
-                else
-                {
-                    roleMastery.Add(masteryId, (slotLevel, 0));
-                }
-            }
-
             if (global && MainManager.Instance?.PlayerSetting != null)
             {
-                MainManager.Instance.PlayerSetting.roleMastery = roleMastery;
+                MainManager.Instance.PlayerSetting.roleMastery = PlayerGroup.roleMastery;
             }
         }
 

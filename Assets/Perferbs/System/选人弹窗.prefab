@@ -63353,7 +63353,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 1
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -63386,8 +63386,8 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 5392821886617668872}
         m_TargetAssemblyTypeName: 
-        m_MethodName: AddButton_setting
-        m_Mode: 3
+        m_MethodName: AddConnectRankButton_setting
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -69900,7 +69900,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 1
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -69933,8 +69933,8 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 5392821886617668872}
         m_TargetAssemblyTypeName: 
-        m_MethodName: MinusButton_setting
-        m_Mode: 3
+        m_MethodName: MinusConnectRankButton_setting
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine

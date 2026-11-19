@@ -130,6 +130,11 @@ namespace Elements
         [JsonIgnore]
         public bool IsLifeStealEnabled { get; set; } = true;
         [JsonIgnore]
+        public Dictionary<UnitCtrl, double> AccumulatedTpRecovery { get; } = new Dictionary<UnitCtrl, double>();
+        [JsonIgnore]
+        public long AccumulatedLifeSteal { get; set; }
+        public bool UseAccumulatedDamage = true;
+        [JsonIgnore]
         public long AbsorberValue { get; set; }
         public int BonusId
         {
@@ -146,6 +151,8 @@ namespace Elements
         public void ReadySkill()
         {
             TotalDamage = 0;
+            AccumulatedTpRecovery.Clear();
+            AccumulatedLifeSteal = 0;
             DamagedPartsList.Clear();
             ProtectParts.Clear();
             for (int index1 = 0; index1 < SkillEffects.Count; ++index1)

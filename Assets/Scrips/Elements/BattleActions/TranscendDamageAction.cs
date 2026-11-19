@@ -13,20 +13,22 @@ namespace Elements
 
         public void StartTimer()
         {
-            Target.AppendCoroutine(updateTimer(), ePauseType.SYSTEM, Target);
+            Target.AppendCoroutine(updateTimer(), ePauseType.SYSTEM);
         }
 
         public DoubleWithEx CalcTranscendDamage(DoubleWithEx damage, DoubleWithEx totalDamage)
+            => CalcTranscendDamage(damage, totalDamage, TranscendRate, TranscendLimit);
+
+        internal static DoubleWithEx CalcTranscendDamage(
+            DoubleWithEx damage, DoubleWithEx totalDamage, double rate, double limit)
         {
-            if (totalDamage == 0.0)
-                return 0.0;
 
             DoubleWithEx ratio = totalDamage.Select(total =>
             {
                 if (total == 0.0)
                     return 0.0;
-                return Math.Min(TranscendRate * total, TranscendLimit) / total;
-            }, $"transcend:{TranscendRate}:{TranscendLimit}");
+                return Math.Min(rate * total, limit) / total;
+            }, $"transcend:{rate}:{limit}");
 
             return damage * ratio;
         }
@@ -39,14 +41,11 @@ namespace Elements
 
         private IEnumerator updateTimer()
         {
-            while (Timer > 0.0)
+            do
             {
-                if (Target == null || Target.IsDead || Target.IdleOnly)
-                    break;
-
-                Timer -= Target.DeltaTimeForPause;
                 yield return null;
-            }
+                Timer -= Target.DeltaTimeForPause;
+            } while (Timer >= 0.0 && !Target.IsDead && !Target.IdleOnly);
 
             Disable();
         }

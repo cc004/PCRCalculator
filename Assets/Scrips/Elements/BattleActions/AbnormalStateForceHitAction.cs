@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace Elements
@@ -21,8 +20,7 @@ namespace Elements
             Skill _skill,
             float _starttime,
             Dictionary<int, bool> _enabledChildAction,
-            ValueDictionary _valueDictionary,
-            Action<string> callBack = null)
+            ValueDictionary _valueDictionary)
         {
             base.ExecAction(
                 _source,
@@ -34,22 +32,17 @@ namespace Elements
                 _enabledChildAction,
                 _valueDictionary);
 
-            UnitCtrl targetOwner = _target.Owner;
-            eActionType forceHitActionType = (eActionType)ActionDetail1;
-            if (!targetOwner.AbnormalStateForceHitData.TryGetValue(forceHitActionType, out var forceHitIds))
-            {
-                forceHitIds = new List<int>();
-                targetOwner.AbnormalStateForceHitData.Add(forceHitActionType, forceHitIds);
-            }
-
+            var forceHitIds = new HashSet<int>();
             foreach (eValueNumber valueNumber in ForceHitIdValues)
             {
                 int forceHitId = BattleUtil.DoubleToInt(_valueDictionary[valueNumber]);
-                if (forceHitId != -1 && !forceHitIds.Contains(forceHitId))
+                if (forceHitId != -1)
                 {
                     forceHitIds.Add(forceHitId);
                 }
             }
+            _target.Owner.SetForceHit((eActionType)ActionDetail1, forceHitIds,
+                BattleUtil.DoubleToInt(_valueDictionary[eValueNumber.VALUE_1]));
         }
     }
 }

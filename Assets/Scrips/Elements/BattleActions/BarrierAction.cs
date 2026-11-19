@@ -30,7 +30,8 @@ namespace Elements
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             AppendIsAlreadyExeced(_target.Owner, _num);
-            var intReverseTruncate = BattleUtil.DoubleToLongReverseTruncate(_valueDictionary[eValueNumber.VALUE_1]);
+            var intReverseTruncate = _valueDictionary[eValueNumber.VALUE_1]
+                .Select(value => BattleUtil.DoubleToIntReverseTruncate(value), "护盾量取整");
             switch (ActionDetail1)
             {
                 case 1:

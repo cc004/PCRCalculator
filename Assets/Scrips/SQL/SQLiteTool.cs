@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Elements;
 using Mono.Data.Sqlite;
-using PCRApi.CN;
+using PCRCaculator.DataSources;
 using PCRCaculator.Guild;
 using UnityEngine.UIElements;
 using Debug = UnityEngine.Debug;
@@ -52,7 +52,7 @@ namespace PCRCaculator.SQL
             if (File.Exists(this.path))
                 Debug.Log($"使用数据库来源 {mgr.DataVer}.db: {this.path}");
             else
-                Debug.Log($"未找到{mgr.DataVer}.db，将自动下载存放至公共目录，如果是jp数据库需要反哈希，无法直接食用");
+                Debug.Log($"未找到{mgr.DataVer}.db，将自动下载到 {Path.Combine(ABExTool.persistentDataPath, mgr.DataVer + ".db")}" + (mgr.RequiresUnhash ? "（日服官方库需要反哈希）" : "（镜像库已反哈希，可直接使用）"));
 
             if (!File.Exists(this.path))
             {
@@ -68,7 +68,7 @@ namespace PCRCaculator.SQL
                     dbPath =
  Path.Combine(ABExTool.persistentDataPath, Path.GetFileNameWithoutExtension(path) + "_patch.db");
 #else
-                dbPath = Path.GetTempFileName();
+                dbPath = CreatePatchDatabasePath();
 #endif
                 File.Copy(path, dbPath, true);
 
@@ -119,6 +119,69 @@ namespace PCRCaculator.SQL
             ConnectDB(path, @readonly);
         }
 
+        /// <summary>
+        /// 为补丁数据库副本挑一个可写的临时路径。
+        /// 不用 Path.GetTempFileName()：部分机器的系统 TEMP 目录不可写（Access denied），会让启动直接失败。
+        /// </summary>
+        private static string CreatePatchDatabasePath()
+        {
+            string directory = null;
+            try
+            {
+                directory = Path.Combine(ABExTool.persistentDataPath, "patch-temp");
+                Directory.CreateDirectory(directory);
+                if (!Directory.Exists(directory))
+                    directory = null;
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"无法使用程序数据目录存放数据库补丁副本，改用系统临时目录: {e.GetType().Name}: {e.Message}");
+                directory = null;
+            }
+
+            if (directory != null)
+            {
+                CleanupStalePatchDatabases(directory);
+                return Path.Combine(directory, $"patch-{Guid.NewGuid():N}.db");
+            }
+
+            try
+            {
+                return Path.GetTempFileName();
+            }
+            catch (Exception e)
+            {
+                var fallback = Path.Combine(Directory.GetCurrentDirectory(), $"patch-{Guid.NewGuid():N}.db");
+                Debug.LogWarning($"系统临时目录同样不可写，改为写在程序目录 {fallback}: {e.GetType().Name}: {e.Message}");
+                return fallback;
+            }
+        }
+
+        private static void CleanupStalePatchDatabases(string directory)
+        {
+            try
+            {
+                var expired = DateTime.UtcNow.AddMinutes(-30);
+                foreach (var file in Directory.GetFiles(directory, "patch-*.db"))
+                {
+                    try
+                    {
+                        if (File.GetLastWriteTimeUtc(file) > expired)
+                            continue;
+                        File.Delete(file);
+                    }
+                    catch
+                    {
+                        // 可能是其它实例正在使用，忽略
+                    }
+                }
+            }
+            catch
+            {
+                // 清理失败不影响正常流程
+            }
+        }
+
         private void DownloadAndPrepareSourceDatabase(string destinationPath)
         {
             var directory = Path.GetDirectoryName(destinationPath);
@@ -132,7 +195,8 @@ namespace PCRCaculator.SQL
             {
                 File.WriteAllBytes(stagingPath, ResolveDatabaseBytes(DownloadProgress));
                 this.path = stagingPath;
-                Unhash();
+                if (mgr.RequiresUnhash)
+                    Unhash();
 
                 if (File.Exists(destinationPath))
                     throw new IOException($"数据库正式路径在发布前意外出现: {destinationPath}");
@@ -189,8 +253,8 @@ namespace PCRCaculator.SQL
             {
                 case PCRApi.AssetManager jp:
                     return jp.ResolveDatabase(progress);
-                case PCRApi.CN.AssetManager cn:
-                    return cn.ResolveDatabase(progress);
+                case JpDatabaseManager jpdb:
+                    return jpdb.ResolveDatabase(progress);
                 default:
                     return mgr.ResolveDatabase();
             }
@@ -741,6 +805,14 @@ namespace PCRCaculator.SQL
         public int PlayerProcessLimit { get; private set; }
         public int PlayerLevelLimit { get; private set; }
         public int UniqueEqLevelLimit { get; private set; }
+        /// <summary>属性强化（属性等级）每个元素的最高等级，来自 experience_talent_level。</summary>
+        public Dictionary<int, enemy_summon_monster> EnemySummonMonsterDic { get; private set; }
+
+        public int TalentLevelLimit { get; private set; }
+        /// <summary>职能精通槽位等级上限，来自 unit_role_mastery_slot_data.slot_level。</summary>
+        public int RoleMasterySlotLevelLimit { get; private set; }
+        /// <summary>职能精通强化（星级）等级上限，来自 unit_role_mastery_enhance_data.enhance_level。</summary>
+        public int RoleMasteryEnhanceLevelLimit { get; private set; }
         public Dictionary<int, unit_talent[]> TalentDic { get; private set; }
         public Dictionary<int, enemy_talent_weakness> EnemyTalentWeaknessDic { get; private set; }
         public Dictionary<int, talent_weakness> TalentWeaknessDic { get; private set; }
@@ -767,6 +839,9 @@ namespace PCRCaculator.SQL
         public Dictionary<int, MasterEnemyMParts.EnemyMParts> Dic7 { get; private set; }
         public Dictionary<int, ailment_data> AilmentDataDic { get; private set; }
         public Dictionary<int, int[]> resistDataDic { get; private set; }
+        public Dictionary<int, int[]> ResistVariationData { get; private set; }
+        public RecoveryAttenuation[] TpRecoveryAttenuation { get; private set; }
+        public RecoveryAttenuation[] LifeStealAttenuation { get; private set; }
         public Dictionary<int, EquipmentData> Dic8 { get; private set; }
         public Dictionary<int, unique_equip_enhance_rate[]> Dic9 { get; private set; }
         public Dictionary<int, unique_equip_enhance_rate[]> Dic92 { get; private set; }
@@ -806,6 +881,27 @@ namespace PCRCaculator.SQL
         public Dictionary<int, labyrinth_quest_data> LabyrinthQuestDataDic { get; private set; }
         public Dictionary<int, labyrinth_difficulty_effect> LabyrinthDifficultyEffectDic { get; private set; }
         public Dictionary<int, labyrinth_difficulty_enemy_data> LabyrinthDifficultyEnemyDataDic { get; private set; }
+        public EventBattleData EventBattles { get; private set; }
+        private EventBattleData ReadEventBattles()
+        {
+            return new EventBattleData
+            {
+                Hunt = GetOptionalDatas<hunt_quest_data>().ToDictionary(x => x.wave_group_id),
+                Invasion = GetOptionalDatas<invasion_quest_data>().ToDictionary(x => x.wave_group_id),
+                Waves = GetOptionalDatas<hunt_wave_group_data>().Cast<mirage_wave_group_data>()
+                    .Concat(GetOptionalDatas<invasion_wave_group_data>()).ToDictionary(x => x.wave_group_id),
+                Difficulties = GetOptionalDatas<invasion_boss_difficulty>().ToDictionary(x => x.quest_id, x => x.difficulty),
+                Environments = GetOptionalDatas<invasion_difficulty_enemy>().ToDictionary(x => x.difficulty),
+                Relics = GetOptionalDatas<invasion_relic>().Cast<labyrinth_relic>().ToDictionary(x => x.relic_id),
+                Groups = GetOptionalDatas<invasion_relic_effect_group>().Cast<labyrinth_relic_effect_group>().ToDictionary(x => x.effect_group_id),
+                Effects = GetOptionalDatas<invasion_relic_effect>().Cast<labyrinth_relic_effect>().ToDictionary(x => x.effect_id),
+                Marks = GetOptionalDatas<invasion_relic_mark_effect>().Cast<labyrinth_relic_mark_effect>()
+                    .GroupBy(x => x.relic_mark_id).ToDictionary(g => g.Key, g => g.ToList()),
+                Series = GetOptionalDatas<invasion_relic_mark_series>().ToDictionary(x => x.relic_mark_id, x => x.relic_mark_title),
+                ScheduleRelics = GetOptionalDatas<invasion_relic_schedule>().GroupBy(x => x.schedule_id)
+                    .ToDictionary(g => g.Key, g => g.Select(x => x.relic_id).OrderBy(id => id).ToList())
+            };
+        }
         public Dictionary<int, labyrinth_relic> LabyrinthRelicDic { get; private set; }
         public Dictionary<int, labyrinth_relic_effect_group> LabyrinthRelicEffectGroupDic { get; private set; }
         public Dictionary<int, labyrinth_relic_effect> LabyrinthRelicEffectDic { get; private set; }
@@ -843,6 +939,42 @@ namespace PCRCaculator.SQL
         {
             return Math.Max(0, enhancements
                 .Where(row => row != null && row.equip_slot == 1)
+                .Select(row => row.enhance_level)
+                .DefaultIfEmpty(0).Max());
+        }
+
+        /// <summary>属性等级上限 = experience_talent_level 里最大的 talent_level。</summary>
+        public static int CalculateTalentLevelLimit(IEnumerable<experience_talent_level> levels)
+        {
+            if (levels == null)
+                return 0;
+
+            return Math.Max(0, levels
+                .Where(row => row != null)
+                .Select(row => row.talent_level)
+                .DefaultIfEmpty(0).Max());
+        }
+
+        /// <summary>职能精通槽位等级上限。</summary>
+        public static int CalculateRoleMasterySlotLevelLimit(IEnumerable<unit_role_mastery_slot_data> slots)
+        {
+            if (slots == null)
+                return 0;
+
+            return Math.Max(0, slots
+                .Where(row => row != null)
+                .Select(row => row.slot_level)
+                .DefaultIfEmpty(0).Max());
+        }
+
+        /// <summary>职能精通强化（星级）等级上限。</summary>
+        public static int CalculateRoleMasteryEnhanceLevelLimit(IEnumerable<unit_role_mastery_enhance_data> enhances)
+        {
+            if (enhances == null)
+                return 0;
+
+            return Math.Max(0, enhances
+                .Where(row => row != null)
                 .Select(row => row.enhance_level)
                 .DefaultIfEmpty(0).Max());
         }
@@ -926,6 +1058,23 @@ namespace PCRCaculator.SQL
             var tasks = new List<Task>();
             tasks.Add(Task.Run(() => PlayerLevelLimit = CalculatePlayerLevelLimit(GetDatas<experience_team>())));
             tasks.Add(Task.Run(() => UniqueEqLevelLimit = CalculateUniqueEqLevelLimit(GetDatas<unique_equipment_enhance_data>())));
+            tasks.Add(Task.Run(() => TalentLevelLimit = CalculateTalentLevelLimit(GetOptionalDatas<experience_talent_level>())));
+            tasks.Add(Task.Run(() =>
+            {
+                var summonRows = GetOptionalDatas<enemy_summon_monster>();
+                var summonDic = new Dictionary<int, enemy_summon_monster>();
+                if (summonRows != null)
+                {
+                    foreach (var row in summonRows)
+                    {
+                        if (row == null || row.enemy_id <= 0) continue;
+                        if (!summonDic.ContainsKey(row.enemy_id)) summonDic[row.enemy_id] = row;
+                    }
+                }
+                EnemySummonMonsterDic = summonDic;
+            }));
+            tasks.Add(Task.Run(() => RoleMasterySlotLevelLimit = CalculateRoleMasterySlotLevelLimit(GetOptionalDatas<unit_role_mastery_slot_data>())));
+            tasks.Add(Task.Run(() => RoleMasteryEnhanceLevelLimit = CalculateRoleMasteryEnhanceLevelLimit(GetOptionalDatas<unit_role_mastery_enhance_data>())));
 
             tasks.Add(
                 DatabaseCacheContract.RunAfterSuccessAsync(
@@ -1080,6 +1229,7 @@ namespace PCRCaculator.SQL
                 Task.Run(() => eReductions = GetOptionalDatas<EReduction>().ToList()));
             tasks.Add(
                 Task.Run(() => rbs = GetOptionalDatas<promotion_bonus>()
+                    .Where(x => x.promotion_level > 0)
                     .GroupBy(x => x.unit_id)
                     .ToDictionary(g => g.Key, g => g.ToDictionary(x => x.promotion_level, x => x))));
             tasks.Add(
@@ -1153,6 +1303,7 @@ namespace PCRCaculator.SQL
                 Task.Run(() => LabyrinthDifficultyEnemyDataDic = GetOptionalDatasDic<labyrinth_difficulty_enemy_data>(a => a.difficulty)));
             tasks.Add(
                 Task.Run(() => LabyrinthDifficultyEffectDic = GetOptionalDatasDic<labyrinth_difficulty_effect>(a => a.id)));
+            tasks.Add(Task.Run(() => EventBattles = ReadEventBattles()));
             tasks.Add(
                 Task.Run(() => LabyrinthRelicDic = GetOptionalDatasDic<labyrinth_relic>(a => a.relic_id)));
             tasks.Add(
@@ -1187,6 +1338,12 @@ namespace PCRCaculator.SQL
 
             tasks.Add(Task.Run(() =>
             {
+                TpRecoveryAttenuation = GetOptionalDatas<tp_recovery_at>().OrderBy(row => row.limit_value).ToArray();
+                LifeStealAttenuation = GetOptionalDatas<hp_drain_at>().OrderBy(row => row.limit_value).ToArray();
+                ResistVariationData = GetOptionalDatas<resist_variation_data>()
+                    .ToDictionary(row => row.resist_variation_id,
+                        row => new[] { row.value_1, row.value_2, row.value_3, row.value_4 });
+
                 var enhanceLevel = GetOptionalDatas<ex_equipment_enhance_data>()
                     .GroupBy(x => x.rarity)
                     .ToDictionary(g => g.Key, g => g.Max(x => x.enhance_level));
@@ -1201,6 +1358,15 @@ namespace PCRCaculator.SQL
                 var subStatuses = subStatusesData != null ?
                     subStatusesData.GroupBy(x => x.group_id)
                     .ToDictionary(g => g.Key, g => g.ToDictionary(x => x.status, x => x.values)) : new Dictionary<int, Dictionary<int, int[]>>();
+
+                var exceedGroups = GetOptionalDatas<ex_equip_5_exceed_limit_group>()
+                    .ToDictionary(row => row.ex_equipment_id);
+                var exceedStatus = GetOptionalDatas<ex_equip_5_exceed_limit_status>()
+                    .GroupBy(row => row.status_group_id)
+                    .ToDictionary(group => group.Key, group => group.ToDictionary(row => row.rank));
+                var exceedSkills = GetOptionalDatas<ex_equip_5_exceed_limit_skill>()
+                    .GroupBy(row => row.group_id)
+                    .ToDictionary(group => group.Key, group => group.ToDictionary(row => row.rank, row => row.skill_id));
 
                 var categories = GetOptionalDatas<ex_equipment_data>()
                     // .Where(x => x.clan_battle_equip_flag)
@@ -1220,6 +1386,11 @@ namespace PCRCaculator.SQL
                                     }
                                 }
                             }
+                        }
+                        if (exceedGroups.TryGetValue(x.ex_equipment_id, out var exceed))
+                        {
+                            exceedStatus.TryGetValue(exceed.status_group_id, out x.exceedStatus);
+                            exceedSkills.TryGetValue(exceed.skill_group_id, out x.exceedSkills);
                         }
                         return x.SetEnhanceLevelMax(enhanceLevel[x.rarity]);
                     })
@@ -1445,7 +1616,8 @@ namespace PCRCaculator.SQL
             Dictionary<int, EnemyData> dic = new Dictionary<int, EnemyData>();
             //Dictionary<int, EnemyData> dic = new Dictionary<int, EnemyData>();
 
-            var list = GetDatas<enemy_parameter>(a => a.enemy_id >= 400000000 && a.enemy_id <= 620000000);
+            var list = GetDatas<enemy_parameter>(a => a.enemy_id >= 400000000 && a.enemy_id <= 620000000)
+                .Concat(GetOptionalDatas<hunt_enemy_parameter>()).Concat(GetOptionalDatas<invasion_enemy_parameter>());
             int idx = 0;
             foreach (var dd in list)
             {
@@ -1927,12 +2099,14 @@ namespace PCRCaculator.SQL
             dic = dic ?? GetDatasDic<unit_unique_equip>(x => x.equip_id);
 
             var basearr = GetDatasDic<unique_equipment_data>(x => x.equipment_id);
+            var specializations = GetOptionalDatas<ex_unique_equipment_1>().ToDictionary(row => row.equipment_id);
 
             return Combine(GetDatas<unique_equip_enhance_rate>(), GetDatas<unique_equipment_enhance_rate>())
                 .GroupBy(x => x.equipment_id)
                 .Where(x => dic.TryGetValue(x.Key, out var val) && val.equip_slot == 1)
                 .ToDictionary(x => dic[x.Key].unit_id, x => x.OrderBy(x => x.min_lv).Select(x =>
                 {
+                    specializations.TryGetValue(x.equipment_id, out x.specialization);
                     x.baseData = basearr[x.equipment_id];
                     return x;
                 }).ToArray());
@@ -2030,19 +2204,23 @@ namespace PCRCaculator.SQL
             Dictionary<int, List<((int, int)[], int)>> add_vals = new Dictionary<int, List<((int, int)[], int)>>();
             Dictionary<int, List<int>> ef_id = new Dictionary<int, List<int>>();
             var list = GetDatas<chara_story_status>();
-            var lovedict = GetDatas<story_detail>().ToDictionary(x => x.story_id, x => x.love_level);
+            var stories = GetDatasDic<story_detail>(story => story.story_id);
+            var lovedict = stories.ToDictionary(pair => pair.Key, pair => pair.Value.love_level);
             foreach (var dd in list)
             {
                 int storyid = dd.story_id;
-                if (!lovedict.ContainsKey(storyid)) continue;
+                if (!stories.TryGetValue(storyid, out var story)) continue;
                 int unitid = storyid / 1000 * 100 + 1;
                 if (!add_vals.ContainsKey(unitid))
                 {
                     add_vals.Add(unitid, new List<((int, int)[], int)>());
                     ef_id[unitid] = dd.GetCharIdList();
                 }
-                var li = dd.GetStatesValueList();
-                add_vals[unitid].Add((li, lovedict[storyid]));
+                // An empty release window marks an unavailable episode. Its unit still
+                // shares bond bonuses from the other costumes in the group.
+                if (!string.IsNullOrEmpty(story.start_time) && story.start_time == story.end_time)
+                    continue;
+                add_vals[unitid].Add((dd.GetStatesValueList(), story.love_level));
             }
             foreach (int id in add_vals.Keys)
             {
@@ -2264,7 +2442,10 @@ namespace PCRCaculator.SQL
             var result = new Dictionary<int, talentFormationData>();
             foreach (var kvp in overwriteDic)
             {
-                result[kvp.Key] = new talentFormationData(kvp.Value, bonusDic);
+                var formation = new talentFormationData(kvp.Value, bonusDic);
+                result[kvp.Key] = formation;
+                if ((kvp.Value.content_type == (int)eBattleCategory.INVASION_SINGLE || kvp.Value.content_type == (int)eBattleCategory.INVASION_TRIPLE || kvp.Value.content_type == (int)eBattleCategory.HUNT_QUEST) && kvp.Value.target_value_2 == 0)
+                    result[kvp.Value.target_value_1] = formation;
             }
             return result;
         }

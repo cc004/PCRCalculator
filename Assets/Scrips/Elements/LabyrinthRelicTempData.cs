@@ -74,16 +74,16 @@ namespace Elements
         public IReadOnlyDictionary<eParamType, long> CreatePassiveParameterDictionary(
             IEnumerable<int> relicIds,
             IEnumerable<PCRCaculator.UnitData> ownUnits,
-            int alphaRupee)
+            int alphaRupee, EventBattleData invasion = null)
         {
             var result = new Dictionary<eParamType, long>(new eParamType_DictComparer());
             var manager = MainManager.Instance;
             if (manager == null || relicIds == null)
                 return result;
 
-            var relicDictionary = manager.LabyrinthRelicDic;
-            var effectGroupDictionary = manager.LabyrinthRelicEffectGroupDic;
-            var effectDictionary = manager.LabyrinthRelicEffectDic;
+            var relicDictionary = invasion?.Relics ?? manager.LabyrinthRelicDic;
+            var effectGroupDictionary = invasion?.Groups ?? manager.LabyrinthRelicEffectGroupDic;
+            var effectDictionary = invasion?.Effects ?? manager.LabyrinthRelicEffectDic;
             if (relicDictionary == null || effectGroupDictionary == null || effectDictionary == null)
                 return result;
 
@@ -124,17 +124,17 @@ namespace Elements
             return result;
         }
 
-        public IReadOnlyList<LabyrinthRelicBattleSkillSpec> CreateBattleSkillSpecs(IEnumerable<int> relicIds)
+        public IReadOnlyList<LabyrinthRelicBattleSkillSpec> CreateBattleSkillSpecs(IEnumerable<int> relicIds, EventBattleData invasion = null)
         {
             var result = new List<LabyrinthRelicBattleSkillSpec>();
             var manager = MainManager.Instance;
             if (manager == null || relicIds == null)
                 return result;
 
-            var relicDictionary = manager.LabyrinthRelicDic;
-            var effectGroupDictionary = manager.LabyrinthRelicEffectGroupDic;
-            var effectDictionary = manager.LabyrinthRelicEffectDic;
-            var markEffectDictionary = manager.LabyrinthRelicMarkEffectDic;
+            var relicDictionary = invasion?.Relics ?? manager.LabyrinthRelicDic;
+            var effectGroupDictionary = invasion?.Groups ?? manager.LabyrinthRelicEffectGroupDic;
+            var effectDictionary = invasion?.Effects ?? manager.LabyrinthRelicEffectDic;
+            var markEffectDictionary = invasion?.Marks ?? manager.LabyrinthRelicMarkEffectDic;
             var relicSkillExecTimeDictionary = manager.RelicSkillExecTimeDic;
             if (relicDictionary == null ||
                 effectGroupDictionary == null ||
@@ -187,17 +187,17 @@ namespace Elements
             return result;
         }
 
-        public IReadOnlyDictionary<int, int> CreateRelicMarkCountDictionary(IEnumerable<int> relicIds)
+        public IReadOnlyDictionary<int, int> CreateRelicMarkCountDictionary(IEnumerable<int> relicIds, EventBattleData invasion = null)
         {
             var manager = MainManager.Instance;
-            if (manager == null || relicIds == null || manager.LabyrinthRelicDic == null)
+            if (manager == null || relicIds == null || (invasion?.Relics ?? manager.LabyrinthRelicDic) == null)
                 return new Dictionary<int, int>();
 
             var normalizedRelicIds = relicIds.Where(id => id > 0).ToList();
             if (normalizedRelicIds.Count == 0)
                 return new Dictionary<int, int>();
 
-            return CreateRelicMarkCounts(normalizedRelicIds, manager.LabyrinthRelicDic);
+            return CreateRelicMarkCounts(normalizedRelicIds, invasion?.Relics ?? manager.LabyrinthRelicDic);
         }
 
         private static void AddBattleSkillSpecs(
@@ -231,7 +231,7 @@ namespace Elements
                     effect.effect_id,
                     effect.effect_value_1,
                     effect.effect_value_2,
-                    execTimes.Select(x => (float)x.exec_time).ToList()));
+                    execTimes));
             }
         }
 
@@ -364,20 +364,20 @@ namespace Elements
         public int EffectId { get; }
         public int SkillId { get; }
         public int SkillLevel { get; }
-        public IReadOnlyList<float> ExecTimes { get; }
+        public IReadOnlyList<relic_skill_exec_time> Timings { get; }
 
         public LabyrinthRelicBattleSkillSpec(
             int effectGroupId,
             int effectId,
             int skillId,
             int skillLevel,
-            IReadOnlyList<float> execTimes)
+            IReadOnlyList<relic_skill_exec_time> timings)
         {
             EffectGroupId = effectGroupId;
             EffectId = effectId;
             SkillId = skillId;
             SkillLevel = skillLevel;
-            ExecTimes = execTimes ?? Array.Empty<float>();
+            Timings = timings ?? Array.Empty<relic_skill_exec_time>();
         }
     }
 
@@ -404,7 +404,7 @@ namespace Elements
             out LabyrinthRelicBattleSkillData skillData)
         {
             skillData = null;
-            if (unitController?.unitActionController == null || spec == null || spec.ExecTimes.Count == 0)
+            if (unitController?.unitActionController == null || spec == null || spec.Timings.Count == 0)
                 return false;
 
             var skill = unitController.unitActionController.CreateLabyrinthRelicSkill(
@@ -413,7 +413,8 @@ namespace Elements
             if (skill == null)
                 return false;
 
-            var sortedSkills = spec.ExecTimes
+            float limit = MyGameCtrl.Instance.tempData.SettingData?.limitTime ?? 90f;
+            var sortedSkills = spec.Timings.SelectMany(t => t.TimesUntil(limit))
                 .Select(execTime => (execTime, skill))
                 .OrderBy(x => x.execTime)
                 .ToList();

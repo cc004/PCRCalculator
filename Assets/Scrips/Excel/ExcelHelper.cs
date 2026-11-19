@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
@@ -226,6 +226,9 @@ namespace ExcelHelper
                                         : new int[] { 0, 0, 0 },
                                     exEquipLevel = t["exEquipLevel"]?.Values<string>() is { } levelValues && levelValues.Any()
                                         ? levelValues.Select(int.Parse).ToArray()
+                                        : new int[] { 0, 0, 0 },
+                                    exEquipExceedRank = t["exEquipExceedRank"]?.Values<int>() is { } exceedRanks && exceedRanks.Any()
+                                        ? exceedRanks.ToArray()
                                         : new int[] { 0, 0, 0 }
                                 };
                                 foreach (var key in unit.playLoveDic.Keys.ToArray())
@@ -845,17 +848,19 @@ namespace ExcelHelper
                 worksheet0.Cells[1, 12].Value = "v" + Application.version;
                 worksheet0.Cells[1, 15].Value = "TPlmt" + MainManager.Instance.PlayerSetting.maxTPUpValue;
                 worksheet0.Cells[2, 12, 2, 13].Merge = true;
-                worksheet0.Cells[2, 12].Value = "角色数据版本";
+                var versionSettings = MainManager.Instance.Version;
+                bool taiwanDatabase = versionSettings.JpDatabaseSource == (int)PCRCaculator.DataSources.JpDatabaseMirror.Taiwan;
+                worksheet0.Cells[2, 12].Value = taiwanDatabase ? "台服数据库版本" : "日服数据库版本";
                 worksheet0.Cells[2, 14, 2, 15].Merge = true;
-                worksheet0.Cells[2, 14].Value = MainManager.Instance.Version.CharacterVersionJP.ToString();
+                worksheet0.Cells[2, 14].Value = versionSettings.DatabaseVersion.ToString();
                 worksheet0.Cells[3, 12, 3, 13].Merge = true;
-                worksheet0.Cells[3, 12].Value = "Boss底层版本";
+                worksheet0.Cells[3, 12].Value = "数据库来源";
                 worksheet0.Cells[3, 14, 3, 15].Merge = true;
-                worksheet0.Cells[3, 14].Value = MainManager.Instance.Version.BossVersionJP.ToString();
+                worksheet0.Cells[3, 14].Value = MainManager.Instance.Version.JpDatabaseSource.ToString();
                 worksheet0.Cells[4, 12, 4, 13].Merge = true;
                 worksheet0.Cells[4, 12].Value = "Boss数据版本";
                 worksheet0.Cells[4, 14, 4, 15].Merge = true;
-                worksheet0.Cells[4, 14].Value = MainManager.Instance.Version.BossVersionCN.ToString();
+                worksheet0.Cells[4, 14].Value = versionSettings.DatabaseVersion.ToString();
                 worksheet0.Cells[5, 12, 5, 13].Merge = true;
                 worksheet0.Cells[5, 12].Value = "是否为QA版本";
                 worksheet0.Cells[5, 14, 5, 15].Merge = true;
@@ -863,7 +868,7 @@ namespace ExcelHelper
                 worksheet0.Cells[6, 12, 6, 13].Merge = true;
                 worksheet0.Cells[6, 12].Value = "使用日服Boss数据";
                 worksheet0.Cells[6, 14, 6, 15].Merge = true;
-                worksheet0.Cells[6, 14].Value = MainManager.Instance.Version.useJP? "‌✔" : "";
+                worksheet0.Cells[6, 14].Value = versionSettings.useJP && !taiwanDatabase ? "‌✔" : "";
                 worksheet0.Cells[7, 12, 7, 13].Merge = true;
                 worksheet0.Cells[7, 12].Value = "使用最新Boss数据";
                 worksheet0.Cells[7, 14, 7, 15].Merge = true;
@@ -891,6 +896,7 @@ namespace ExcelHelper
                 worksheet0.MySetValue(titleCurrentLineNum++, 2, "RANK", blod: true, backColor: backColotInt_2);
                 worksheet0.MySetValue(titleCurrentLineNum++, 2, "专1/专2", blod: true, backColor: backColotInt_2);
                 worksheet0.MySetValue(titleCurrentLineNum++, 2, "星级", blod: true, backColor: backColotInt_2);
+                worksheet0.MySetValue(titleCurrentLineNum++, 2, "连结RANK", blod: true, backColor: backColotInt_2);
                 worksheet0.MySetValue(titleCurrentLineNum++, 2, "武/防/饰", blod: true, backColor: backColotInt_2);
                 worksheet0.MySetValue(titleCurrentLineNum++, 2, "属性等级", blod: true, backColor: backColotInt_2);
                 worksheet0.MySetValue(titleCurrentLineNum, 2, "属性技能", blod: true, backColor: backColotInt_2);
@@ -928,11 +934,12 @@ namespace ExcelHelper
                     worksheet0.MySetValue(currentLineNum++, 7 - count, unitData.GetRankDescribe(), backColor: backColotInt_1);
                     worksheet0.MySetValue(currentLineNum++, 7 - count, unitData.GetUniqueEqsDescribe(), backColor: backColotInt_1);
                     worksheet0.MySetValue(currentLineNum++, 7 - count, unitData.rarity, backColor: backColotInt_1);
+                    worksheet0.MySetValue(currentLineNum++, 7 - count, unitData.connectRank, backColor: backColotInt_1);
                     worksheet0.MySetValue(currentLineNum++, 7 - count, unitData.GetExEquipDescribe(), backColor: backColotInt_1);
                     worksheet0.MySetValue(currentLineNum++, 7 - count, unitData.TalentLevelDescribe(), backColor: backColotInt_1);
                     if (!GuildManager.Instance.IsGuildBoss)
                     {
-                        currentLineNum = currentLineNum = MainManager.Instance.UnitRoleDataDic.Count > 0 ? 15:13;
+                        currentLineNum = titleCurrentLineNum - 1;
                         for (int i = 0; i < 3; i++)
                         {
                             worksheet0.Cells[currentLineNum + 1 + i * 3, 7 - count, currentLineNum + 3 + i * 3, 7 - count].Merge = true;
@@ -944,8 +951,7 @@ namespace ExcelHelper
                     count++;
                     currentLineNum = 5;
                 }
-                currentLineNum += MainManager.Instance.UnitRoleDataDic.Count > 0 ? 2 : 0;
-                currentLineNum += GuildManager.Instance.IsGuildBoss ? 9:18;
+                currentLineNum = titleCurrentLineNum + (GuildManager.Instance.IsGuildBoss ? 0 : 9);
                 worksheet0.Cells[3, 8, 3, 10].Merge = true;
                 worksheet0.MySetValue(3, 8, "备注", blod: true, backColor: backColotInt_2);
                 worksheet0.Cells[4, 8, currentLineNum - 1, 10].Merge = true;
@@ -1005,7 +1011,7 @@ namespace ExcelHelper
                     {
                         while (curline < UBList.Count && UBList[curline].UBTime < time) ++curline;
                         foreach (var (cont, i) in content.Select((cont, i) => (cont, i)))
-                            worksheet0.MySetValue(14 + curline, 14 + i, cont, centre:false);
+                            worksheet0.MySetValue(currentLineNum + curline, 14 + i, cont, centre:false);
                         ++curline;
                     }
 
@@ -1023,7 +1029,7 @@ namespace ExcelHelper
                     {
                         while (curline < UBList.Count && UBList[curline].UBTime < lframe) ++curline;
                         foreach (var (cont, i) in content.Select((cont, i) => (cont, i)))
-                            worksheet0.MySetValue(17 + curline, 12 + i, cont, centre:false);
+                            worksheet0.MySetValue(currentLineNum + curline, 12 + i, cont, centre:false);
                         ++curline;
                     }
 
@@ -1079,11 +1085,12 @@ namespace ExcelHelper
 
                 // 添加一个sheet
                 ExcelWorksheet worksheet1 = package.Workbook.Worksheets.Add("基础数据");
-                string[] HeadNames = new string[25]
+                string[] HeadNames = new string[]
                 {
                     "角色ID","角色名字","角色等级","角色星级","好感度","Rank",
                     "左上", "右上", "左中","右中","左下","右下",
-                "UB","技能1","技能2","EX技能","专武1","专武2","EX武器","EX武器等级","EX防具","EX防具等级","EX首饰","EX首饰等级","高级设置"};
+                "UB","技能1","技能2","EX技能","专武1","专武2","EX武器","EX武器等级","EX防具","EX防具等级","EX首饰","EX首饰等级","高级设置",
+                    "EX武器超越炼醒","EX防具超越炼醒","EX首饰超越炼醒","连结RANK"};
                 worksheet1.Cells[1, 1, 1, HeadNames.Length].Merge = true;//合并单元格(1行1列到1行6列)
                 worksheet1.Cells["A1"].Style.Font.Size = 16; //字体大小
                 worksheet1.Cells["A1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center; //对其方式
@@ -1102,6 +1109,7 @@ namespace ExcelHelper
                     worksheet1.Cells[lineNum, 4].Value = unitData.rarity;
                     worksheet1.Cells[lineNum, 5].Value = unitData.playLoveDic[unitData.unitId];//unitData.love;
                     worksheet1.Cells[lineNum, 6].Value = unitData.rank;
+                    worksheet1.Cells[lineNum, 29].Value = unitData.connectRank;
                     for(int i = 0; i < unitData.equipLevel.Length; i++)
                     {
                         if(unitData.equipLevel[i] == -1)
@@ -1119,6 +1127,7 @@ namespace ExcelHelper
                     {
                         worksheet1.Cells[lineNum, 19 + i * 2].Value = unitData.exEquip[i];
                         worksheet1.Cells[lineNum, 19 + i * 2 + 1].Value = unitData.exEquipLevel[i];
+                        worksheet1.Cells[lineNum, 26 + i].Value = unitData.ExceedRank(i);
                     }
                     if (unitData.playLoveDic != null)
                     {

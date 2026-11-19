@@ -309,7 +309,7 @@ curl --fail-with-body \
 - `TpChangeEvents` 包含变化前后 TP、请求增量、实际增量、溢出量和是否跨过 UB 就绪阈值。角色槽位索引为 `0..4`，无法绑定时使用 `-1`。
 - 玩家伤害、TP、UB 等数组按响应 `PlayerList` 对齐。`UBTime` 使用帧单位，可含同帧顺序小数。
 
-当前 .NET server 以 `DONT_USE_EX` 编译，`Stats.TotalDamage`、`OnceResult.currentDamage` 为实战采样伤害，`OnceResult.exceptDamage` 读取的期望类型在此模式下也退化为采样值。`ScorePhysicsExpectation`、`ScoreMagicExpectation` 累计的是逐帧攻防评分。当前版本的普通 `/simulate` 尚未实现用于计算独立蓝字期望的 `UseExpectedDamage` 和 `Stats.ExpectedTotalDamage` 字段。五种子均值的处理见第 5 节。
+`Stats.TotalDamage` 和 `OnceResult.currentDamage` 返回本场种子的实战伤害。读取界面蓝字期望伤害时，请在 `/simulate` 请求中设置 `NeedOnceResult=true`，读取 `OnceResult.exceptDamage`。此值沿用本场时间轴，对每击的暴击结果加权，并独立结算护盾吸收。单击涉及超过 12 个独立暴击判定时使用近似期望。`ScorePhysicsExpectation` 和 `ScoreMagicExpectation` 累计逐帧攻防评分。五种子均值的处理见第 5 节。
 
 开关和输出映射见 [BattleStatistics.cs](../Assets/Scrips/Elements/Battle/BattleStatistics.cs)。
 
@@ -363,7 +363,7 @@ curl --fail-with-body \
 | ---: | --- | --- |
 | 0 | None | `OptimizationFitness=null` |
 | 1 | RealDamage | 获胜时为剩余秒数乘 `1,000,000,000` 后转 `long`，其他结果使用实战伤害 |
-| 2 | ExpectedDamage | 当前 .NET 类型退化为实战伤害；获胜评分同目标 1 |
+| 2 | ExpectedDamage | 获胜评分同目标 1，其他结果使用本场期望伤害 |
 | 3 | PhysicalAttack | 战斗结束时攻击力与 TP 上升门槛相关评分 |
 | 4 | MagicAttack | 战斗结束时魔法攻击力与 TP 上升门槛相关评分 |
 

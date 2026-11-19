@@ -7,6 +7,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Elements.Battle;
+using PCRCaculator.SQL;
 using Spine;
 using UnityEngine;
 
@@ -43,7 +44,7 @@ namespace Elements
       eUnitRespawnPos _basePos = (eUnitRespawnPos) Mathf.Min(9, Mathf.Max(0, (int) (_source.RespawnPos + (int) _valueDictionary[eValueNumber.VALUE_2])));
       UnitCtrl unitCtrl = battleManager.Summon(new SummonData
       {
-        SummonId = ActionDetail2,
+        SummonId = GetSummonEnemyId(_source),
         TargetPosition = _target.GetLocalPosition() + new Vector3((float)((_source.IsLeftDir || _source.IsForceLeftDir ? -1f : 1f) * _valueDictionary[eValueNumber.VALUE_7]), 0.0f),
         Owner = _source,
         Skill = _skill,
@@ -120,6 +121,26 @@ namespace Elements
     {
       OURS = 1,
       OTHER = 2,
+    }
+
+    /// <summary>
+    /// 对应官方 SummonAction.GetSummonEnemyId：
+    /// 敌人召唤表按当前关卡的 enemy_parameter.enemy_id 区分同一模型的不同难度。
+    /// 表里查不到时返回 0（官方同样返回 0）。
+    /// </summary>
+    public int GetSummonEnemyId(UnitCtrl _owner)
+    {
+      if (ActionDetail1 != 4 || _owner == null)
+      {
+        return ActionDetail2;
+      }
+      var summonMonsterDic = PCRCaculator.MainManager.Instance != null ? PCRCaculator.MainManager.Instance.EnemySummonMonsterDic : null;
+      enemy_summon_monster summonMonster;
+      if (summonMonsterDic == null || !summonMonsterDic.TryGetValue(_owner.enemyId, out summonMonster) || summonMonster == null)
+      {
+        return 0;
+      }
+      return summonMonster.GetChildUnitId(ActionDetail2);
     }
 
     public enum eSummonType

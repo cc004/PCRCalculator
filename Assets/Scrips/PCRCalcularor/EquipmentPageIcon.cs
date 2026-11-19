@@ -49,7 +49,7 @@ namespace PCRCaculator
             //     numText.gameObject.SetActive(false);
             // }
         }
-        public void SetExEquipmentIcon(int unitId, int equipmentid, int exlevel, int[] exEquipSubs, int j = 0)
+        public void SetExEquipmentIcon(int unitId, int equipmentid, int exlevel, int[] exEquipSubs, int j = 0, int exceedRank = 0)
         {
             Sprite loadedSprite = ABExTool.GetSprites(ABExTool.SpriteType.EX装备, equipmentid);
             if (loadedSprite != null)
@@ -76,7 +76,7 @@ namespace PCRCaculator
                             var mergedStatus = new Dictionary<eParamType, int>();
 
                             // 遍历每个属性对（类型和等级）
-                            for (int k = 0; k < exEquipSubs.Length; k += 2)
+                            for (int k = 0; k + 1 < exEquipSubs.Length; k += 2)
                             {
                                 int statusIndex = exEquipSubs[k];     // 状态类型索引
                                 int statusLevel = exEquipSubs[k + 1]; // 状态等级
@@ -197,6 +197,18 @@ namespace PCRCaculator
                 {
                     text.gameObject.SetActive(false);
                 }
+            }
+            if (equipmentid > 0 && exceedRank > 0 && subText.Count > 0)
+            {
+                var last = subText.LastOrDefault(t => t.gameObject.activeSelf);
+                var label = last ?? subText[0];
+                label.text = last != null ? $"{label.text}/星{exceedRank}" : $"星{exceedRank}";
+#if UNITY_5_3_OR_NEWER
+                label.resizeTextForBestFit = true;
+                label.resizeTextMinSize = 1;
+                label.resizeTextMaxSize = label.fontSize;
+#endif
+                label.gameObject.SetActive(true);
             }
         }
     }

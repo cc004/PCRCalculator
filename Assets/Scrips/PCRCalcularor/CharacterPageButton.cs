@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -308,11 +308,44 @@ namespace PCRCaculator
             owner2.NoSkipOnChangeAbnormalState += (a, b, c, d, e) => SetAbnormalIcons(a, b, c, d, e);
             owner2.button = this;
             SetHPAndTP(1, 0);
-            skillUI.Init(unitCtrl.unitParameter.SkillData.MainSkillIds.ToArray(),unitCtrl.unitParameter.SkillData.main_skill_evolution_1, unitCtrl.unitParameter.SkillData.main_skill_evolution_2);
-            skillUI.Init(unitCtrl.unitParameter.SkillData.SpSkillIds.ToArray(), unitCtrl.unitParameter.SkillData.sp_skill_evolution_1, unitCtrl.unitParameter.SkillData.sp_skill_evolution_2);
+            var unitSkillData = unitCtrl.unitParameter.SkillData;
+            skillUI.Init(BuildSkillIconIds(unitSkillData.MainSkillIds, unitSkillData.main_skill_evolution_1, unitSkillData.main_skill_evolution_2, unitSkillData.MainSkillRevolutionIdList));
+            skillUI.Init(BuildSkillIconIds(unitSkillData.SpSkillIds, unitSkillData.sp_skill_evolution_1, unitSkillData.sp_skill_evolution_2, unitSkillData.SpecialSkillRevolutionIdList));
             owner2.NoSkipOnChangeSkillID += skillUI.SetSkillState;
             owner2.NoSkipOnSkillCD += skillUI.SetCastTime;
             owner2.NoSkipOnUsingSkill += skillUI.SetPlayTime;
+        }
+
+        /// <summary>
+        /// 汇总一个技能槽位可能出现的全部技能 id：基础技能 + 技能进化（+）+ 技能革命（++）。
+        /// 技能革命档（比如 1084022）以前没被预装，战斗里切换到该档时技能图标 UI 会抛 KeyNotFoundException。
+        /// </summary>
+        private static List<int> BuildSkillIconIds(IEnumerable<int> skillIds, int evolution1, int evolution2, IEnumerable<int> revolutionIds)
+        {
+            var result = new List<int>();
+
+            void Add(int skillId)
+            {
+                if (skillId > 0 && !result.Contains(skillId))
+                    result.Add(skillId);
+            }
+
+            if (skillIds != null)
+            {
+                foreach (int skillId in skillIds)
+                    Add(skillId);
+            }
+
+            Add(evolution1);
+            Add(evolution2);
+
+            if (revolutionIds != null)
+            {
+                foreach (int skillId in revolutionIds)
+                    Add(skillId);
+            }
+
+            return result;
         }
 
         public void SetHPAndTP(float normalizedHPRate,float normalizedTPRate)

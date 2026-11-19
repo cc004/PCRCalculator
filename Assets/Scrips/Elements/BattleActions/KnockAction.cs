@@ -20,6 +20,14 @@ namespace Elements
 
         public Dictionary<int, List<UnitCtrl>> DisableKnockBackUnitList { get; set; }
 
+        // 官方 KnockAction.ReadyAction（RVA 0x38694A0）：调用基类 ReadyAction 后，若 unitListForSort 非空则 List<T>.Clear（0x4E85EE0）
+        public override void ReadyAction(UnitCtrl _source, UnitActionController _sourceActionController, Skill _skill)
+        {
+            base.ReadyAction(_source, _sourceActionController, _skill);
+            if (unitListForSort != null)
+                unitListForSort.Clear();
+        }
+
         public override void ExecAction(
           UnitCtrl _source,
           BasePartsData _target,

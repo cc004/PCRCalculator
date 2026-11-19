@@ -327,7 +327,7 @@ namespace Elements.Battle
 
         public float BattleLeftTime { get; set; }
 
-        public int GetMiliLimitTime() => (int)(BattleLeftTime * 1000.0);
+        public int GetMiliLimitTime() => (int)(BattleLeftTime * 1000f);
 
         public int CurrentWave { get; set; }
 
@@ -1432,14 +1432,10 @@ namespace Elements.Battle
             {
                 if (!t.IsPlaying)
                 {
-                    if (t.updatePositionRunning)
+                    // 日服在弹道停止播放后即可复用，旧移动协程可能还在本帧收尾。
+                    if (t.updatePositionRunning && enableFirearmBug && !skipping)
                     {
-                        if (enableFirearmBug)
-                        {
-                            if (!skipping)
-                                UnityEngine.Debug.LogError($"[{BattleHeaderController.CurrentFrameCount}] 检测到弹道BUG {t.owner.UnitName} => {source.UnitName} {name}@{t.GetHashCode():x}");
-                        }
-                        else continue;
+                        UnityEngine.Debug.Log($"[{BattleHeaderController.CurrentFrameCount}] 复用弹道 {t.owner.UnitName} => {source.UnitName} {name}@{t.GetHashCode():x}");
                     }
                     t.ResetParam();
 
@@ -4015,7 +4011,7 @@ namespace Elements.Battle
             //this.BattleCategory = this.tempData.PHDACAOAOMA.CLCOKFOINCL;
             DodgeTPRecoverRatio = MainManager.Instance.GetDodgeTPRecoveryRatio();
 
-            BattleCategory = eBattleCategory.ARENA;//设定战斗系统为JJC
+            BattleCategory = eBattleCategory.ARENA;
                                                         //this.battleProcessor = this.createBattleProcessor(PPNELKAAIKP);
                                                         //this.battleEffectPool.BACHGMADMKC = this.battleProcessor.GetForceNormalSD();
                                                         //this.FICLPNJNOEP = this.battleProcessor.GetEnemyPoint();
@@ -4806,6 +4802,7 @@ namespace Elements.Battle
             allStandByDone = false;
             BattleManager battleManager = this;
             tempData = gameCtrl.tempData;
+            BattleCategory = MainManager.Instance.databaseCache.EventBattles.Category(tempData.waveGroupId);
             skipping = tempData.skipping;
 #if UNITY_5_3_OR_NEWER
             // 资源准备放到线程池上并发跑，主线程只轮询进度：不会再把整个战斗启动卡住。
@@ -6232,6 +6229,7 @@ namespace Elements.Battle
                     }
 
                     unitData_my = enemyData.CreateUnitData();
+                    unitCtrl.enemyId = enemyData.enemy_id;
                     parameter = TempData.CreateUnitParameter(enemyData, GuildPlayerGroupData.LogBarrierType.FullBarrier);
                 }
                 else
@@ -6258,13 +6256,14 @@ namespace Elements.Battle
                         MainManager.Instance.UnitRarityDic[_summonData.Owner.unitData.PrefabId].GetEXSkillValue(unitData_my) :
                         new BaseData()
                         // MainManager.Instance.UnitRarityDic[_summonData.Owner.UnitId].GetEXSkillValueNoEv(unitData_my)
-                    ) : null,
+                    ) : new BaseData(),
                     labyrinthEnhanceParameter: !flag ? MyGameCtrl.Instance.tempData.LabyrinthEnhanceParameter : null,
                     labyrinthRelicPassiveParameter: !flag ? MyGameCtrl.Instance.tempData.LabyrinthRelicPassiveParameter : null,
                     summonType: _summonData.SummonType);
             _this.semanubmanager.ObserveEnemyUnit(unitCtrl);
                 if (!flag)
                     unitCtrl.SetTalentFormationBonus(_this.UnitTalentFormationBonusDictionary);
+                unitCtrl.SetConnectRankStatus(_summonData.Owner.UnitParameter, _this.tempData.ConnectRankSystemId);
                 unitCtrl.ApplyPassiveSkill(true, _summonData.ConsiderEquipmentAndBonus);
 
                 // this logic maybe in unitCtrl Initialize

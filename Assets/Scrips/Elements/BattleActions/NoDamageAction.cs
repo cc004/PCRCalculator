@@ -15,6 +15,10 @@ namespace Elements
                 UnitCtrl.eAbnormalState.PHYSICS_DODGE
             },
             {
+                eNoDamageType.MAGIC_DODGE,
+                UnitCtrl.eAbnormalState.MAGIC_DODGE
+            },
+            {
                 eNoDamageType.ABNORMAL,
                 UnitCtrl.eAbnormalState.NO_ABNORMAL
             },
@@ -68,6 +72,7 @@ namespace Elements
             {
                 case eNoDamageType.NO_DAMAGE:
                 case eNoDamageType.PHYSICS_DODGE:
+                case eNoDamageType.MAGIC_DODGE:
                 case eNoDamageType.ABNORMAL:
                 case eNoDamageType.DEBUFF:
                 case eNoDamageType.BREAK_POINT:
@@ -101,7 +106,9 @@ namespace Elements
             [System.ComponentModel.Description("BREAK免疫")]
             BREAK_POINT = 6,
             [System.ComponentModel.Description("无敌2")]
-            NO_DAMAGE2
+            NO_DAMAGE2,
+            [System.ComponentModel.Description("魔法闪避")]
+            MAGIC_DODGE = 8
 
         }
     }

@@ -112,7 +112,7 @@ namespace PCRCalculatorServer
                         onceResult = new OnceResultData
                         {
                             id = 0,
-                            exceptDamage = GuildCalculator.Instance.totalDamageExcept.Expect,
+                            exceptDamage = GuildCalculator.Instance.GetTotalDamageExpect(),
                             criticalEX = GuildCalculator.Instance.totalDamageCriEX,
                             currentDamage = totalDamage,
                             randomSeed = MyGameCtrl.Instance.CurrentSeedForSave,

@@ -158,7 +158,7 @@ namespace Elements
 		// RVA: 0x30DE8DC Offset: 0x30DE8DC VA: 0x30DE8DC
 		private bool judgeSilenceOrToad(UnitCtrl _unitCtrl)
 		{
-			return _unitCtrl.IsAbnormalState(UnitCtrl.eAbnormalState.SILENCE) || _unitCtrl.ToadDatas.Count > 0;
+			return _unitCtrl.IsSilencedOrBerserk || _unitCtrl.ToadDatas.Count > 0;
 		}
 
 	}

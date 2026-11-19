@@ -586,6 +586,19 @@ namespace PCRCaculator.SQL
         public int team_level { get; set; }
     }
 
+    /// <summary>
+    /// 属性等级经验表：talent_level 即属性强化里每个元素的最高可设置等级。
+    /// （该表还包含一列列名为 sha256 的字段，sqlite-net 按类字段名取列，多余列会被忽略。）
+    /// </summary>
+    public class experience_talent_level
+    {
+        [PrimaryKey]
+        public int talent_level { get; set; }
+        public int total_point { get; set; }
+        public int consume_num { get; set; }
+        public int total_enhance_value { get; set; }
+    }
+
     public class equipment_data : DbBaseData
     {
         [PrimaryKey]
@@ -608,6 +621,48 @@ namespace PCRCaculator.SQL
         public string equipment_name { get; set; }
         public string description { get; set; }
         public int promotion_level { get; set; }
+    }
+
+    /// <summary>敌人召唤表：enemy_id → 5 个候选子单位（SummonAction detail_1 == 4 时用 detail_2 取）。</summary>
+    public class enemy_summon_monster : DbBaseData
+    {
+        public int enemy_id { get; set; }
+        public int child_enemy_parameter_1 { get; set; }
+        public int child_enemy_parameter_2 { get; set; }
+        public int child_enemy_parameter_3 { get; set; }
+        public int child_enemy_parameter_4 { get; set; }
+        public int child_enemy_parameter_5 { get; set; }
+
+        public int GetChildUnitId(int _index)
+        {
+            switch (_index)
+            {
+                case 1: return child_enemy_parameter_1;
+                case 2: return child_enemy_parameter_2;
+                case 3: return child_enemy_parameter_3;
+                case 4: return child_enemy_parameter_4;
+                case 5: return child_enemy_parameter_5;
+                default: return 0;
+            }
+        }
+    }
+
+    public class RecoveryAttenuation
+    {
+        public int limit_value { get; set; }
+        public double correction_value { get; set; }
+    }
+
+    public class tp_recovery_at : RecoveryAttenuation { }
+    public class hp_drain_at : RecoveryAttenuation { }
+
+    public class resist_variation_data
+    {
+        public int resist_variation_id { get; set; }
+        public int value_1 { get; set; }
+        public int value_2 { get; set; }
+        public int value_3 { get; set; }
+        public int value_4 { get; set; }
     }
 
     public class promotion_bonus : DbBaseData
@@ -712,6 +767,8 @@ namespace PCRCaculator.SQL
     }
     public class story_detail
     {
+        public string start_time { get; set; }
+        public string end_time { get; set; }
         public int story_id { get; set; }
         public int love_level { get; set; }
     }
@@ -795,6 +852,33 @@ namespace PCRCaculator.SQL
         public int sale_price { get; set; }
         public int require_level { get; set; }
     }
+    public class ex_unique_equipment_1
+    {
+        [PrimaryKey]
+        public int equipment_id { get; set; }
+        public int hp { get; set; }
+        public int attack { get; set; }
+        public int defense { get; set; }
+        public int magic_attack { get; set; }
+        public int magic_defense { get; set; }
+        public int critical { get; set; }
+        public int magic_critical { get; set; }
+        public int dodge { get; set; }
+        public int life_steal { get; set; }
+        public int wave_hp_recovery { get; set; }
+        public int wave_energy_recovery { get; set; }
+        public int penetration { get; set; }
+        public int magic_penetration { get; set; }
+        public int energy_recovery_rate { get; set; }
+        public int hp_recovery_rate { get; set; }
+        public int energy_reduce_rate { get; set; }
+        public int accuracy { get; set; }
+
+        public BaseData GetBaseData() => new BaseData(hp, attack, defense, magic_attack, magic_defense,
+            critical, magic_critical, dodge, life_steal, wave_hp_recovery, wave_energy_recovery,
+            penetration, magic_penetration, energy_recovery_rate, hp_recovery_rate, energy_reduce_rate, accuracy);
+    }
+
     public class unique_equipment_enhance_data
     {
         [PrimaryKey]
@@ -821,6 +905,7 @@ namespace PCRCaculator.SQL
     public class unique_equip_enhance_rate : DbBaseData
     {
         public unique_equipment_data baseData;
+        public ex_unique_equipment_1 specialization;
         public virtual int min_lv { get; set; }
         public virtual int max_lv { get; set; }
         public int equipment_id { get; set; }
@@ -1363,10 +1448,81 @@ namespace PCRCaculator.SQL
         }
     }
 
+    public class hunt_enemy_parameter : enemy_parameter { }
+    public class invasion_enemy_parameter : enemy_parameter { }
+    public class hunt_wave_group_data : mirage_wave_group_data { }
+    public class invasion_wave_group_data : mirage_wave_group_data { }
+    public class invasion_difficulty_enemy : labyrinth_difficulty_enemy_data { }
+    public class invasion_relic : labyrinth_relic { }
+    public class invasion_relic_effect : labyrinth_relic_effect { }
+    public class invasion_relic_effect_group : labyrinth_relic_effect_group { }
+    public class invasion_relic_mark_effect : labyrinth_relic_mark_effect { }
+
+    public class EventQuest
+    {
+        public int quest_id { get; set; }
+        public int schedule_id { get; set; }
+        public int wave_group_id { get; set; }
+        public string quest_name { get; set; }
+        public int limit_time { get; set; }
+    }
+    public class hunt_quest_data : EventQuest { }
+    public class invasion_quest_data : EventQuest { public int quest_type { get; set; } }
+    public class invasion_boss_difficulty
+    {
+        public int quest_id { get; set; }
+        public int difficulty { get; set; }
+    }
+    public class invasion_relic_schedule
+    {
+        public int schedule_id { get; set; }
+        public int relic_id { get; set; }
+    }
+    public class invasion_relic_mark_series
+    {
+        public int relic_mark_id { get; set; }
+        public string relic_mark_title { get; set; }
+    }
+
+    public class EventBattleData
+    {
+        public Dictionary<int, hunt_quest_data> Hunt = new();
+        public Dictionary<int, invasion_quest_data> Invasion = new();
+        public Dictionary<int, mirage_wave_group_data> Waves = new();
+        public Dictionary<int, int> Difficulties = new();
+        public Dictionary<int, invasion_difficulty_enemy> Environments = new();
+        public Dictionary<int, labyrinth_relic> Relics = new();
+        public Dictionary<int, labyrinth_relic_effect_group> Groups = new();
+        public Dictionary<int, labyrinth_relic_effect> Effects = new();
+        public Dictionary<int, List<labyrinth_relic_mark_effect>> Marks = new();
+        public Dictionary<int, List<int>> ScheduleRelics = new();
+        public Dictionary<int, string> Series = new();
+
+        public eBattleCategory Category(int wave)
+        {
+            if (Hunt.ContainsKey(wave)) return eBattleCategory.HUNT_QUEST;
+            if (Invasion.TryGetValue(wave, out var quest))
+                return quest.quest_type == 2 ? eBattleCategory.INVASION_TRIPLE : eBattleCategory.INVASION_SINGLE;
+            return eBattleCategory.ARENA;
+        }
+
+        public List<labyrinth_relic> SelectRelicsForSchedule(int scheduleId) =>
+            ScheduleRelics.TryGetValue(scheduleId, out var ids)
+                ? ids.Where(Relics.ContainsKey).Select(id => Relics[id]).ToList() : new List<labyrinth_relic>();
+
+        public List<int> SelectRelics(int scheduleId, IEnumerable<int> ids)
+        {
+            if (ids == null || !ScheduleRelics.TryGetValue(scheduleId, out var available))
+                return new List<int>();
+            return ids.Where(id => available.Contains(id) && Relics.ContainsKey(id)).Distinct().Take(5).ToList();
+        }
+    }
+
     public class labyrinth_relic
     {
         [PrimaryKey]
         public int relic_id { get; set; }
+        public int rarity { get; set; }
         public string name { get; set; }
         public string effect_description { get; set; }
         public int effect_group_id { get; set; }
@@ -1431,6 +1587,20 @@ namespace PCRCaculator.SQL
         public int id { get; set; }
         public int skill_id { get; set; }
         public double exec_time { get; set; }
+        public int repeat_count { get; set; }
+        public double repeat_interval { get; set; }
+
+        public IEnumerable<float> TimesUntil(float limit)
+        {
+            yield return (float)exec_time;
+            if (repeat_interval <= 0) yield break;
+            for (int n = 1; repeat_count < 0 || n <= repeat_count; n++)
+            {
+                double time = exec_time + n * repeat_interval;
+                if (time > limit) yield break;
+                yield return (float)time;
+            }
+        }
     }
 
     public class unit_role_mastery_id : DbBaseData

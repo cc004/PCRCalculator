@@ -31,6 +31,30 @@ namespace Elements
         public bool ShowsIcon = true;
         public bool TriggerCall = true;
 
+        /// <summary>
+        /// 官方 Elements.ChangeParameterFieldData.isEffectBossBodyOnly()（RVA 0x37F0B80）：
+        /// 只对 BOSS 本体生效的状态类型集合 = BuffParamKind {8,10,11,12,14,15,16,17,18}。
+        /// 反汇编为连续的 cmp [this+0x80], N / je，命中即 return true。
+        /// </summary>
+        public bool isEffectBossBodyOnly()
+        {
+            switch (BuffParamKind)
+            {
+                case UnitCtrl.BuffParamKind.ENERGY_RECOVER_RATE:                     // 8
+                case UnitCtrl.BuffParamKind.MOVE_SPEED:                              // 10
+                case UnitCtrl.BuffParamKind.PHYSICAL_CRITICAL_DAMAGE_RATE:           // 11
+                case UnitCtrl.BuffParamKind.MAGIC_CRITICAL_DAMAGE_RATE:              // 12
+                case UnitCtrl.BuffParamKind.RECEIVE_CRITICAL_DAMAGE_RATE:            // 14
+                case UnitCtrl.BuffParamKind.RECEIVE_PHYSICAL_AND_MAGIC_DAMAGE_PERCENT: // 15
+                case UnitCtrl.BuffParamKind.RECEIVE_PHYSICAL_DAMAGE_PERCENT:         // 16
+                case UnitCtrl.BuffParamKind.RECEIVE_MAGIC_DAMAGE_PERCENT:            // 17
+                case UnitCtrl.BuffParamKind.PHYSICAL_DAMAGE_UP_PERCENT:              // 18
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
         public void DispelImmediately(UnitCtrl _unit)
         {
             if (getClearedIndex(_unit) < base.fieldIndex)

@@ -89,7 +89,7 @@ namespace PCRCaculator.Guild
                 MainManager.Instance.WindowConfigMessage("HP只能输入整数，请不要用科学计数法。", null);
                 return;
             }
-            newEnemyData.baseData.Hp = long.Parse(inputField_currentHP.text);
+            newEnemyData.baseData.CurrentHp = long.Parse(inputField_currentHP.text);
             newEnemyData.level = int.Parse(inputField_lv.text);
             newEnemyData.baseData.Def = int.Parse(inputField_def.text);
             newEnemyData.baseData.Magic_def = int.Parse(inputField_def_mg.text);
@@ -184,7 +184,7 @@ namespace PCRCaculator.Guild
             }
             this.enemyData = enemyData;
             unit_id = enemyData.unit_id;
-            inputField_currentHP.text = "" + (long)enemyData.baseData.Hp;
+            inputField_currentHP.text = "" + enemyData.baseData.CurrentHp;
             inputField_HP.text = "" + enemyData.baseData.RealHp;
             inputField_lv.text = "" + enemyData.level;
             inputField_def.text = "" + Mathf.RoundToInt(enemyData.baseData.Def);

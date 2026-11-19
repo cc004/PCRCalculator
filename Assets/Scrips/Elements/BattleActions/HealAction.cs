@@ -36,16 +36,17 @@ namespace Elements
       Action<string> action = null)
     {
       base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
-      int num1 = 0;
+      long baseHeal = 0;
       bool flag = ActionDetail1 == 1;
       switch ((eValueType)(float)_valueDictionary[eValueNumber.VALUE_1])
       {
         case eValueType.FIXED:
-          long num2 = _source.IsPartsBoss ? (flag ? parts.GetAtkZero() : parts.GetMagicStrZero()) : (int) (flag ? _source.AtkZero : _source.MagicStrZero);
-          num1 = (int) _valueDictionary[eValueNumber.VALUE_2] + (int) (num2 * (double) _valueDictionary[eValueNumber.VALUE_4]);
+          long attack = _source.IsPartsBoss ? (flag ? parts.GetAtkZero() : parts.GetMagicStrZero()) : (long)(flag ? _source.AtkZero : _source.MagicStrZero);
+          baseHeal = BattleUtil.DoubleToLong((double)_valueDictionary[eValueNumber.VALUE_2])
+              + BattleUtil.DoubleToLong(attack * (double)_valueDictionary[eValueNumber.VALUE_4]);
           break;
         case eValueType.PERCENTAGE:
-          num1 = (int) (_target.Owner.MaxHp * (double) _valueDictionary[eValueNumber.VALUE_2] / 100.0);
+          baseHeal = BattleUtil.DoubleToLong(_target.Owner.MaxHp * (double)_valueDictionary[eValueNumber.VALUE_2] / 100.0);
           break;
       }
 
@@ -54,10 +55,10 @@ namespace Elements
       {
         healEnhance = _source.HealEnhanceZero;
       }
-      long num3 = (long)((int)(num1 * ((_source.IsPartsBoss ? parts.GetHpRecoverRateZero() : (double)(int)_source.HpRecoveryRateZero) + 100.0) * (healEnhance + 10000.0) / 100.0 / 10000.0) / ExecTime.Length * (double)_skill.AweValue);
-
-      //_target.Owner.SetRecovery(num3, flag ? UnitCtrl.eInhibitHealType.PHYSICS : UnitCtrl.eInhibitHealType.MAGIC, _source, this.EffectType == eEffectType.COMMON, _target: _target,action:action);
-      _target.Owner.SetRecovery(num3, 0, flag ? UnitCtrl.eInhibitHealType.PHYSICS : UnitCtrl.eInhibitHealType.MAGIC, _source, UnitCtrl.GetHealDownValue(_source), EffectType == eEffectType.COMMON, _target: _target, _releaseToad: true, action: action);
+      long recoveryRate = _source.IsPartsBoss ? parts.GetHpRecoverRateZero() : _source.HpRecoveryRateZero;
+      long totalHeal = BattleUtil.DoubleToLong((recoveryRate + 100.0) * baseHeal * (healEnhance + 10000.0) / 100.0 / 10000.0);
+      long healPerHit = BattleUtil.DoubleToLong((totalHeal / ExecTime.Length) * _skill.AweValue);
+      _target.Owner.SetRecovery(healPerHit, 0, flag ? UnitCtrl.eInhibitHealType.PHYSICS : UnitCtrl.eInhibitHealType.MAGIC, _source, UnitCtrl.GetHealDownValue(_source), EffectType == eEffectType.COMMON, _target: _target, _releaseToad: true, action: action);
 
     }
 

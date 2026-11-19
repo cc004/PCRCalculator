@@ -2,7 +2,7 @@ using Elements;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OfficeOpenXml;
-using PCRApi.CN;
+using PCRCaculator.DataSources;
 using PCRCaculator.Calc;
 using PCRCaculator.Guild;
 using PCRCaculator.SQL;
@@ -55,6 +55,15 @@ namespace PCRCaculator
         public int PlayerProcessLimit => databaseCache.playerProcessLimit;
         public int PlayerLevelLimit => databaseCache.playerLevelLimit;
         public int UniqueEqLevelLimit => databaseCache.uniqueEqLevelLimit;
+        /// <summary>属性强化（属性等级）每个元素的最高等级，0 表示数据库里没有该表。</summary>
+        public Dictionary<int, enemy_summon_monster> EnemySummonMonsterDic => databaseCache.enemySummonMonsterDic;
+
+
+        public int TalentLevelLimit => databaseCache.talentLevelLimit;
+        /// <summary>职能精通槽位等级上限，0 表示数据库里没有该表。</summary>
+        public int RoleMasterySlotLevelLimit => databaseCache.roleMasterySlotLevelLimit;
+        /// <summary>职能精通强化（星级）等级上限，0 表示数据库里没有该表。</summary>
+        public int RoleMasteryEnhanceLevelLimit => databaseCache.roleMasteryEnhanceLevelLimit;
 
         public DatabaseCache databaseCache = new DatabaseCache();
 
@@ -64,10 +73,19 @@ namespace PCRCaculator
             public int playerProcessLimit;
             public int playerLevelLimit;
             public int uniqueEqLevelLimit;
+            public int talentLevelLimit;
+
+        public Dictionary<int, enemy_summon_monster> enemySummonMonsterDic;
+        public Dictionary<int, connect_rank_boost> connectRankBoostDic;
+            public int roleMasterySlotLevelLimit;
+            public int roleMasteryEnhanceLevelLimit;
             public bool cacheBuildComplete;
             public string databaseSourceFingerprint;
             public Dictionary<int, ailment_data> ailmentDataDic = new Dictionary<int, ailment_data>();
             public Dictionary<int, int[]> resistDataDic = new Dictionary<int, int[]>();//抵抗数据
+            public Dictionary<int, int[]> resistVariationData = new();
+            public RecoveryAttenuation[] tpRecoveryAttenuation = Array.Empty<RecoveryAttenuation>();
+            public RecoveryAttenuation[] lifeStealAttenuation = Array.Empty<RecoveryAttenuation>();
             public Dictionary<int, EquipmentData> equipmentDic = new Dictionary<int, EquipmentData>();//装备类与装备id的对应字典
             public Dictionary<int, UnitRarityData> unitRarityDic = new Dictionary<int, UnitRarityData>();//角色基础数据与角色id的对应字典 
             public Dictionary<int, List<extra_effect_unit_group>> extraEffectUnitGroupDic = new Dictionary<int, List<extra_effect_unit_group>>();//特别角色组(技能角色存在判断)
@@ -132,6 +150,7 @@ namespace PCRCaculator
             public Dictionary<int, labyrinth_quest_data> LabyrinthQuestDataDic = new();
             public Dictionary<int, labyrinth_difficulty_enemy_data> LabyrinthDifficultyEnemyDataDic = new();
             public Dictionary<int, labyrinth_difficulty_effect> LabyrinthDifficultyEffectDic = new();
+            public EventBattleData EventBattles = new();
             public Dictionary<int, labyrinth_relic> LabyrinthRelicDic = new();
             public Dictionary<int, labyrinth_relic_effect_group> LabyrinthRelicEffectGroupDic = new();
             public Dictionary<int, labyrinth_relic_effect> LabyrinthRelicEffectDic = new();
@@ -340,9 +359,6 @@ namespace PCRCaculator
 
 
         public bool LoadFinished { get; private set; }
-        private const string Url = "https://wthee.xyz/pcr/api/v1/db/info/v2";
-        private const string Url2 = "https://l3-prod-all-gs-gzlj.bilibiligame.net/source_ini/get_maintenance_status?format=json";
-        public string truthVersion;
         public void Awake()
         {
             if (Instance == null)
@@ -370,9 +386,19 @@ namespace PCRCaculator
 
         public class VersionData
         {
-            public long CharacterVersionJP = 10067700;
-            public long BossVersionJP = 10066500;
-            public long BossVersionCN = 0;
+            public long JpDatabaseVersion = 0;
+            public int JpDatabaseSource = 1;
+            public long TwDatabaseVersion = 0;
+            [Newtonsoft.Json.JsonIgnore]
+            public long DatabaseVersion
+            {
+                get => JpDatabaseSource == (int)JpDatabaseMirror.Taiwan ? TwDatabaseVersion : JpDatabaseVersion;
+                set
+                {
+                    if (JpDatabaseSource == (int)JpDatabaseMirror.Taiwan) TwDatabaseVersion = value;
+                    else JpDatabaseVersion = value;
+                }
+            }
             public bool useQA = false;
             public bool useJP = true;
             public bool newAB = false;
@@ -381,6 +407,20 @@ namespace PCRCaculator
         }
 
         public VersionData Version;
+
+        private JpDatabaseManager jpDatabaseManager;
+
+        /// <summary>日服 master 数据库来源（镜像库，已反哈希），取代原来的国服数据库。</summary>
+        public JpDatabaseManager JpDatabase
+        {
+            get
+            {
+                if (jpDatabaseManager == null)
+                    jpDatabaseManager = new JpDatabaseManager(Version.DatabaseVersion,
+                        (JpDatabaseMirror)Version.JpDatabaseSource);
+                return jpDatabaseManager;
+            }
+        }
 
         public void Start()
         {
@@ -449,7 +489,7 @@ namespace PCRCaculator
 
         private string cacheKey
         {
-            get => $"{Version.CharacterVersionJP}_{Version.BossVersionJP}_{Version.BossVersionCN}_{Version.useQA}_{Version.useJP}_{Version.newAB}";
+            get => $"{Version.DatabaseVersion}_{Version.JpDatabaseSource}_{Version.useJP}_{Version.newAB}";
         }
 
         private string cachePath()
@@ -464,23 +504,17 @@ namespace PCRCaculator
             public string Status { get; set; }
         }
 
+        /// <summary>
+        /// 只保留一份数据库来源：日服镜像库。角色库/Boss 库已统一到该版本，不再单独下载官方库。
+        /// </summary>
         private DatabaseSourceDescriptor[] GetDatabaseSources()
         {
-            return new[]
-            {
-                new DatabaseSourceDescriptor(
-                    "character",
-                    ABExTool.mgrCharacter?.DataVer,
-                    SQLiteTool.ResolveSourceDatabasePath(ABExTool.mgrCharacter)),
-                new DatabaseSourceDescriptor(
-                    "jp",
-                    ABExTool.mgrDataJP?.DataVer,
-                    SQLiteTool.ResolveSourceDatabasePath(ABExTool.mgrDataJP)),
-                new DatabaseSourceDescriptor(
-                    "cn",
-                    ABExTool.mgrDataCN?.DataVer,
-                    SQLiteTool.ResolveSourceDatabasePath(ABExTool.mgrDataCN)),
-            };
+            var sources = new List<DatabaseSourceDescriptor>();
+            sources.Add(new DatabaseSourceDescriptor(
+                "jpdb",
+                JpDatabase.DataVer,
+                SQLiteTool.ResolveSourceDatabasePath(JpDatabase)));
+            return sources.ToArray();
         }
 
         private CacheLoadResult LoadFromCache(string expectedSourceFingerprint, string fingerprintStatus)
@@ -614,16 +648,26 @@ namespace PCRCaculator
                     skillActionDescribe_cn = allData.skillActionDescribe_cn;
                 }
                 */
-                if (Version.BossVersionCN == 0 || Version.useLatestProd == true)
+                if (Version.DatabaseVersion == 0 || Version.useLatestProd)
                 {
                     // 更新 UI：正在获取远端版本
-                    try { wait?.SetMessage("正在获取版本信息..."); } catch { }
-                    await SendPostRequestAsync(() =>
+                    try { wait?.SetMessage("正在获取数据库版本..."); } catch { }
+                    try
                     {
-                        Version.useQA = false;
-                        Version.BossVersionCN = long.Parse(truthVersion);
-                        SaveManager.Save(Version);
-                    });
+                        var latestJpDatabaseVersion = await JpDatabaseDownloader.FetchLatestVersionAsync((JpDatabaseMirror)Version.JpDatabaseSource);
+                        if (latestJpDatabaseVersion > 0 && latestJpDatabaseVersion != Version.DatabaseVersion)
+                        {
+                            Version.DatabaseVersion = latestJpDatabaseVersion;
+                            SaveManager.Save(Version);
+                        }
+
+                        Debug.Log($"数据库版本: {Version.DatabaseVersion}, 来源: {Version.JpDatabaseSource}");
+                    }
+                    catch (Exception versionException)
+                    {
+                        Debug.LogError(
+                            $"获取数据库最新版本号失败，沿用本地版本 {Version.DatabaseVersion}: {versionException.Message}");
+                    }
                 }
 
                 var tasks = new List<Task>();
@@ -694,14 +738,11 @@ namespace PCRCaculator
                     // AB资源初始化计时
                     // 数据库初始化计时
                     var dbInitStopwatch = System.Diagnostics.Stopwatch.StartNew();
-                    var dbTool = SQLData.OpenDB(ABExTool.mgrCharacter);
-                    var dbTool3 = SQLData.OpenDB(ABExTool.mgrDataCN);
-                    var dbTool2 = DatabaseCacheContract.ResolveSharedDatabase(
-                        dbTool,
-                        () => SQLData.OpenDB(ABExTool.mgrDataJP),
-                        ReferenceEquals(ABExTool.mgrDataJP, ABExTool.mgrCharacter));
+                    // 数据库统一到日服镜像库：不再分别打开角色库/Boss 库，三处引用同一实例。
+                    var dbTool = SQLData.OpenDB(JpDatabase);
+                    var dbTool2 = dbTool;
+                    var dbTool3 = dbTool;
                     var dbTool2ForCleanup = dbTool2;
-                    dbInitStopwatch.Stop();
                     Debug.Log($"数据库打开完成，耗时: {dbInitStopwatch.ElapsedMilliseconds}ms");
 
                     // 数据库准备计时
@@ -709,10 +750,14 @@ namespace PCRCaculator
                     // 更新 UI：准备数据库
                     try { wait?.SetMessage("正在准备数据库"); } catch { }
                     var dbPrepareTask = Task.WhenAll(
-                        Task.Run(() => dbTool.Prepare()),
                         Task.Run(() =>
                         {
-                            if (ABExTool.mgrDataJP != ABExTool.mgrCharacter) dbTool2.Prepare();
+                            if (!ReferenceEquals(dbTool, dbTool3)) dbTool.Prepare();
+                        }),
+                        Task.Run(() =>
+                        {
+                            if (!ReferenceEquals(dbTool2, dbTool) && !ReferenceEquals(dbTool2, dbTool3))
+                                dbTool2.Prepare();
                         }),
                         Task.Run(() => dbTool3.Prepare()));
 
@@ -745,26 +790,27 @@ namespace PCRCaculator
                     var dbDataStopwatch = System.Diagnostics.Stopwatch.StartNew();
                     var dbDataTask = DatabaseCacheContract.RunAfterSuccessAsync(
                         Task.WhenAll(
-                            dbTool.ParallelGetAll(),
-                            ABExTool.mgrDataJP != ABExTool.mgrCharacter
-                                ? dbTool2.ParallelGetAll()
-                                : Task.CompletedTask,
-                            dbTool3.ParallelGetAll()),
+                            dbTool.ParallelGetAll()),
                         () =>
                             {
                                 dbDataStopwatch.Stop();
                                 Debug.Log($"数据库数据加载完成，耗时: {dbDataStopwatch.ElapsedMilliseconds}ms");
 
-                                var dbCN = dbTool3;
-
-                                // Progression follows the selected region; JP resources may be newer than CN availability.
-                                if (!Version.useJP) dbTool2 = dbTool3;
-                                databaseCache.playerProcessLimit = dbTool2.PlayerProcessLimit;
-                                databaseCache.playerLevelLimit = dbTool2.PlayerLevelLimit;
-                                databaseCache.uniqueEqLevelLimit = dbTool2.UniqueEqLevelLimit;
+                                // 数据库已统一为日服镜像库单实例：名称、职业精通、各类上限都取自它。
+                                databaseCache.playerProcessLimit = dbTool.PlayerProcessLimit;
+                                databaseCache.playerLevelLimit = dbTool.PlayerLevelLimit;
+                                databaseCache.uniqueEqLevelLimit = dbTool.UniqueEqLevelLimit;
+                                databaseCache.talentLevelLimit = dbTool.TalentLevelLimit;
+            databaseCache.enemySummonMonsterDic = dbTool.EnemySummonMonsterDic;
+            databaseCache.connectRankBoostDic = dbTool.ConnectRankBoostDic;
+                                databaseCache.roleMasterySlotLevelLimit = dbTool.RoleMasterySlotLevelLimit;
+                                databaseCache.roleMasteryEnhanceLevelLimit = dbTool.RoleMasteryEnhanceLevelLimit;
 
                                 databaseCache.ailmentDataDic = dbTool.AilmentDataDic ?? databaseCache.ailmentDataDic;
                                 databaseCache.resistDataDic = dbTool.resistDataDic ?? databaseCache.resistDataDic;
+                                databaseCache.resistVariationData = dbTool.ResistVariationData;
+                                databaseCache.tpRecoveryAttenuation = dbTool.TpRecoveryAttenuation;
+                                databaseCache.lifeStealAttenuation = dbTool.LifeStealAttenuation;
                                 databaseCache.equipmentDic = dbTool.Dic8 ?? databaseCache.equipmentDic;
                                 if (databaseCache.equipmentDic != null && !databaseCache.equipmentDic.ContainsKey(999999))
                                     databaseCache.equipmentDic.Add(999999, EquipmentData.EMPTYDATA);
@@ -825,6 +871,7 @@ namespace PCRCaculator
                                 databaseCache.LabyrinthWaveGroupDataDic = dbTool.LabyrinthWaveGroupDataDic ?? databaseCache.LabyrinthWaveGroupDataDic;
                                 databaseCache.LabyrinthDifficultyEnemyDataDic = dbTool.LabyrinthDifficultyEnemyDataDic ?? databaseCache.LabyrinthDifficultyEnemyDataDic;
                                 databaseCache.LabyrinthDifficultyEffectDic = dbTool.LabyrinthDifficultyEffectDic ?? databaseCache.LabyrinthDifficultyEffectDic;
+                                databaseCache.EventBattles = dbTool.EventBattles;
                                 databaseCache.LabyrinthRelicDic = dbTool.LabyrinthRelicDic ?? databaseCache.LabyrinthRelicDic;
                                 databaseCache.LabyrinthRelicEffectGroupDic = dbTool.LabyrinthRelicEffectGroupDic ?? databaseCache.LabyrinthRelicEffectGroupDic;
                                 databaseCache.LabyrinthRelicEffectDic = dbTool.LabyrinthRelicEffectDic ?? databaseCache.LabyrinthRelicEffectDic;
@@ -845,84 +892,13 @@ namespace PCRCaculator
 
                                 try
                                 {
-                                    Task.WaitAll(
-                                        Task.Run(() =>
-                                        {
-                                            var filteredUnitRarity = dbTool3.Dic1?.Where(p => p.Key / 10000 == 17 || p.Key == 105701).ToList();
-                                            if (filteredUnitRarity != null) databaseCache.unitRarityDic.OverrideWith(filteredUnitRarity);
-                                        }),
-                                        Task.Run(() =>
-                                        {
-                                            var filteredUniqueEquipment = dbTool3.Dic9?.Where(p => p.Key / 10000 == 17).ToList();
-                                            if (filteredUniqueEquipment != null) databaseCache.uniqueEquipmentDataDic.OverrideWith(filteredUniqueEquipment);
-                                        }),
-                                        Task.Run(() =>
-                                        {
-                                            var filteredUniqueEquipment2 = dbTool3.Dic92?.Where(p => p.Key / 10000 == 17).ToList();
-                                            if (filteredUniqueEquipment2 != null) databaseCache.uniqueEquipment2DataDic.OverrideWith(filteredUniqueEquipment2);
-                                        }),
-                                        Task.Run(() =>
-                                        {
-                                            var filteredSkillData = dbTool3.Dic3?.Where(p => p.Key / 100000 == 17).ToList();
-                                            if (filteredSkillData != null) databaseCache.skillDataDic.OverrideWith(filteredSkillData);
-                                        }),
-                                        Task.Run(() =>
-                                        {
-                                            var filteredSkillAction = dbTool3.Dic4?.Where(p => p.Key / 10000000 == 17).ToList();
-                                            if (filteredSkillAction != null) databaseCache.skillActionDic.OverrideWith(filteredSkillAction);
-                                        }),
-                                        Task.Run(() =>
-                                        {
-                                            if (dbTool3.masterUnitSkillDataRf?.dict != null)
-                                            {
-                                                var filteredMasterUnitSkill = dbTool3.masterUnitSkillDataRf.dict.Where(p => p.Key / 100000 == 17).ToList();
-                                                databaseCache.masterUnitSkillDataRf.dict.Remove(1701003); // old jp data
-                                                databaseCache.masterUnitSkillDataRf.dict.OverrideWith(filteredMasterUnitSkill);
-                                            }
-                                        }),
-                                        Task.Run(() =>
-                                        {
-                                            var filteredAllUnitAttackPattern = dbTool3.Dic5?.Where(p => p.Key / 1000000 == 17).ToList();
-                                            if (filteredAllUnitAttackPattern != null) databaseCache.allUnitAttackPatternDic.OverrideWith(filteredAllUnitAttackPattern);
-                                        }),
-                                        Task.Run(() =>
-                                        {
-                                            var filteredUnitRoleData = dbTool3.UnitRoleDataDic?.Where(p => p.Key / 10000 == 17).ToList();
-                                            if (filteredUnitRoleData != null) databaseCache.UnitRoleDataDic.OverrideWith(filteredUnitRoleData);
-                                        }),
-                                        Task.Run(() =>
-                                        {
-                                            if (dbTool3.unitExEquips != null)
-                                            {
-                                                var jita = dbTool3.unitExEquips[170101];
-                                                var filteredUnitExEquips = dbTool3.unitExEquips.Where(p => p.Key / 10000 == 17).ToList();
-                                                databaseCache.unitExEquips.OverrideWith(filteredUnitExEquips);
-                                                databaseCache.unitExEquips[170301] = jita;
-                                            }
-                                        }),
-                                        Task.Run(() => { if (dbCN.Pair.Item1 != null) databaseCache.unitStoryDic.TryAdd(dbCN.Pair.Item1); }),
-                                        Task.Run(() => { if (dbCN.Pair.Item2 != null) databaseCache.unitStoryEffectDic.TryAdd(dbCN.Pair.Item2); }),
-                                        Task.Run(() => { if (dbCN.Pair.Item3 != null) databaseCache.unitStoryLoveDic.TryAdd(dbCN.Pair.Item3); }),
-                                        Task.Run(() => { if (dbCN.TalentQuestBattleEffectDic != null) databaseCache.talentQuestBattleEffectDic.OverrideWith(dbCN.TalentQuestBattleEffectDic); }),
-                                        Task.Run(() => { if (dbCN.AbyssBattleEffectDic != null) databaseCache.abyssBattleEffectDic.OverrideWith(dbCN.AbyssBattleEffectDic); }),
-                                        Task.Run(() => { if (dbCN.MirageBattleEffectDic != null) databaseCache.mirageBattleEffectDic.OverrideWith(dbCN.MirageBattleEffectDic); }),
-                                        Task.Run(() => { if (dbCN.ExtraEffectDataDic != null) databaseCache.extraEffectDataDic.TryAdd(dbCN.ExtraEffectDataDic); }),
-                                        Task.Run(() => { if (dbCN.LabyrinthQuestDataDic != null) databaseCache.LabyrinthQuestDataDic.TryAdd(dbCN.LabyrinthQuestDataDic); }),
-                                        Task.Run(() => { if (dbCN.LabyrinthWaveGroupDataDic != null) databaseCache.LabyrinthWaveGroupDataDic.TryAdd(dbCN.LabyrinthWaveGroupDataDic); }),
-                                        Task.Run(() => { if (dbCN.LabyrinthDifficultyEnemyDataDic != null) databaseCache.LabyrinthDifficultyEnemyDataDic.TryAdd(dbCN.LabyrinthDifficultyEnemyDataDic); }),
-                                        Task.Run(() => { if (dbCN.LabyrinthDifficultyEffectDic != null) databaseCache.LabyrinthDifficultyEffectDic.OverrideWith(dbCN.LabyrinthDifficultyEffectDic); }),
-                                        Task.Run(() => { if (dbCN.LabyrinthRelicDic != null) databaseCache.LabyrinthRelicDic.OverrideWith(dbCN.LabyrinthRelicDic); }),
-                                        Task.Run(() => { if (dbCN.LabyrinthRelicEffectGroupDic != null) databaseCache.LabyrinthRelicEffectGroupDic.TryAdd(dbCN.LabyrinthRelicEffectGroupDic); }),
-                                        Task.Run(() => { if (dbCN.LabyrinthRelicEffectDic != null) databaseCache.LabyrinthRelicEffectDic.TryAdd(dbCN.LabyrinthRelicEffectDic); }),
-                                        Task.Run(() => { if (dbCN.LabyrinthRelicMarkEffectDic != null) databaseCache.LabyrinthRelicMarkEffectDic.OverrideWith(dbCN.LabyrinthRelicMarkEffectDic); }),
-                                        Task.Run(() => { if (dbCN.LabyrinthEnhanceInformationDic != null) databaseCache.LabyrinthEnhanceInformationDic.OverrideWith(dbCN.LabyrinthEnhanceInformationDic); }),
-                                        Task.Run(() => { if (dbCN.RelicActionExecTimeDic != null) databaseCache.RelicActionExecTimeDic.TryAdd(dbCN.RelicActionExecTimeDic); }),
-                                        Task.Run(() => { if (dbCN.RelicSkillExecTimeDic != null) databaseCache.RelicSkillExecTimeDic.TryAdd(dbCN.RelicSkillExecTimeDic); })
-                                    );
+                                    // 国服数据库已移除：这里只保留原来对废弃日服技能数据的清理
+                                    if (databaseCache.masterUnitSkillDataRf?.dict != null)
+                                        databaseCache.masterUnitSkillDataRf.dict.Remove(1701003);
                                 }
-                                catch (AggregateException ex)
+                                catch (Exception ex)
                                 {
-                                    Debug.LogError($"补充数据加载部分失败（非致命）: {ex.InnerExceptions?.FirstOrDefault()?.Message}");
+                                    Debug.LogError($"清理旧日服技能数据失败（非致命）: {ex.Message}");
                                 }
 
                                 // databaseCache.unitRarityDic.TryAdd(dbCN.Dic1);
@@ -961,23 +937,6 @@ namespace PCRCaculator
                                             Task.Run(() => { if (dbTool2.RelicActionExecTimeDic != null) databaseCache.RelicActionExecTimeDic.TryAdd(dbTool2.RelicActionExecTimeDic); }),
                                             Task.Run(() => { if (dbTool2.RelicSkillExecTimeDic != null) databaseCache.RelicSkillExecTimeDic.TryAdd(dbTool2.RelicSkillExecTimeDic); })
                                         );
-                                }
-                                catch (AggregateException ex) { Debug.LogError($"补充数据覆盖部分失败（非致命）: {ex.InnerExceptions?.FirstOrDefault()?.Message}"); }
-                                try
-                                {
-                                    Task.WaitAll(
-                                        Task.Run(() => { if (dbTool3.Dic2 != null) databaseCache.enemyDataDic.Override2With(dbTool3.Dic2); }),
-                                        Task.Run(() => { if (dbTool3.Dic3 != null) databaseCache.skillDataDic.Override2With(dbTool3.Dic3); }),
-                                        Task.Run(() => { if (dbTool3.Dic4 != null) databaseCache.skillActionDic.Override2With(dbTool3.Dic4); }),
-                                        Task.Run(() => { if (dbTool3.TowerEnemyParameterDic != null) databaseCache.towerEnemyParameterDic.Override2With(dbTool3.TowerEnemyParameterDic); }),
-                                        Task.Run(() => { if (dbTool3.TalentQuestEnemyParameterDic != null) databaseCache.talentQuestEnemyParameterDic.Override2With(dbTool3.TalentQuestEnemyParameterDic); }),
-                                        Task.Run(() => { if (dbTool3.AbyssEnemyParameterDic != null) databaseCache.abyssEnemyParameterDic.Override2With(dbTool3.AbyssEnemyParameterDic); }),
-                                        Task.Run(() => { if (dbTool3.LabyrinthEnemyParameterDic != null) databaseCache.labyrinthEnemyParameterDic.Override2With(dbTool3.LabyrinthEnemyParameterDic); }),
-                                        Task.Run(() => { if (dbTool3.MirageEnemyParameterDic != null) databaseCache.mirageEnemyParameterDic.Override2With(dbTool3.MirageEnemyParameterDic); }),
-                                        Task.Run(() => { if (dbTool3.TalentSkillNodeDic != null) databaseCache.talentSkillNodeDic.Override2With(dbTool3.TalentSkillNodeDic); }),
-                                        Task.Run(() => { if (dbTool3.TeamSkillNodeDic != null) databaseCache.teamSkillNodeDic.Override2With(dbTool3.TeamSkillNodeDic); }),
-                                        Task.Run(() => { if (dbTool3.MirageNemesisAreaDic != null) databaseCache.mirageNemesisAreaDic.Override2With(dbTool3.MirageNemesisAreaDic); })
-                                    );
                                 }
                                 catch (AggregateException ex) { Debug.LogError($"补充数据覆盖部分失败（非致命）: {ex.InnerExceptions?.FirstOrDefault()?.Message}"); }
                             },
@@ -1113,6 +1072,8 @@ namespace PCRCaculator
                 // 数据就绪后开始后台预热图标 AB 包：每帧只载一个包（异步），预热完再点角色 / EX 装备 / BOSS 列表就不会卡
 #if UNITY_5_3_OR_NEWER
                 try { ABExTool.StartSpriteWarmup(); } catch (Exception warmException) { Debug.LogWarning($"启动图标预取失败: {warmException.Message}"); }
+                // buff/debuff 图标也换成游戏内最新图集（manifest 里有这个包，后台下载 + 切片）
+                try { PCRCaculator.Battle.BuffIconAtlasUpdater.StartPrefetch(this); } catch (Exception buffIconException) { Debug.LogWarning($"启动 buff 图标图集预取失败: {buffIconException.Message}"); }
 #endif
                 
                 // 计时结束并输出
@@ -1694,7 +1655,8 @@ namespace PCRCaculator
         }
         public int GetMotionType(int unitid, int skinid)
         {
-            if (skinid == 170361 || unitid == 170301)
+            if (skinid == 170361 || unitid == UnitData.JitaSixStarBattlePrefabId ||
+                skinid == 170161 || unitid == UnitData.JitaAlternateBattlePrefabId)
                 return 34;
             return UnitRarityDic.TryGetValue(unitid, out UnitRarityData t) ? t.detailData.motionType : 0;
         }
@@ -1702,174 +1664,6 @@ namespace PCRCaculator
         {
             return ExtraEffectUnitGroupDic.ContainsKey(groupId) ? ExtraEffectUnitGroupDic[groupId] : null;
         }
-#if UNITY_5_3_OR_NEWER
-        public async Task SendPostRequestAsync2(Action onComplete)
-        {
-            const string app_ver = "11.7.2"; // change this when the app version changes
-            using UnityWebRequest www = new UnityWebRequest(Url2, UnityWebRequest.kHttpVerbPOST);
-            byte[] postData = System.Text.Encoding.UTF8.GetBytes("{\"viewer_id\": \"0\"}");
-
-            // 设置必要请求头
-            www.uploadHandler = new UploadHandlerRaw(postData);
-            www.downloadHandler = new DownloadHandlerBuffer();
-            www.SetRequestHeader("Content-Type", "application/json");
-            www.SetRequestHeader("Accept-Encoding", "gzip");
-            www.SetRequestHeader("User-Agent", "Dalvik/2.1.0 (Linux, U, Android 5.1.1, PCRT00 Build/LMY48Z)");
-            www.SetRequestHeader("X-Unity-Version", "2021.3.20f1c1");
-            www.SetRequestHeader("APP-VER", app_ver);
-            www.SetRequestHeader("BATTLE-LOGIC-VERSION", "4");
-            www.SetRequestHeader("DEVICE", "2");
-            www.SetRequestHeader("DEVICE-NAME", "OPPO PCRT00");
-            www.SetRequestHeader("EXCEL-VER", "1.0.0");
-            www.SetRequestHeader("GRAPHICS-DEVICE-NAME", "Adreno (TM) 640");
-            www.SetRequestHeader("IP-ADDRESS", "10.0.2.15");
-            www.SetRequestHeader("LOCALE", "CN");
-            www.SetRequestHeader("PLATFORM", "2");
-            www.SetRequestHeader("PLATFORM-ID", "2");
-            www.SetRequestHeader("CHANNEL-ID", "1");
-            www.SetRequestHeader("RES-KEY", "ab00a0a6dd915a052a2ef7fd649083e5");
-            www.SetRequestHeader("RES-VER", "10002200");
-
-            // 统一异步等待机制
-            TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-
-            www.SendWebRequest().completed += (AsyncOperation op) =>
-            {
-                try
-                {
-                    if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
-                    {
-                        Debug.LogError($"请求失败: {www.error}");
-                        truthVersion = "获取失败（重试）";
-                    }
-                    else
-                    {
-                        var raw = www.downloadHandler.text;
-                        // Debug.Log($"Response:\n{raw}");
-
-                        try
-                        {
-                            var response = JsonConvert.DeserializeObject<BcrResponse>(raw);
-                            truthVersion = response?.data?.manifest_ver ?? "获取失败（重试）";
-                            // Debug.Log($"manifest_ver = {truthVersion}");
-                        }
-                        catch (Exception jsonEx)
-                        {
-                            // Debug.LogError($"JSON解析失败: {jsonEx}");
-                            truthVersion = "获取失败（重试）";
-                        }
-                    }
-                }
-                finally
-                {
-                    onComplete?.Invoke();
-                    tcs.TrySetResult(true);
-                }
-            };
-
-            await tcs.Task;
-        }
-
-        public async Task SendPostRequestAsync(Action onComplete)
-        {
-            await SendPostRequestAsync2(onComplete);
-            return;
-
-            using UnityWebRequest www = new UnityWebRequest(Url, UnityWebRequest.kHttpVerbPOST);
-            byte[] formdata = new System.Text.UTF8Encoding().GetBytes("{\"regionCode\":\"cn\"}");
-
-            // 设置请求头部
-            www.SetRequestHeader("Content-Type", "application/json");
-            www.uploadHandler = new UploadHandlerRaw(formdata);
-            www.downloadHandler = new DownloadHandlerBuffer();
-
-            // 使用 TaskCompletionSource 包装 UnityWebRequest
-            TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-            www.SendWebRequest().completed += (AsyncOperation op) =>
-            {
-                if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
-                {
-                    Debug.LogError("Error: " + www.error);
-                    truthVersion = "获取失败（重试）";
-                }
-                else
-                {
-                    var responseText = www.downloadHandler.text;
-                    var response = JsonConvert.DeserializeObject<ApiResponse>(responseText);
-                    // 输出truthVersion
-                    truthVersion = response.data.truthVersion;
-                }
-                onComplete?.Invoke();
-                tcs.SetResult(true);
-            };
-
-            // 等待任务完成
-            await tcs.Task;
-        }
-#else
-        public async Task SendPostRequestAsync(Action onComplete)
-        {
-            const string app_ver = "99.9.9";
-            var httpClient = new HttpClient();
-
-            // 构造 POST Body
-            var jsonBody = "{\"viewer_id\": \"0\"}";
-            var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
-
-            // 添加 Headers
-            content.Headers.ContentType.CharSet = "UTF-8";
-
-            var request = new HttpRequestMessage(HttpMethod.Post, Url2)
-            {
-                Content = content
-            };
-
-            request.Headers.TryAddWithoutValidation("Accept-Encoding", "gzip");
-            request.Headers.TryAddWithoutValidation("User-Agent", "Dalvik/2.1.0 (Linux, U, Android 5.1.1, PCRT00 Build/LMY48Z)");
-            request.Headers.TryAddWithoutValidation("X-Unity-Version", "2021.3.20f1c1");
-            request.Headers.TryAddWithoutValidation("APP-VER", app_ver);
-            request.Headers.TryAddWithoutValidation("BATTLE-LOGIC-VERSION", "4");
-            request.Headers.TryAddWithoutValidation("DEVICE", "2");
-            request.Headers.TryAddWithoutValidation("DEVICE-NAME", "OPPO PCRT00");
-            request.Headers.TryAddWithoutValidation("EXCEL-VER", "1.0.0");
-            request.Headers.TryAddWithoutValidation("GRAPHICS-DEVICE-NAME", "Adreno (TM) 640");
-            request.Headers.TryAddWithoutValidation("IP-ADDRESS", "10.0.2.15");
-            request.Headers.TryAddWithoutValidation("LOCALE", "CN");
-            request.Headers.TryAddWithoutValidation("PLATFORM", "2");
-            request.Headers.TryAddWithoutValidation("PLATFORM-ID", "2");
-            request.Headers.TryAddWithoutValidation("CHANNEL-ID", "1");
-            request.Headers.TryAddWithoutValidation("RES-KEY", "ab00a0a6dd915a052a2ef7fd649083e5");
-            request.Headers.TryAddWithoutValidation("RES-VER", "10002200");
-
-            try
-            {
-                var responseMessage = await httpClient.SendAsync(request);
-                var raw = await responseMessage.Content.ReadAsStringAsync();
-
-
-                if (!responseMessage.IsSuccessStatusCode)
-                {
-                    throw new Exception("bad status code: " + responseMessage.StatusCode);
-                }
-                else
-                {
-                    var response = JsonConvert.DeserializeObject<BcrResponse>(raw);
-                    truthVersion = response.data.manifest_ver;
-
-                    if (truthVersion == null) throw new Exception("manifest ver is null, resp: " + raw);
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"请求异常: {ex}");
-                truthVersion = "获取失败（重试）";
-            }
-            finally
-            {
-                onComplete?.Invoke();
-            }
-        }
-#endif
     }
 
     public class UnitData_other

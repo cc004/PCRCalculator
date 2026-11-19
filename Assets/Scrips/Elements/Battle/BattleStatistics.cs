@@ -591,7 +591,7 @@ namespace Elements.Battle
                 DamageTypeValue = (int)damageType,
                 DamageTypeName = damageType.ToString(),
                 IsCritical = isCritical,
-                RemainingHp = remainingHp,
+                RemainingHp = System.Math.Max(0L, remainingHp),
                 TargetPartsIndex = targetPartsIndex,
                 ActionType = actionType,
                 ActionTypeValue = (int)actionType,

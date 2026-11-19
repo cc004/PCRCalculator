@@ -65,7 +65,9 @@ namespace PCRCaculator
         private void LoadPanel()
         {
             SelectionManager?.LoadSavedSelection();
-            EnhanceManager?.LoadSavedSelection();
+            bool invasion = SelectionManager?.IsInvasion == true;
+            if (relicToggles != null) relicToggles.gameObject.SetActive(!invasion);
+            if (!invasion) EnhanceManager?.LoadSavedSelection();
             OnRelicToggleChanged();
         }
 
@@ -78,8 +80,14 @@ namespace PCRCaculator
                 return;
 
             SelectionManager?.SaveSelectedRelics();
-            EnhanceManager?.SaveSelectedNodes();
-            if (global)
+            bool invasion = SelectionManager?.IsInvasion == true;
+            if (!invasion) EnhanceManager?.SaveSelectedNodes();
+            if (global && invasion)
+            {
+                mainManager.PlayerSetting.invasionRelicIds = new List<int>(group.invasionRelicIds);
+                mainManager.SavePlayerSetting();
+            }
+            else if (global)
             {
                 mainManager.PlayerSetting.labyrinthRelicIds = new List<int>(
                     group.labyrinthRelicIds ?? new List<int>());
@@ -103,14 +111,21 @@ namespace PCRCaculator
                 return;
 
             mainManager.LoadPlayerSettings();
-            // 空列表也是有效配置，表示取消当前队伍的全部遗物。
-            group.labyrinthRelicIds = new List<int>(
-                mainManager.PlayerSetting.labyrinthRelicIds ?? new List<int>());
-            group.labyrinthAlphaRupee = Mathf.Max(0, mainManager.PlayerSetting.labyrinthAlphaRupee);
-            group.labyrinthEnhancedNodeIds = new List<int>(
-                mainManager.PlayerSetting.labyrinthEnhancedNodeIds ?? new List<int>());
-            SelectionManager?.LoadSavedSelection();
-            EnhanceManager?.LoadSavedSelection();
+            if (SelectionManager?.IsInvasion == true)
+            {
+                var events = mainManager.databaseCache.EventBattles;
+                var quest = events.Invasion[group.waveGroupId];
+                group.invasionRelicIds = events.SelectRelics(quest.schedule_id, mainManager.PlayerSetting.invasionRelicIds);
+            }
+            else
+            {
+                group.labyrinthRelicIds = new List<int>(
+                    mainManager.PlayerSetting.labyrinthRelicIds ?? new List<int>());
+                group.labyrinthAlphaRupee = Mathf.Max(0, mainManager.PlayerSetting.labyrinthAlphaRupee);
+                group.labyrinthEnhancedNodeIds = new List<int>(
+                    mainManager.PlayerSetting.labyrinthEnhancedNodeIds ?? new List<int>());
+            }
+            LoadPanel();
             guildManager.SaveDataToJson();
             mainManager.WindowMessage("已恢复成全局遗物配置！");
         }
@@ -121,7 +136,9 @@ namespace PCRCaculator
                 return;
 
             int selectedIndex = 0;
-            if (relicToggles != null)
+            if (SelectionManager?.IsInvasion == true)
+                selectedIndex = relicManagers.IndexOf(SelectionManager.gameObject);
+            else if (relicToggles != null)
             {
                 for (int i = 0; i < relicToggles.transform.childCount; i++)
                 {

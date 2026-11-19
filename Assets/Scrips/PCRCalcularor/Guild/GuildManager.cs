@@ -261,13 +261,13 @@ namespace PCRCaculator.Guild
         }
         private const int SpecialBossPrefixDivisor = 10000000;
         public int BossType => selectedBossEnemyids[0] / 100000000;
-        public bool IsGuildBoss { get => BossType == 4; }
+        public bool IsGuildBoss { get => IsGuildBossId(selectedBossEnemyids[0]); }
         public bool IsDungeonBoss { get => BossType == 5; }
         public bool IsMirageBoss { get => IsMirageBossId(selectedBossEnemyids[0]); }
         public bool IsTalentQuestBoss { get => BossType == 8; }
         public bool IsAbyssBoss { get => BossType == 9; }
         public bool IsLabyrinthBoss { get => IsLabyrinthBossId(selectedBossEnemyids[0]); }
-        public bool IsGuildBossId(int id) => id / 100000000 == 4;
+        public bool IsGuildBossId(int id) => id / 100000000 == 4 && id / SpecialBossPrefixDivisor != 41;
         public bool IsTalentQuestBossId(int id) => id / 100000000 == 8;
         public bool IsAbyssBossId(int id) => id / 100000000 == 9;
         public bool IsDungeonBossId(int id) => id / 100000000 == 5;
@@ -313,6 +313,140 @@ namespace PCRCaculator.Guild
             //    string.Join("\n", typeof(UnitCtrl).GetProperties().Select(p => p.Name)));
             LoadAddedPlayerData();
         }
+        private static string EventScheduleLabel(int scheduleId) => $"第{scheduleId % 1000}期";
+
+        private static string EventQuestLabel(EventQuest quest, EventBattleData events)
+        {
+            if (quest is hunt_quest_data)
+                return $"{quest.quest_id % 100}层";
+            var difficulty = events.Difficulties.GetValueOrDefault(quest.quest_id);
+            var prefix = difficulty switch
+            {
+                1 => "N",
+                2 => "H",
+                3 => "VH",
+                4 => "EX",
+                _ => $"难度{difficulty}-"
+            };
+            return $"{prefix}{quest.quest_id % 10}";
+        }
+
+#if UNITY_5_3_OR_NEWER
+        private GameObject eventPanel;
+        private Dropdown eventSchedule, eventQuest;
+        private List<int> schedules;
+        private List<EventQuest> quests;
+        private bool choosingInvasion;
+        private EventBattleData Events => MainManager.Instance.databaseCache.EventBattles;
+
+        private static void PositionEventControl(UnityEngine.Component control, float x, float y, float width, float height)
+        {
+            var rect = (RectTransform)control.transform;
+            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(.5f, .5f);
+            rect.anchoredPosition = new Vector2(x, y);
+            rect.sizeDelta = new Vector2(width, height);
+        }
+
+        private Dropdown EventDropdown(Transform parent, float x, float y, float width)
+        {
+            var dropdown = Instantiate(dropdowns_ChooseMirageBoss[0], parent, false);
+            dropdown.onValueChanged = new Dropdown.DropdownEvent();
+            dropdown.ClearOptions();
+            PositionEventControl(dropdown, x, y, width, 34);
+            var caption = dropdown.captionText.rectTransform;
+            caption.offsetMin = new Vector2(caption.offsetMin.x, 1);
+            caption.offsetMax = new Vector2(caption.offsetMax.x, -1);
+            var row = (RectTransform)dropdown.itemText.rectTransform.parent;
+            row.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 34);
+            return dropdown;
+        }
+
+        private static void SetEventOptions(Dropdown dropdown, List<string> labels, int index)
+        {
+            dropdown.ClearOptions();
+            dropdown.AddOptions(labels);
+            dropdown.SetValueWithoutNotify(Math.Max(0, index));
+            dropdown.RefreshShownValue();
+            dropdown.interactable = labels.Count > 0;
+        }
+
+        internal Button EventButton(Transform parent, string label, float x, float y, float width, UnityEngine.Events.UnityAction click)
+        {
+            var template = dropdowns_ChooseMirageBoss[0].transform.parent.parent.Find("ok").GetComponent<Button>();
+            var button = Instantiate(template, parent, false);
+            button.onClick = new Button.ButtonClickedEvent();
+            button.onClick.AddListener(click);
+            button.GetComponentInChildren<Text>(true).text = label;
+            PositionEventControl(button, x, y, width, 34);
+            return button;
+        }
+
+        private void InitEventQuestControls()
+        {
+            var host = dropdowns_ChooseMirageBoss[0].transform.parent.parent;
+            eventPanel = new GameObject("活动关卡", typeof(RectTransform));
+            eventPanel.transform.SetParent(host, false);
+            eventPanel.SetActive(false);
+            eventSchedule = EventDropdown(eventPanel.transform, 66, 4, 290);
+            eventQuest = EventDropdown(eventPanel.transform, 66, -40, 290);
+            eventSchedule.onValueChanged.AddListener(_ => UpdateEventQuests(0));
+            eventQuest.onValueChanged.AddListener(_ => PreviewEventQuest());
+            foreach (string name in new[] { "讨魔战线", "挑战任务" })
+            {
+                var toggle = Instantiate(toggles_ChooseType[4], toggles_ChooseType[0].transform.parent, false);
+                toggle.onValueChanged = new Toggle.ToggleEvent();
+                toggle.SetIsOnWithoutNotify(false);
+                toggle.GetComponentInChildren<Text>(true).text = name;
+                toggle.gameObject.SetActive(true);
+                bool invasion = name == "讨魔战线";
+                toggle.interactable = invasion ? Events.Invasion.Count > 0 : Events.Hunt.Count > 0;
+                toggle.onValueChanged.AddListener(on =>
+                {
+                    if (on) OpenEventQuest(invasion);
+                    else if (choosingInvasion == invasion) eventPanel.SetActive(false);
+                });
+                toggles_ChooseType.Add(toggle);
+            }
+            for (int i = 0; i < toggles_ChooseType.Count; i++)
+            {
+                var rect = (RectTransform)toggles_ChooseType[i].transform;
+                rect.anchoredPosition = new Vector2(rect.anchoredPosition.x, -20 - 39 * i);
+            }
+        }
+
+        private void OpenEventQuest(bool invasion)
+        {
+            choosingInvasion = invasion;
+            var group = SettingData.GetCurrentPlayerGroup();
+            var all = invasion ? Events.Invasion.Values.Cast<EventQuest>() : Events.Hunt.Values.Cast<EventQuest>();
+            schedules = all.Select(q => q.schedule_id).Distinct().OrderByDescending(x => x).ToList();
+            var saved = all.FirstOrDefault(q => q.wave_group_id == group.waveGroupId);
+            SetEventOptions(eventSchedule, schedules.Select(EventScheduleLabel).ToList(), schedules.IndexOf(saved?.schedule_id ?? 0));
+            eventPanel.SetActive(true);
+            UpdateEventQuests(saved?.wave_group_id ?? 0);
+        }
+
+        private void UpdateEventQuests(int savedWave)
+        {
+            var all = choosingInvasion ? Events.Invasion.Values.Cast<EventQuest>() : Events.Hunt.Values.Cast<EventQuest>();
+            quests = all.Where(q => schedules.Count > 0 && q.schedule_id == schedules[eventSchedule.value] && Events.Waves.ContainsKey(q.wave_group_id))
+                .OrderBy(q => q.quest_id).ToList();
+            SetEventOptions(eventQuest, quests.Select(q => EventQuestLabel(q, Events)).ToList(),
+                quests.FindIndex(q => q.wave_group_id == savedWave));
+            PreviewEventQuest();
+        }
+
+        private void PreviewEventQuest()
+        {
+            if (quests.Count == 0) return;
+            var quest = quests[eventQuest.value];
+            var wave = Events.Waves[quest.wave_group_id];
+            specialEnemyid = new[] { wave.enemy_id_1, wave.enemy_id_2, wave.enemy_id_3, wave.enemy_id_4, wave.enemy_id_5 }
+                .Where(id => id > 0).ToArray();
+            WaveGroupId = quest.wave_group_id;
+            SetBossImages(specialEnemyid, EnemyDataDic);
+        }
+#endif
         public void Start()
         {
             if (!isLightStart)
@@ -365,6 +499,9 @@ namespace PCRCaculator.Guild
             yield return null;
             //Load();
             //LoadAddedPlayerData();
+#if UNITY_5_3_OR_NEWER
+            InitEventQuestControls();
+#endif
             RefreshOnStart();
             if (MainManager.Instance.AutoCalculatorData.isCalculating)
             {
@@ -662,24 +799,20 @@ namespace PCRCaculator.Guild
             secondDropdown.AddOptions(secondDropdownOptions);
         }
         // 深渊讨伐战期数选项
+        private int[] abyssPeriodIds = Array.Empty<int>();
+
         public void UpdateAbyssFirstDropdownOptions()
         {
             Dropdown firstDropdown = dropdowns_ChooseAbyssBoss[0];
+            int previousIndex = firstDropdown.value;
+            // 多期可以复用前哨关卡的波次。按活动 ID 列出有前哨和 Boss 配置的期数。
+            abyssPeriodIds = AbyssQuestFilterDic == null || AbyssBossFilterDic == null
+                ? Array.Empty<int>()
+                : AbyssQuestFilterDic.Keys.Intersect(AbyssBossFilterDic.Keys).OrderBy(id => id).ToArray();
             firstDropdown.ClearOptions();
-
-            List<string> firstDropdownOptions = new List<string>();
-
-            if (AbyssWaveGroupDataDic != null)
-            {
-                int optionCount = Mathf.CeilToInt(AbyssWaveGroupDataDic.Count / 15.0f);
-
-                for (int i = 1; i <= optionCount; i++)
-                {
-                    firstDropdownOptions.Add($"第{i}期");
-                }
-            }
-
-            firstDropdown.AddOptions(firstDropdownOptions);
+            firstDropdown.AddOptions(abyssPeriodIds.Select((id, index) => $"第{index + 1}期").ToList());
+            if (abyssPeriodIds.Length > 0)
+                firstDropdown.value = Mathf.Clamp(previousIndex, 0, abyssPeriodIds.Length - 1);
         }
 
         public void UpdateAbyssThirdDropdownOptions()
@@ -707,44 +840,36 @@ namespace PCRCaculator.Guild
         }
         public void OnChooseAbyssDropDownChanged()
         {
+            TryApplyAbyssSelection();
+        }
+
+        private bool TryApplyAbyssSelection()
+        {
             int firstOption = dropdowns_ChooseAbyssBoss[0].value;
             int secondOption = dropdowns_ChooseAbyssBoss[1].value;
             int thirdOption = dropdowns_ChooseAbyssBoss[2].value + 1;
 
-            Dictionary<int, int> sourceDic;
-            if (secondOption == 0)
-            {
-                // 当 firstOption 为 0 时，使用 AbyssQuestFilterDic
-                sourceDic = AbyssQuestFilterDic;
-            }
-            else
-            {
-                // 当 firstOption 大于 0 时，使用 AbyssBossFilterDic
-                sourceDic = AbyssBossFilterDic;
-            }
-            var sortedAbyssIds = sourceDic.Keys
-                .OrderBy(x => x)
-                .ToArray();
-
-            int selectedAbyssId = sortedAbyssIds[firstOption];
+            if (firstOption < 0 || firstOption >= abyssPeriodIds.Length)
+                return false;
+            var sourceDic = secondOption == 0 ? AbyssQuestFilterDic : AbyssBossFilterDic;
+            int selectedAbyssId = abyssPeriodIds[firstOption];
             int abyssWaveGroupIdPrefix = sourceDic[selectedAbyssId];
 
             // 构造wave_group_id
             // 格式: abyssWaveGroupIdPrefix(第1-5位) + secondOption(第6位) + thirdOption(第7位) + 00(最后2位)
             int waveGroupId = abyssWaveGroupIdPrefix + secondOption * 1000 + thirdOption * 100;
 
-            WaveGroupId = waveGroupId;
             var matchingData = AbyssWaveGroupDataDic?.Values
                 .FirstOrDefault(data => data.wave_group_id == waveGroupId);
-            if (matchingData != null)
-            {
-                specialEnemyid = matchingData.enemy_ids.ToArray();
-                SetBossImages(specialEnemyid, AbyssEnemyParameterDic);
-            }
-            else
+            if (matchingData == null)
             {
                 Debug.LogError($"未找到匹配的wave group数据: {waveGroupId}");
+                return false;
             }
+            WaveGroupId = waveGroupId;
+            specialEnemyid = matchingData.enemy_ids.ToArray();
+            SetBossImages(specialEnemyid, AbyssEnemyParameterDic);
+            return true;
         }
         public void UpdateSecretDungeonFirstDropdownOptions()
         {
@@ -1469,7 +1594,8 @@ namespace PCRCaculator.Guild
                 }
                 else if (toggles_ChooseType[2].isOn)
                 {
-                    OnChooseAbyssDropDownChanged();
+                    if (!TryApplyAbyssSelection())
+                        return;
                 }
                 else if (toggles_ChooseType[4].isOn)
                 {
@@ -1483,6 +1609,14 @@ namespace PCRCaculator.Guild
                         return;
                     }
                 }
+#if UNITY_5_3_OR_NEWER
+                if (toggles_ChooseType.Skip(7).Any(t => t.isOn))
+                {
+                    if (quests == null || quests.Count == 0) return;
+                    PreviewEventQuest();
+                    if (choosingInvasion) group.invasionRelicIds = Events.SelectRelics(quests[eventQuest.value].schedule_id, group.invasionRelicIds);
+                }
+#endif
                 enemyId = specialEnemyid;
             }
             //selectedBossEnemyid = SettingData.currentTurn == 1 ? guildEnemyData.enemyIds_1[SettingData.currentGuildEnemyNum] : guildEnemyData.enemyIds_2[SettingData.currentGuildEnemyNum];
@@ -1511,7 +1645,7 @@ namespace PCRCaculator.Guild
             group.useLogBarrierNew = GuildPlayerGroupData.LogBarrierType.FullBarrier; // (GuildPlayerGroupData.LogBarrierType)dropdowns_ChooseBoss[4].value;
             int specialEnemyWaveGroupId = GetSpecialEnemyWaveGroupId(group.selectedEnemyIDs);
             group.waveGroupId = specialEnemyWaveGroupId != 0 ? specialEnemyWaveGroupId
-                : IsTalentQuestBoss || IsAbyssBoss || IsDungeonBoss || IsMirageBoss || IsLabyrinthBoss ? WaveGroupId : 0;
+                : IsTalentQuestBoss || IsAbyssBoss || IsDungeonBoss || IsMirageBoss || IsLabyrinthBoss || selectedBossEnemyids[0] / SpecialBossPrefixDivisor == 41 || selectedBossEnemyids[0] / SpecialBossPrefixDivisor == 78 ? WaveGroupId : 0;
             WaveGroupId = group.waveGroupId;
             SaveDataToJson();
             Refresh();
@@ -1744,6 +1878,7 @@ namespace PCRCaculator.Guild
                 toggles_ChooseType[4].SetActive(false);
             }
             UpdateMirageAreaDropdownOptions();
+            UpdateAbyssFirstDropdownOptions();
             SetChooseBossDropDown(data.currentGuildMonth);
             //dropdowns_ChooseBoss[2].value = data.currentGuildMonth >= 1000 ? data.currentGuildMonth - 1000 : (data.currentGuildMonth + 1) % 12;
             dropdowns_ChooseBoss[0].value = data.currentGuildEnemyNum;
@@ -1898,6 +2033,17 @@ namespace PCRCaculator.Guild
         }
         public void UpdateTooglesChooseType()
         {
+#if UNITY_5_3_OR_NEWER
+            var wave = SettingData.GetCurrentPlayerGroup().waveGroupId;
+            bool invasion = Events.Invasion.ContainsKey(wave);
+            if (invasion || Events.Hunt.ContainsKey(wave))
+            {
+                var toggle = toggles_ChooseType[invasion ? 7 : 8];
+                if (toggle.isOn) OpenEventQuest(invasion);
+                else toggle.isOn = true;
+                return;
+            }
+#endif
             if (IsLabyrinthBoss)
             {
                 if (toggles_ChooseType.Count > 5)
@@ -2016,7 +2162,7 @@ namespace PCRCaculator.Guild
                 data.waveGroupId = specialEnemyWaveGroupId;
                 WaveGroupId = specialEnemyWaveGroupId;
             }
-            else if (IsTalentQuestBoss || IsAbyssBoss || IsDungeonBoss || IsMirageBoss || IsLabyrinthBoss)
+            else if (IsTalentQuestBoss || IsAbyssBoss || IsDungeonBoss || IsMirageBoss || IsLabyrinthBoss || MainManager.Instance.databaseCache.EventBattles.Waves.ContainsKey(data.waveGroupId))
             {
                 data.waveGroupId = data.waveGroupId == 0 ? WaveGroupId : data.waveGroupId;
                 WaveGroupId = data.waveGroupId;
@@ -2083,7 +2229,7 @@ namespace PCRCaculator.Guild
             }
             SetBattleEffectPictures();
             if (relicButton != null)
-                relicButton.SetActive(IsLabyrinthBoss);
+                relicButton.SetActive(IsLabyrinthBoss || MainManager.Instance.databaseCache.EventBattles.Invasion.ContainsKey(data.waveGroupId));
             // else
             // {
             //     bossPicture.sprite = ABExTool.GetSprites(ABExTool.SpriteType.角色图标, EnemyDataDic[selectedBossEnemyids[0]].unit_id);
@@ -2115,7 +2261,29 @@ namespace PCRCaculator.Guild
             {
                 currentHPinput.text = " " + data.playerSetingHP;
             }
-            if (IsGuildBoss)
+            UpdateBossTitle(data);
+            RandomSeed.text = "" + SettingData.GetCurrentRandomData().RandomSeed;
+            UseFixedRandomSeed.isOn = SettingData.GetCurrentRandomData().UseFixedRandomSeed;
+            usePlayerSettingHP.isOn = SettingData.GetCurrentPlayerGroup().usePlayerSettingHP;
+            UpdateWeaknessSprites();
+            if (selectedBossEnemyids[0] > 0)
+            {
+                GetTalentFormationBonusDescription();
+            }
+        }
+
+        private void UpdateBossTitle(GuildPlayerGroupData data)
+        {
+            var events = MainManager.Instance.databaseCache.EventBattles;
+            if (events.Hunt.TryGetValue(data.waveGroupId, out var hunt))
+            {
+                BossText.text = $"挑战任务 {EventScheduleLabel(hunt.schedule_id)} {EventQuestLabel(hunt, events)}";
+            }
+            else if (events.Invasion.TryGetValue(data.waveGroupId, out var invasion))
+            {
+                BossText.text = $"讨魔战线 {EventScheduleLabel(invasion.schedule_id)} {EventQuestLabel(invasion, events)}";
+            }
+            else if (IsGuildBoss)
             {
                 string des = "";
                 switch (data.currentTurn)
@@ -2163,14 +2331,6 @@ namespace PCRCaculator.Guild
             else if (data.isSpecialBoss)
             {
                 BossText.text = "自定义";
-            }
-            RandomSeed.text = "" + SettingData.GetCurrentRandomData().RandomSeed;
-            UseFixedRandomSeed.isOn = SettingData.GetCurrentRandomData().UseFixedRandomSeed;
-            usePlayerSettingHP.isOn = SettingData.GetCurrentPlayerGroup().usePlayerSettingHP;
-            UpdateWeaknessSprites();
-            if (selectedBossEnemyids[0] > 0)
-            {
-                GetTalentFormationBonusDescription();
             }
         }
         private void RefreshCalcSettings_start()
@@ -3293,6 +3453,7 @@ namespace PCRCaculator.Guild
             var bossId = isBattle ? MyGameCtrl.Instance.tempData.guildEnemy[0].enemy_id : selectedBossEnemyids[0];
             var waveGroupId = isBattle ? MyGameCtrl.Instance.tempData.waveGroupId : WaveGroupId;
             var formationData = IsTalentQuestBossId(bossId) || IsAbyssBossId(bossId) || IsMirageBossId(bossId)
+                || MainManager.Instance.databaseCache.EventBattles.Waves.ContainsKey(waveGroupId)
                 || (waveGroupId != 0 && specialEnemyIds.Values.Any(selection => selection.WaveGroupId == waveGroupId))
                 ? (MainManager.Instance.TalentFormationDic.TryGetValue(waveGroupId, out var talentData) ? talentData : null)
                 : MainManager.Instance.TalentFormationDic.TryGetValue(bossId, out var bossData)
@@ -3481,7 +3642,11 @@ namespace PCRCaculator.Guild
         {
             string des = "";
             var data = GetCurrentPlayerGroup();
-            if (data.selectedEnemyIDs[0] / 100000000 == 8)
+            if (MainManager.Instance.databaseCache.EventBattles.Invasion.TryGetValue(data.waveGroupId, out var invasion))
+                des += $"讨魔 {invasion.quest_id}";
+            else if (MainManager.Instance.databaseCache.EventBattles.Hunt.TryGetValue(data.waveGroupId, out var hunt))
+                des += $"挑战 {hunt.quest_id}";
+            else if (data.selectedEnemyIDs[0] / 100000000 == 8)
             {
                 des += data.talentQuestMap switch
                 {
@@ -3580,6 +3745,7 @@ namespace PCRCaculator.Guild
         // Null means the arena opponent inherits this group's configuration.
         public TeamEnhanceConfiguration arenaEnemyTeamEnhance;
         public List<int> labyrinthEnhancedNodeIds = new List<int>();
+        public List<int> invasionRelicIds = new List<int>();
         public List<int> labyrinthRelicIds = new List<int>();
         public int labyrinthAlphaRupee;
         public int labyrinthOwnedUnitsCount;

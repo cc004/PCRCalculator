@@ -749,6 +749,7 @@ namespace Elements
                     {
                         ActionParameter actionParameter2 = _skill.ActionParameters[actionParameter.ActionChildrenIndexes[j]];
                         actionParameter2.Position = position;
+                        actionParameter2.IsFlightStateTargetByReflection = IsReflectionCenteredOnFlyingTarget(actionParameter);
                         searchAndSortTarget(_skill, actionParameter2, basePosition, false, considerBodyWidth);
                     }
                 }
@@ -771,7 +772,7 @@ namespace Elements
             {
                 if (actionParameter != null && actionParameter.Value != null)
                 {
-                    actionParameter.Value[eValueNumber.VALUE_3] = _additionalAttackEnhance / 10000.0f + 1.0f;
+                    actionParameter.Value[eValueNumber.VALUE_3] = _additionalAttackEnhance / 10000.0 + 1.0;
                     // TODO strange of overwriting this value find the reason
                 }
             }
@@ -1107,7 +1108,7 @@ namespace Elements
             {
                 _hasNoTarget = false;
             }
-            if (_hasNoTarget || (Owner.IsAbnormalState(UnitCtrl.eAbnormalState.SILENCE) && !Owner.AttackWhenSilence))
+            if (_hasNoTarget || (Owner.IsSilencedOrBerserk && !Owner.AttackWhenSilence))
             {
                 if (Owner.IsBoss && !Owner.IsConfusionOrConvert() && !skill.IsPrincessForm && currentSpineCtrl.IsAnimation(skill.AnimId, skill.SkillNum, -1, Owner.MotionPrefix))
                 {
@@ -1406,6 +1407,13 @@ namespace Elements
             battleManager.SetForegroundEnable(true);
         }
 
+        private static bool IsReflectionCenteredOnFlyingTarget(ActionParameter reflection)
+        {
+            return (reflection.ActionDetail1 == 1 || reflection.ActionDetail1 == 4)
+                && reflection.TargetList.Count > 0
+                && reflection.TargetList[0].Owner.IsAbnormalState(UnitCtrl.eAbnormalState.FLIGHT);
+        }
+
         public void AddBlackoutTarget(int _skillId)
         {
             Skill skill = skillDictionary[_skillId];
@@ -1448,6 +1456,7 @@ namespace Elements
                                 for (int count2 = actionParameter1.ActionChildrenIndexes.Count; index3 < count2; ++index3)
                                 {
                                     ActionParameter actionParameter2 = skill.ActionParameters[actionParameter1.ActionChildrenIndexes[index3]];
+                                    actionParameter2.IsFlightStateTargetByReflection = IsReflectionCenteredOnFlyingTarget(actionParameter1);
                                     searchAndSortTarget(skill, actionParameter2, _basePosition, _considerBodyWidth: _considerBodyWidth);
                                     for (int index4 = 0; index4 < actionParameter2.TargetNum && index4 != actionParameter2.TargetList.Count; ++index4)
                                     {
@@ -1502,6 +1511,7 @@ namespace Elements
                             for (int count2 = actionParameter1.ActionChildrenIndexes.Count; index3 < count2; ++index3)
                             {
                                 ActionParameter actionParameter2 = skill.ActionParameters[actionParameter1.ActionChildrenIndexes[index3]];
+                                actionParameter2.IsFlightStateTargetByReflection = IsReflectionCenteredOnFlyingTarget(actionParameter1);
                                 searchAndSortTarget(skill, actionParameter2, _basePosition, _considerBodyWidth: _considerBodyWidth);
                                 actionParameter2.IsSearchAndSorted = false;
                             }
@@ -1691,6 +1701,7 @@ namespace Elements
             }
             
             var _valueDictionary = action.PrepareActionValue(Owner); // TODO may be right: source
+
 
             bool _last = action.JudgeLastAndNotExeced(target.Owner, num);
             bool _targetOneParts = action.AlreadyExecedData[target.Owner][num].TargetPartsNumber == 1;

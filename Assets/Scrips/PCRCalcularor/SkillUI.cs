@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -21,63 +21,85 @@ namespace PCRCaculator.Battle
         private float allcastTime;
         
 
-        public void Init(int[] skilllist,int skillEV1,int skillEV2)
+        public void Init(IEnumerable<int> skillIds)
         {
-            Action<int> action = a =>
-            {
-                //string path = "skills/icon_skill_" + MainManager.Instance.SkillDataDic[a].icon;
-                //Sprite im = MainManager.LoadSourceSprite(path);
-                Sprite im = ABExTool.GetSprites(ABExTool.SpriteType.技能图标, MainManager.Instance.SkillDataDic[a].icon);
-                if (skillImageDic.ContainsKey(a))
-                {
-                    skillImageDic[a] = im;
-                }
-                else
-                {
-                    skillImageDic.Add(a, im);
-                }
-            };
-            for (int i = 0; i < skilllist.Length; i++)
-            {
-                if (skilllist[i] > 0)
-                {
-                    action(skilllist[i]);
-                }
-            }
-            if (skillEV1 != 0)
-                action(skillEV1);
-            if (skillEV2 != 0)
-                action(skillEV2);
+            if (skillIds == null)
+                return;
 
+            foreach (int skillId in skillIds)
+            {
+                AddSkillIcon(skillId);
+            }
         }
+
+        private void AddSkillIcon(int skillId)
+        {
+            if (skillId <= 0)
+                return;
+
+            skillImageDic[skillId] = ResolveSkillIcon(skillId);
+        }
+
+        /// <summary>
+        /// 从技能表里取图标；取不到返回 null（调用方自己兜底）。
+        /// 技能革命（++ 档）这类运行期才会出现的 id 也能在这里补。
+        /// </summary>
+        private static Sprite ResolveSkillIcon(int skillId)
+        {
+            MainManager mainManager = MainManager.Instance;
+            if (mainManager == null || mainManager.SkillDataDic == null)
+                return null;
+
+            if (!mainManager.SkillDataDic.TryGetValue(skillId, out SkillData skillData) || skillData == null)
+                return null;
+
+            return ABExTool.GetSprites(ABExTool.SpriteType.技能图标, skillData.icon);
+        }
+
         public void SetSkillState(int currentSkillid,int nextSkillid,float castTime,float animeTime)
         {
-            if (currentSkillid == 1)
-            {
-                iconImage_current.sprite = atkicon;
-                iconText_current.gameObject.SetActive(false);
-            }
-            else
-            {
-                iconImage_current.sprite = skillImageDic[currentSkillid];
-                iconText_current.gameObject.SetActive(true);
-                int num = currentSkillid % 10 - 1;
-                iconText_current.text = num + "";
-            }
-            if (nextSkillid == 1)
-            {
-                iconImage_next.sprite = atkicon;
-                iconText_next.gameObject.SetActive(false);
-            }
-            else
-            {
-                iconImage_next.sprite = skillImageDic[nextSkillid];
-                iconText_next.gameObject.SetActive(true);
-                int num = nextSkillid % 10 - 1;
-                iconText_next.text = num + "";
-            }
+            ApplySkillState(iconImage_current, iconText_current, currentSkillid);
+            ApplySkillState(iconImage_next, iconText_next, nextSkillid);
             allcastTime = castTime;
             mask_A.fillAmount = 0;
+        }
+
+        private void ApplySkillState(Image iconImage, TextMeshProUGUI iconText, int skillId)
+        {
+            if (iconImage != null)
+            {
+                iconImage.sprite = skillId == 1 ? atkicon : GetSkillIcon(skillId);
+            }
+
+            if (iconText == null)
+                return;
+
+            bool showLevel = skillId != 1;
+            iconText.gameObject.SetActive(showLevel);
+            if (showLevel)
+            {
+                iconText.text = (skillId % 10 - 1) + "";
+            }
+        }
+
+        /// <summary>
+        /// 取技能图标；字典里没有就现场解析一次并缓存，仍取不到则用普攻图标兜底。
+        /// 以前这里直接索引字典，遇到未预装的技能 id（如技能革命 ++ 档）会抛 KeyNotFoundException。
+        /// </summary>
+        private Sprite GetSkillIcon(int skillId)
+        {
+            if (skillImageDic.TryGetValue(skillId, out Sprite sprite) && sprite != null)
+                return sprite;
+
+            sprite = ResolveSkillIcon(skillId);
+            if (sprite == null)
+            {
+                sprite = atkicon;
+                Debug.LogWarning($"[SkillUI] skill {skillId} 在技能表里找不到图标，先用普攻图标兜底");
+            }
+
+            skillImageDic[skillId] = sprite;
+            return sprite;
         }
 
         public void SetCastTime(float time)

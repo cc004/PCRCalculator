@@ -7,20 +7,50 @@
 //using Elements.Data;
 
 using System.Collections.Generic;
+using PCRCaculator.SQL;
 using UnityEngine;
 
 namespace Elements
 {
   public class BattleUtil
   {
-    public static float GetCriticalRate(float critical, int level, int targetLevel) => (float)(critical * 0.0500000007450581 * (level / (double)targetLevel) * 0.00999999977648258);
+    public const long MaxBattleParameter = 2_000_000_000L;
+
+    public static double ApplyRecoveryAttenuation(RecoveryAttenuation[] tiers, double previous, double amount)
+    {
+      if (tiers.Length == 0)
+        return amount;
+
+      // The -1 row gives the rate beyond the last finite threshold.
+      double total = 0.0;
+      for (int i = 1; i < tiers.Length; i++)
+      {
+        var tier = tiers[i];
+        if (tier.limit_value <= previous)
+          continue;
+        if (previous + amount < tier.limit_value)
+          return total + amount * tier.correction_value;
+
+        double portion = tier.limit_value - previous;
+        total += portion * tier.correction_value;
+        amount -= portion;
+        previous = tier.limit_value;
+      }
+      return total + amount * tiers[0].correction_value;
+    }
+
+    public static LongWithEx GetEffectiveParameter(LongWithEx baseValue, LongWithEx additionalBuff) =>
+        (baseValue.Max(0) + additionalBuff).Min(MaxBattleParameter);
+
+    public static float GetCriticalRate(float critical, int level, int targetLevel) =>
+        critical * 0.05f * ((float)level / targetLevel) * 0.01f;
 
     public static float GetDodgeByLevelDiff(int level, BasePartsData _target)
     {
       float ret = 1.0f;
       if (!_target.Owner.IsBoss)
       {
-        ret = (float)(1.0 - Mathf.Max(_target.GetLevel() - level, 0.0f) / 100.0);
+        ret = 1f - Mathf.Max(_target.GetLevel() - level, 0f) / 100f;
       }
       return ret;
     }
@@ -32,12 +62,7 @@ namespace Elements
       if (owner.IsBoss)
           return 1f;
 
-      int targetLevel = _target.GetLevel();
-      float baseDodge = 1f + (float)(targetLevel - _level) / -100f;
-      if (targetLevel - _level <= 0)
-          baseDodge = 1f;
-      baseDodge *= _coefficient;
-      baseDodge = Mathf.Min(baseDodge, 1f);
+      float baseDodge = Mathf.Min(GetDodgeByLevelDiff(_level, _target) * _coefficient, 1f);
 
       long targetResist = owner.AbnormalStateDodgeResistZero;
       long sourceHit = _source.AbnormalStateDodgeHitZero;
@@ -120,10 +145,10 @@ namespace Elements
     {
       if (_num >= 0.0)
       {
-        long num = Mathf.CeilToInt((float)_num);
+        long num = (long)System.Math.Ceiling(_num);
         return Approximately(_num, num) ? num : (long)_num;
       }
-      long num1 = Mathf.FloorToInt((float)_num);
+      long num1 = (long)System.Math.Floor(_num);
       return Approximately(_num, num1) ? num1 : (long)_num;
     }
 
@@ -144,14 +169,14 @@ namespace Elements
       int num = (int)_num;
       if (Approximately(num, _num))
         return num;
-      return _num <= 0.0 ? Mathf.FloorToInt((float)_num) : Mathf.CeilToInt((float)_num);
+      return DoubleToInt(_num <= 0.0 ? System.Math.Floor(_num) : System.Math.Ceiling(_num));
     }
     public static long DoubleToLongReverseTruncate(double _num)
     {
       long num = (long)_num;
       if (Approximately(num, _num))
         return num;
-      return _num <= 0.0 ? Mathf.FloorToInt((float)_num) : Mathf.CeilToInt((float)_num);
+      return DoubleToLong(_num <= 0.0 ? System.Math.Floor(_num) : System.Math.Ceiling(_num));
     }
 
     public static LongWithEx DoubleToLongReverseTruncate(DoubleWithEx _num)
@@ -167,9 +192,9 @@ namespace Elements
       return (float)FloatToInt(_value * 1000f) / 1000f;
     }
 
-    public static float DoubleToPerMille(double _value)
+    public static double DoubleToPerMille(double _value)
     {
-      return (float)DoubleToInt(_value * 1000.0) / 1000f;
+      return DoubleToLong(_value * 1000.0) / 1000.0;
     }
     public static FloatWithEx FloatToIntReverseTruncate(FloatWithEx _num)
     {

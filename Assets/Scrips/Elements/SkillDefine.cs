@@ -40,6 +40,7 @@ namespace Elements
     {
             eActionType.DESTROY,
             eActionType.FORCE_HP_CHANGE,
+            eActionType.FOLLOW_UP_DAMAGE,
             eActionType.CONVERT_DAMAGE_OVER_TIME
     };
 
@@ -819,6 +820,34 @@ namespace Elements
             {
                 eActionType.ENCHANT_UB_TRIGGER_SEAL,
                 typeof(EnchantUbTriggerSealAction)
+            },
+            {
+                eActionType.KETSUBAN,
+                typeof(KetsubanAction)
+            },
+            {
+                eActionType.PASSIVE_INTERMITTENT,
+                typeof(PassiveIntermittentAction)
+            },
+            {
+                eActionType.EVERY_ATTACK_CRITICAL,
+                typeof(EveryAttackCriticalAction)
+            },
+            {
+                eActionType.UNABLE_STATE_GUARD_FOR_EXTRA_EFFECT,
+                typeof(UnableStateGuardForExtraEffectAction)
+            },
+            {
+                eActionType.IF_CONTAINS_CHARA_TYPE_GROUP,
+                typeof(IfContainsCharaTypeGroupAction)
+            },
+            {
+                eActionType.FOLLOW_UP_DAMAGE,
+                typeof(FollowUpDamageAction)
+            },
+            {
+                eActionType.CHANGE_SKILL_DAMAGE_RATE,
+                typeof(ChangeSkillDamageRateAction)
             }
         };
         public static readonly Dictionary<eActionType, bool> ProtectEnableDic = new Dictionary<eActionType, bool>
@@ -945,6 +974,7 @@ namespace Elements
           { (eActionType)132, false },
           { (eActionType)133, false },
           { (eActionType)134, false },
+          { eActionType.CHANGE_SKILL_DAMAGE_RATE, false },
         };
 
         /*public static readonly Dictionary<int, eUbResponceVoiceType> UbResponceVoiceDictionary = new Dictionary<int, eUbResponceVoiceType>()

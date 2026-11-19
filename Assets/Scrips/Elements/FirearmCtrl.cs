@@ -291,13 +291,22 @@ namespace Elements
             float _b2 = num1 + num2;
             float _a1 = (float)num3 - num4;
             float _a2 = (float)num3 + num4;
-            //Debug.Log(BattleHeaderController.CurrentFrameCount + "-弹道检测：" + num1 + "--" + num2 + "--" + num3+"--"+num4);
+            if (MoveType == eMoveTypes.LINEAR)
+                return HasReachedLinearTarget(speed.x, _b1, _b2, _a1, _a2);
             if (_a1 >= (double)_b2 && !BattleUtil.Approximately(_a1, _b2) || _a2 <= (double)_b1 && !BattleUtil.Approximately(_a2, _b1))
                 return _hitFlag;
             if (MoveType != eMoveTypes.PARABORIC && MoveType != eMoveTypes.PARABORIC_ROTATE)
                 return true;
             InFlag = true;
             return _hitFlag;
+        }
+
+        internal static bool HasReachedLinearTarget(float speedX, float projectileLeft, float projectileRight, float targetLeft, float targetRight)
+        {
+            // A linear projectile can pass the entire target between two frames.
+            return speedX > 0f
+                ? projectileRight >= targetLeft || BattleUtil.Approximately(projectileRight, targetLeft)
+                : projectileLeft <= targetRight || BattleUtil.Approximately(projectileLeft, targetRight);
         }
 
         protected virtual bool getStopFlag() => stopFlag;

@@ -19,6 +19,9 @@ public static class AssetDownloadUtil
     /// <summary>单个请求的最大尝试次数（含首次）。</summary>
     public const int MaxAttempts = 3;
 
+    /// <summary>默认 User-Agent：GitHub API 对缺失该头的请求直接返回 403。</summary>
+    public const string UserAgent = "PCRCalculator/1.0 (+https://github.com/acygen/PCRCalculator)";
+
     private static readonly TimeSpan AttemptTimeout = TimeSpan.FromSeconds(120);
 
     /// <summary>manifest 抓取共用的并发闸门，避免递归展开时并发数无限放大。</summary>
@@ -97,6 +100,16 @@ public static class AssetDownloadUtil
         try
         {
             result.DefaultRequestHeaders.ConnectionClose = false;
+        }
+        catch (Exception)
+        {
+            // 忽略：个别运行时不支持该头
+        }
+
+        try
+        {
+            // GitHub API 对没有 User-Agent 的请求直接返回 403，必须显式带上。
+            result.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", UserAgent);
         }
         catch (Exception)
         {

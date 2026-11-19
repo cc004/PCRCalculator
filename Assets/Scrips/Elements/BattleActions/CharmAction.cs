@@ -37,7 +37,9 @@ namespace Elements
             // double pp = (double)_valueDictionary[eValueNumber.VALUE_3] * BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target);
             double pp = BattleUtil.CalcDodgeByLevelDiffUseParam(_skill.Level, _source, _target, IsExEquipSkillAction, (float)_valueDictionary[eValueNumber.VALUE_3]);
             var randomData = new RandomData(_source, _target.Owner, ActionId, 7, pp);
-            if (BattleManager.Random(0.0f, 1f, ref randomData) < pp)
+            bool forceHit = _target.Owner.ConsumeForceHit(ActionType, ActionDetail1)
+                || BattleUtil.Approximately(_valueDictionary[eValueNumber.VALUE_5], 1.0);
+            if (BattleManager.Random(0.0f, 1f, ref randomData) < pp || forceHit)
             {
                 AppendIsAlreadyExeced(_target.Owner, _num);
                 UnitCtrl.eAbnormalState _abnormalState = UnitCtrl.eAbnormalState.CONVERT;
@@ -57,7 +59,7 @@ namespace Elements
                         break;
                 }
                 //_target.Owner.SetAbnormalState(_source, _abnormalState, AbnormalStateFieldAction == null ? (float)_valueDictionary[eValueNumber.VALUE_1] : 90f, this, _skill);
-                _target.Owner.SetAbnormalState(_source, _abnormalState, (base.AbnormalStateFieldAction == null) ? (float)_valueDictionary[eValueNumber.VALUE_1] : 90f, this, _skill, 0f, 0f, _reduceEnergy: false, _isDamageRelease: false, 1f, (float)_valueDictionary[eValueNumber.VALUE_5] == 0f);
+                _target.Owner.SetAbnormalState(_source, _abnormalState, (base.AbnormalStateFieldAction == null) ? (float)_valueDictionary[eValueNumber.VALUE_1] : 90f, this, _skill, 0f, 0f, _reduceEnergy: false, _isDamageRelease: false, 1f, _valueDictionary[eValueNumber.VALUE_5] == 0.0, _isIgnoreDebuffImmune: IsIgnoreDebuffImmune());
                 action("魅惑");
             }
             else

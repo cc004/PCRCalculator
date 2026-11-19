@@ -277,6 +277,7 @@ namespace Elements.Battle
         [JsonConverter(typeof(RoleMasteryJsonConverter))]
         public Dictionary<int, (int slotLevel, int enhanceLevel)> EnemyRoleMastery { get; set; }
         public List<int> LabyrinthEnhancedNodeIds { get; set; } = new List<int>();
+        public List<int> InvasionRelicIds { get; set; } = new List<int>();
         public List<int> LabyrinthRelicIds { get; set; } = new List<int>();
         public List<int> LabyrinthOwnedUnitIds { get; set; } = new List<int>();
         public int? LabyrinthOwnedUnitsCount { get; set; }
@@ -293,6 +294,7 @@ namespace Elements.Battle
         public bool IsSetMode { get; set; }
         public bool IsSemanMode { get; set; }
         public bool UseSequenceUB { get; set; }
+        public bool InfiniteBossHp { get; set; }
         public bool IsGuildBattle { get; set; } = true;
         public bool IsSkipping { get; set; } = true;
         public int WaveGroupId { get; set; } = 0;
@@ -319,6 +321,7 @@ namespace Elements.Battle
                 IsSemanMode = this.IsSemanMode,
                 UseSequenceUB = this.UseSequenceUB,
                 IsGuildBattle = this.IsGuildBattle,
+                InfiniteBossHp = this.InfiniteBossHp,
                 IsSkipping = this.IsSkipping,
                 TalentFullInfo = this.TalentFullInfo,
                 IsTalentQuest = this.IsTalentQuest,
@@ -364,6 +367,7 @@ namespace Elements.Battle
                 EnemyMasterSkillNodeLevels = this.EnemyMasterSkillNodeLevels != null ? new Dictionary<int, int>(this.EnemyMasterSkillNodeLevels) : null,
                 EnemyRoleMastery = this.EnemyRoleMastery != null ? new Dictionary<int, (int, int)>(this.EnemyRoleMastery) : null,
                 LabyrinthEnhancedNodeIds = this.LabyrinthEnhancedNodeIds?.ToList(),
+                InvasionRelicIds = this.InvasionRelicIds?.ToList(),
                 LabyrinthRelicIds = this.LabyrinthRelicIds?.ToList(),
                 LabyrinthOwnedUnitIds = this.LabyrinthOwnedUnitIds?.ToList(),
                 LabyrinthOwnedUnitsCount = this.LabyrinthOwnedUnitsCount,

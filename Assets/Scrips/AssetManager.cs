@@ -15,7 +15,7 @@ using System.Text.RegularExpressions;
 using PCRCaculator;
 using Random = System.Random;
 using LibConeshell;
-using PCRApi.CN;
+using PCRCaculator.SQL;
 
 namespace PCRApi
 {
@@ -502,6 +502,9 @@ namespace PCRApi
             => Task.Run(() => ResolveDatabase(progress), cancellationToken);
 
         public string DataVer => $"jp{Ver}";
+
+        /// <summary>日服官方库是 Coneshell 加密的，需要 rainbow 反哈希才能用。</summary>
+        public bool RequiresUnhash => true;
 
 
         public void CalcHash()

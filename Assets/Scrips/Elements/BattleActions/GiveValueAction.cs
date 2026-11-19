@@ -68,7 +68,13 @@ namespace Elements
             UnitCtrl JELADBAMFKH = unitCtrl;
             UnitCtrl LIMEKPEENOB = owner;
             battleLog.AppendBattleLog(eBattleLogType.GIVE_VALUE_ADDITIONAL, 0, 0L, 0L, 0, actionId, JELADBAMFKH: JELADBAMFKH, LIMEKPEENOB: LIMEKPEENOB);
-            setValue(_addValue, _skill.ActionParameters.Find(e => e.ActionId == ActionDetail1));
+            ActionParameter targetAction = _skill.ActionParameters.Find(e => e.ActionId == ActionDetail1);
+            if (targetAction == null)
+            {
+                UnityEngine.Debug.LogWarning($"[GiveValueAction] action {ActionId} 的目标 action {ActionDetail1} 不在技能 {_skill.SkillId} 内，忽略本次附加值");
+                return;
+            }
+            setValue(_addValue, targetAction);
         }
 
         /*protected virtual void createValue(
@@ -148,6 +154,7 @@ namespace Elements
       eValueNumber _evalue,
       BasePartsData _target)
         {
+            var sourceParts = _target.Owner == _source ? parameterParts : null;
             switch (BattleUtil.DoubleToInt(_valueDictionary[eValueNumber.VALUE_1]))
             {
                 case (int)eAdditiveValueType.HP:
@@ -171,48 +178,16 @@ namespace Elements
                     _addValue[_evalue] = (DoubleWithEx)_skill.TotalDamage * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 case (int)eAdditiveValueType.TARGET_ATK:
-                    //_addValue[_evalue] = BattleUtil.FloatToInt(_target.Owner.Atk) * _valueDictionary[eValueNumber.VALUE_2];
-                    if (_target.Owner == _source && parameterParts != null)
-                    {
-                        _addValue[_evalue] = parameterParts.GetAtkZero() * _valueDictionary[eValueNumber.VALUE_2];
-                    }
-                    else
-                    {
-                        _addValue[_evalue] = (DoubleWithEx)_target.Owner.AtkZero * _valueDictionary[eValueNumber.VALUE_2];
-                    }
+                    _addValue[_evalue] = (DoubleWithEx)(sourceParts?.GetAtkZeroEx() ?? _target.Owner.AtkZero) * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 case (int)eAdditiveValueType.TARGET_MAGIC_ATK:
-                    //_addValue[_evalue] = BattleUtil.FloatToInt(_target.Owner.MagicStr) * _valueDictionary[eValueNumber.VALUE_2];
-                    if (_target.Owner == _source && parameterParts != null)
-                    {
-                        _addValue[_evalue] = parameterParts.GetMagicStrZero() * _valueDictionary[eValueNumber.VALUE_2];
-                    }
-                    else
-                    {
-                        _addValue[_evalue] = (DoubleWithEx)_target.Owner.MagicStrZero * _valueDictionary[eValueNumber.VALUE_2];
-                    }
+                    _addValue[_evalue] = (DoubleWithEx)(sourceParts?.GetMagicStrZeroEx() ?? _target.Owner.MagicStrZero) * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 case (int)eAdditiveValueType.TARGET_DEF:
-                    //_addValue[_evalue] = (float)(int)_target.Owner.Def * _valueDictionary[eValueNumber.VALUE_2];
-                    if (_target.Owner == _source && parameterParts != null)
-                    {
-                        _addValue[_evalue] = (DoubleWithEx)parameterParts.GetDefZero() * _valueDictionary[eValueNumber.VALUE_2];
-                    }
-                    else
-                    {
-                        _addValue[_evalue] = (DoubleWithEx)_target.GetDefZero() * _valueDictionary[eValueNumber.VALUE_2];
-                    }
+                    _addValue[_evalue] = (DoubleWithEx)(sourceParts ?? _target).GetDefZero() * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 case (int)eAdditiveValueType.TARGET_MAGIC_DEF:
-                    //_addValue[_evalue] = (float)(int)_target.Owner.MagicDef * _valueDictionary[eValueNumber.VALUE_2];
-                    if (_target.Owner == _source && parameterParts != null)
-                    {
-                        _addValue[_evalue] = (DoubleWithEx)parameterParts.GetMagicDefZero() * _valueDictionary[eValueNumber.VALUE_2];
-                    }
-                    else
-                    {
-                        _addValue[_evalue] = (DoubleWithEx)_target.GetMagicDefZero() * _valueDictionary[eValueNumber.VALUE_2];
-                    }
+                    _addValue[_evalue] = (DoubleWithEx)(sourceParts ?? _target).GetMagicDefZero() * _valueDictionary[eValueNumber.VALUE_2];
                     break;
                 case (int)eAdditiveValueType.AHEAD_UNIT_NUM:
                     List<UnitCtrl> _targetList1 = !_source.IsOther ? battleManager.UnitList : battleManager.EnemyList;

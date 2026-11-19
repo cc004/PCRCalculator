@@ -93,6 +93,12 @@ namespace Elements.Battle
 
                 if (next.depending?.pressed ?? true)
                 {
+                    // An imported timeline can omit automatic UBs while retaining their
+                    // ordinal in the player timestamps. Give that UB its turn on this frame.
+                    int ordinal = (int)System.Math.Round((next.origin - next.frame) / SameFrameOrderStep);
+                    int releases = recordedFrame == cnt ? recordedSameFrameOrdinal + 1 : 0;
+                    if (cnt == next.frame && releases < ordinal)
+                        return false;
                     if (next.frame <= cnt)
                     {
                         return true;

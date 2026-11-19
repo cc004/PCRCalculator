@@ -871,6 +871,7 @@ namespace Elements
 
         public void Destory()
         {
+            FireTarget?.Owner.IncomingProjectiles.Remove(this);
             Object.Destroy(obj);
         }
 #if UNITY_5_3_OR_NEWER
@@ -888,6 +889,7 @@ namespace Elements
 #endif
         public void ResetParam()
         {
+            FireTarget?.Owner.IncomingProjectiles.Remove(this);
             IsPlaying = true;
             activeSelf = true;
             stopFlag = false;
@@ -939,7 +941,7 @@ namespace Elements
                 }
             }
             FireTarget = _target;
-            //_target.Owner.FirearmCtrlsOnMe.Add(this);
+            _target.Owner.IncomingProjectiles.Add(this);
             EndActions = _actions;
             SkillHitEffects = _skillEffect;
             owner = _owner;
@@ -1026,7 +1028,7 @@ namespace Elements
                         stopFlag = true;
                         if (OnHitAction != null)
                         {
-                            //FireTarget.Owner.FirearmCtrlsOnMe.Remove(data);
+                            FireTarget.Owner.IncomingProjectiles.Remove(this);
                             OnHitAction(this);
                         }
                         //onCowHit.Call();
@@ -1037,7 +1039,7 @@ namespace Elements
                 if (getStopFlag())
                 {
                     activeSelf = false;
-                    //data.FireTarget.Owner.FirearmCtrlsOnMe.Remove(data);
+                    FireTarget.Owner.IncomingProjectiles.Remove(this);
                     timeToDie = true;
                 }
                 else
@@ -1067,7 +1069,7 @@ namespace Elements
                     var moveType = (eMoveTypes) data.MoveType;
                     if ((moveType == eMoveTypes.LINEAR || moveType == eMoveTypes.HORIZONTAL) && Vector3.Distance(this.initialPosistion, b) > _lifeDistance)
                     {
-                        // this.FireTarget.Owner.FirearmCtrlsOnMe.Remove(this);
+                        FireTarget.Owner.IncomingProjectiles.Remove(this);
                         // Debug.Log($"[{BattleHeaderController.CurrentFrameCount}] firearm hit set to die due to out of distance {name}@{GetHashCode():x}.");
                         this.timeToDie = true;
                     }
@@ -1093,19 +1095,10 @@ namespace Elements
             float _b2 = num1 + num2;
             float _a1 = (float)num3 - num4;
             float _a2 = (float)num3 + num4;
-            //Debug.Log(BattleHeaderController.CurrentFrameCount + "-弹道检测：" + num1 + "--" + num2 + "--" + num3+"--"+num4);
+            if ((eMoveTypes)data.MoveType == eMoveTypes.LINEAR)
+                return FirearmCtrl.HasReachedLinearTarget(speed.x, _b1, _b2, _a1, _a2);
             if ((double)_a1 >= (double)_b2 && !BattleUtil.Approximately(_a1, _b2) || (double)_a2 <= (double)_b1 && !BattleUtil.Approximately(_a2, _b1))
               return _hitFlag;
-            // if (speed.x > 0)
-            // {
-            //     if (_a1 >= (double)_b2 && !BattleUtil.Approximately(_a1, _b2))
-            //         return _hitFlag;
-            // }
-            // else
-            // {
-            //     if (_a2 <= (double)_b1 && !BattleUtil.Approximately(_a2, _b1))
-            //         return _hitFlag;
-            // }
             if ((eMoveTypes)data.MoveType != eMoveTypes.PARABORIC && (eMoveTypes)data.MoveType != eMoveTypes.PARABORIC_ROTATE)
                 return true;
             InFlag = true;

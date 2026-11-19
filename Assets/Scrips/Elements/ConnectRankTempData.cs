@@ -14,6 +14,43 @@ namespace Elements
         public long SecondaryValue { get; set; }
     }
 
+    public sealed class ConnectRankPartyBonus
+    {
+        public long TalentBonusPermyriad { get; private set; }
+        private readonly Dictionary<(long rate, long limit), int> damageBonuses = new();
+
+        public ConnectRankPartyBonus(IEnumerable<UnitParameter> party, int systemId = 0)
+        {
+            var ranks = ConnectRankTempData.Instance;
+            int coefficient = ranks.BoostCoefficient(systemId);
+            foreach (var unit in party)
+            {
+                int level = ranks.GetConnectRankBonusLevel(unit.UniqueData?.ConnectRank ?? 0);
+                if (level == 0)
+                    continue;
+
+                var bonuses = ranks.CreateRankBonusDictionary(level);
+                if (bonuses.TryGetValue(1, out var talent))
+                    TalentBonusPermyriad += talent.PrimaryValue * coefficient / 100;
+                if (bonuses.TryGetValue(2, out var damage))
+                {
+                    var key = (damage.PrimaryValue * coefficient / 100, damage.SecondaryValue * coefficient / 100);
+                    damageBonuses.TryGetValue(key, out int count);
+                    damageBonuses[key] = count + 1;
+                }
+            }
+        }
+
+        public DoubleWithEx CalcTranscendDamage(DoubleWithEx hit, DoubleWithEx total)
+        {
+            DoubleWithEx extra = 0;
+            foreach (var bonus in damageBonuses)
+                extra += TranscendDamageDataForSkillAction.CalcTranscendDamage(
+                    hit, total, bonus.Key.rate / 10000.0, bonus.Key.limit) * bonus.Value;
+            return extra;
+        }
+    }
+
     public class ConnectRankTempData
     {
 #if ENABLE_THREADING
@@ -163,6 +200,19 @@ namespace Elements
                 .ToDictionary(pair => pair.Key, pair => pair.Value);
         }
 
+        /// <summary>
+        /// 连结RANK 的 RANK 奖励里 bonus_type=3 对应的「等级上限 +N」（官方 UnitData.CalcAdditionalLevelCap 用的就是 key=3）。
+        /// </summary>
+        public int GetConnectRankAdditionalLevelCap(int connectRank)
+        {
+            var bonusDictionary = CreateRankBonusDictionary(GetConnectRankBonusLevel(connectRank));
+            return bonusDictionary != null &&
+                   bonusDictionary.TryGetValue(3, out var parameter) &&
+                   parameter != null
+                ? (int)parameter.PrimaryValue
+                : 0;
+        }
+
         public int GetDefaultConnectRankLimit()
         {
             var limitCommon = MainManager.Instance?.ConnectRankLimitCommonDic;
@@ -173,6 +223,12 @@ namespace Elements
             return chart != null && chart.Count > 0 ? chart.Keys.Max() : 0;
         }
 
+        public int BoostCoefficient(int systemId)
+        {
+            var boosts = MainManager.Instance?.ConnectRankBoostDic;
+            return boosts != null && boosts.TryGetValue(systemId, out var row) ? 100 + row.coefficient : 100;
+        }
+
         public IReadOnlyDictionary<eParamType, long> CreateScaledRankStatusDictionary(
             int roleId,
             int rank,
@@ -180,10 +236,7 @@ namespace Elements
             int systemId)
         {
             var statusDictionary = CreateRankStatusDictionary(roleId, rank, attackType);
-            var coefficient = 100;
-            var boostDic = MainManager.Instance?.ConnectRankBoostDic;
-            if (boostDic != null && boostDic.TryGetValue(systemId, out var boost))
-                coefficient += boost.coefficient;
+            int coefficient = BoostCoefficient(systemId);
 
             if (coefficient == 100)
                 return statusDictionary;

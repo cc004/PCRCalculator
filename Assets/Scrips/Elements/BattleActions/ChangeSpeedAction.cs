@@ -185,7 +185,8 @@ namespace Elements
                 }
                 flag = true;
             }
-            if (!flag && (num < pp || TargetAssignment == eTargetAssignment.OWNER_SITE))
+            bool forceHit = owner.ConsumeForceHit(ActionType, ActionDetail1);
+            if (!flag && (num < pp || TargetAssignment == eTargetAssignment.OWNER_SITE || forceHit))
             {
                 AppendIsAlreadyExeced(_target.Owner, _num);
                 UnitCtrl.eAbnormalState abnormalState2 = AbnormalStateDic[(eChangeSpeedType)ActionDetail1];

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 public static class Extensions
 {
-    public static BaseData CalcUniqueValue(this unique_equip_enhance_rate[] rates, int level)
+    public static BaseData CalcUniqueValue(this unique_equip_enhance_rate[] rates, int level, bool specialized = false)
     {
         BaseData s = rates[0].baseData.GetBaseData();
         
@@ -17,6 +17,9 @@ public static class Extensions
             if (level < rate.min_lv) break;
             s += rate.GetBaseData() * ((rate.max_lv == -1 ? level : Math.Min(rate.max_lv, level)) - rate.min_lv + 1);
         }
+
+        if (specialized && rates[0].specialization != null)
+            s += rates[0].specialization.GetBaseData();
 
         return BaseData.Round(BaseData.CeilToInt(s));
     }

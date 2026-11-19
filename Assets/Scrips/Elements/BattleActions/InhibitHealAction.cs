@@ -17,7 +17,8 @@ namespace Elements
         private enum eInhibitType
         {
             INHIBIT,
-            DECREASE
+            DECREASE,
+            DISABLE
         }
         private Dictionary<eInhibitType, UnitCtrl.eAbnormalState> abnormalStateDic = new Dictionary<eInhibitType, UnitCtrl.eAbnormalState>
         {
@@ -28,6 +29,10 @@ namespace Elements
             {
                 eInhibitType.DECREASE,
                 UnitCtrl.eAbnormalState.DECREASE_HEAL
+            },
+            {
+                eInhibitType.DISABLE,
+                UnitCtrl.eAbnormalState.DISABLE_HEAL
             }
         };
         public override void ExecActionOnStart(
@@ -49,7 +54,7 @@ namespace Elements
             double pp = BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target);
 
             var randomData = new RandomData(_source, _target.Owner, ActionId, 13, (float)pp);
-            if (BattleManager.Random(0.0f, 1f, ref randomData) < (double)BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target))
+            if (BattleManager.Random(0.0f, 1f, ref randomData) < pp || TargetAssignment == eTargetAssignment.OWNER_SITE)
             {
                 AppendIsAlreadyExeced(_target.Owner, _num);
                 _target.Owner.SetAbnormalState(_source, abnormalStateDic[(eInhibitType)base.ActionDetail1], (base.AbnormalStateFieldAction == null) ? (float)_valueDictionary[eValueNumber.VALUE_2] : 9999f, this, _skill, _valueDictionary[eValueNumber.VALUE_1]);

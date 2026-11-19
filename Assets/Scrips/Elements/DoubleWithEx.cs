@@ -20,6 +20,7 @@ namespace Elements
     {
         [FieldOffset(0)]
         private readonly double value;
+        public bool MayBePositive => value > 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public DoubleWithEx(double value = 0.0)
@@ -183,6 +184,7 @@ namespace Elements
     public class DoubleWithEx : IComparable<DoubleWithEx>, IEquatable<DoubleWithEx>, IWithEx
     {
         private bool pure => min == max;
+        public bool MayBePositive => max > 0;
 
         public double ToDouble() => value;
         public long ToLong() => (long)value;
@@ -236,7 +238,8 @@ namespace Elements
             if (p == 0.0) return 0.0;
             if (p == 1.0) return 1.0;
             var p0 = (long) (p * 1000);
-            var result = new DoubleWithEx(val ? 1 : 0, p, root: _ => GetRandN(order) < p0 ? 1 : 0, min: 0,
+            var result = new DoubleWithEx(val ? 1 : 0, p, root: hash => hash < 0 && exactRolls != null
+                ? exactRolls.Value(order, p) : GetRandN(order) < p0 ? 1 : 0, min: 0,
                 max: 1)
             {
                 rnd = rnd
@@ -244,6 +247,61 @@ namespace Elements
             return result;
         }
 
+        // A multi-hit attack can reuse the same crit roll both for its hit and its barrier divisor.
+        // Evaluate the existing damage expression with one outcome per distinct roll.
+        [ThreadStatic] private static CriticalOutcomes exactRolls;
+        [ThreadStatic] private static CriticalOutcomes reusableRolls;
+        [ThreadStatic] private static int evaluationId;
+        private sealed class CriticalOutcomes
+        {
+            internal readonly Dictionary<int, int> indices = new Dictionary<int, int>();
+            internal readonly List<double> chances = new List<double>();
+            internal int mask;
+            internal int Value(int roll, double chance)
+            {
+                if (!indices.TryGetValue(roll, out int i))
+                {
+                    i = chances.Count;
+                    indices.Add(roll, i);
+                    chances.Add(chance);
+                }
+                return (mask >> i) & 1;
+            }
+        }
+        private static int NextEvaluation() => evaluationId = evaluationId == int.MinValue ? -1 : evaluationId - 1;
+
+        internal static double ExpectedHit(LongWithEx damage) =>
+            EvaluateRolls(hash => damage.Emulate(hash), damage.Expect);
+
+        internal double ExpectedValue() => pure ? value : EvaluateRolls(Emulate, avg);
+
+        private static double EvaluateRolls(Func<int, double> evaluate, double fallback)
+        {
+            var rolls = reusableRolls ??= new CriticalOutcomes();
+            rolls.indices.Clear();
+            rolls.chances.Clear();
+            rolls.mask = 0;
+            exactRolls = rolls;
+            try
+            {
+                double first = evaluate(NextEvaluation());
+                int count = rolls.chances.Count;
+                if (count == 0) return first;
+                // Bound the cost for expressions spanning many independent hits.
+                if (count > 12) return fallback;
+                double expected = 0;
+                for (int mask = 0; mask < (1 << count); mask++)
+                {
+                    rolls.mask = mask;
+                    double probability = 1;
+                    for (int i = 0; i < count; i++)
+                        probability *= ((mask >> i) & 1) == 0 ? 1 - rolls.chances[i] : rolls.chances[i];
+                    expected += probability * (mask == 0 ? first : evaluate(NextEvaluation()));
+                }
+                return expected;
+            }
+            finally { exactRolls = null; }
+        }
 
         public DoubleWithEx Select(Func<double, double> selector, string select)
         {
@@ -371,14 +429,7 @@ namespace Elements
 
         public LongWithEx ToLongWithEx()
         {
-            double _num = value;
-            if (_num >= 0.0)
-            {
-                long num = (long)Math.Ceiling(_num);
-                return Approximately(_num, num) ? (LongWithEx)this.Ceil() : (LongWithEx)this.Floor();
-            }
-            long num1 = (long)Math.Floor(_num);
-            return Approximately(_num, num1) ? (LongWithEx)this.Floor() : (LongWithEx)this.Ceil();
+            return (LongWithEx)Select(x => BattleUtil.DoubleToLong(x), "truncate");
         }
 
         public DoubleWithEx Max(double f)

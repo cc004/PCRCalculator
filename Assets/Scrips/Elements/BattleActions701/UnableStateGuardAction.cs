@@ -8,29 +8,46 @@ namespace Elements
 	public class UnableStateGuardAction : ActionParameter
 	{
 		// Token: 0x0600415F RID: 16735 RVA: 0x001141C4 File Offset: 0x001141C4
+		/// <summary>图标类型：113 派生类会覆盖成 UNABLE_STATE_GUARD_EXTRA_EFFECT。</summary>
+		protected virtual eStateIconType IconType
+		{
+			get { return eStateIconType.UNABLE_STATE_GUARD; }
+		}
+
+		/// <summary>本次耐性数据存放位置（113 与 100 用不同字段）。</summary>
+		protected virtual SealData GetSealData(UnitCtrl _owner)
+		{
+			return _owner == null ? null : _owner.UnableStateGuardData;
+		}
+
+		protected virtual void SetSealData(UnitCtrl _owner, SealData _data)
+		{
+			if (_owner != null) _owner.UnableStateGuardData = _data;
+		}
+
 		public override void ExecAction(UnitCtrl _source, BasePartsData _target, int _num, UnitActionController _sourceActionController, Skill _skill, float _starttime, Dictionary<int, bool> _enabledChildAction, ValueDictionary _valueDictionary)
 		{
 			base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
 			UnitCtrl owner = _target.Owner;
 			bool flag = (int)_valueDictionary[eValueNumber.VALUE_1] == -1;
 			int num = flag ? 1 : ((int)_valueDictionary[eValueNumber.VALUE_1]);
-			if (owner.UnableStateGuardData == null)
+			SealData sealData = GetSealData(owner);
+			if (sealData == null)
 			{
-				owner.UnableStateGuardData = new SealData
+				SetSealData(owner, new SealData
 				{
 					Max = num,
 					DisplayCount = !flag
-				};
+				});
 			}
 			else
 			{
-				SealData unableStateGuardData = owner.UnableStateGuardData;
-				unableStateGuardData.RemoveSeal(unableStateGuardData.Count, true);
-				unableStateGuardData.Max = num;
-				unableStateGuardData.DisplayCount = !flag;
+				sealData.RemoveSeal(sealData.Count, true);
+				sealData.Max = num;
+				sealData.DisplayCount = !flag;
 			}
-			owner.OnChangeState.Call(owner, eStateIconType.UNABLE_STATE_GUARD, true);
-			owner.UnableStateGuardData.AddSeal((float)_valueDictionary[eValueNumber.VALUE_3], owner, eStateIconType.UNABLE_STATE_GUARD, num);
+			owner.OnChangeState.Call(owner, IconType, true);
+			GetSealData(owner).AddSeal((float)_valueDictionary[eValueNumber.VALUE_3], owner, IconType, num);
 		}
 
 		// Token: 0x06004160 RID: 16736 RVA: 0x0011427C File Offset: 0x0011427C

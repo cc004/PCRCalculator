@@ -21,6 +21,7 @@ namespace PCRCaculator
         private class ExEquipOption : Dropdown.OptionData
         {
             public int equip_id;
+            public int sliderMax;
 
             public ExEquipOption(ex_equipment_data data)
             {
@@ -33,6 +34,7 @@ namespace PCRCaculator
                     5 => "彩",
                     _ => "未知"
                 };
+                sliderMax = data.SliderMax;
                 equip_id = data.ex_equipment_id;
                 var name = MainManager.Instance.databaseCache.exEquipmentName_cn.TryGetValue(equip_id, out var cnName) ? cnName : data.name;
                 text = $"{color}-{name}";
@@ -693,8 +695,10 @@ namespace PCRCaculator
                 for (int i = 0; i < 3; ++i)
                 {
                     data.exEquip[i] = (ExEquip[i].options[ExEquip[i].value] as ExEquipOption).equip_id;
-                    var maxStar = data.exEquip[i] == 0 ? 0 : temp[i][data.exEquip[i]].levelMax;
-                    data.exEquipLevel[i] = Math.Min((int)detailSliders_setting[16 + i].value, maxStar);
+                    var equip = data.exEquip[i] == 0 ? null : temp[i][data.exEquip[i]];
+                    int value = (int)detailSliders_setting[16 + i].value;
+                    data.exEquipLevel[i] = Math.Min(value, equip?.levelMax ?? 0);
+                    data.exEquipExceedRank[i] = equip?.exceedStatus == null ? 0 : Math.Min(value, equip.SliderMax);
                     if (i < subs.Count)
                     {
                         var subGroup = subs[i];
@@ -1234,18 +1238,22 @@ namespace PCRCaculator
                     }
                     ExEquip[i].value = Math.Max(0, ExEquip[i].options.FindIndex(e => e is ExEquipOption e2 && e2.equip_id == data.exEquip[i]));
                     var subItems = new[] { subs[i].sub1, subs[i].sub2, subs[i].sub3, subs[i].sub4 };
-                    if (ExEquip[i].value > 0 && data.exEquipSubs.Count > 0)
+                    if (ExEquip[i].value > 0 && data.exEquipSubs != null && data.exEquipSubs.TryGetValue(i, out var savedSubs) && savedSubs?.Length >= 8)
                     {
                         for (int k = 0; k < 4; ++k)
                         {
-                            int statusIndex = data.exEquipSubs[i][k * 2];
-                            int statusLevel = data.exEquipSubs[i][k * 2 + 1];
+                            int statusIndex = savedSubs[k * 2];
+                            int statusLevel = savedSubs[k * 2 + 1];
                             subItems[k].typeOption.value = Mathf.Clamp(
                                 statusIndex + 1, 0, subItems[k].typeOption.options.Count - 1);
                             subItems[k].valueOption.value = statusIndex < 0
                                 ? 0
                                 : Mathf.Clamp(statusLevel, 0, subItems[k].valueOption.options.Count - 1);
                         }
+                    }
+                    else if (ExEquip[i].value > 0)
+                    {
+                        OnExEquipChanged(i);
                     }
                     else
                     {
@@ -1255,9 +1263,10 @@ namespace PCRCaculator
                             subItems[k].valueOption.SetActive(false);
                         }
                     }
-                    detailSliders_setting[16 + i].maxValue = data.exEquip[i] == 0 ? 0 : temp[i][data.exEquip[i]].levelMax;
+                    detailSliders_setting[16 + i].maxValue = data.exEquip[i] == 0 ? 0 : temp[i][data.exEquip[i]].SliderMax;
                     detailSliders_setting[16 + i].minValue = 0;
-                    detailSliders_setting[16 + i].value = data.exEquipLevel[i];
+                    detailSliders_setting[16 + i].value = data.exEquip[i] != 0 && temp[i][data.exEquip[i]].exceedStatus != null
+                        ? data.ExceedRank(i) : data.exEquipLevel[i];
                     detailTexts_setting[16 + i].text = detailSliders_setting[16 + i].value.ToString();
                 }
             }
@@ -1296,6 +1305,8 @@ namespace PCRCaculator
         // 当ExEquip下拉框选项改变时调用
         public void OnExEquipChanged(int equipIndex)
         {
+            var option = ExEquip[equipIndex].options[ExEquip[equipIndex].value] as ExEquipOption;
+            detailSliders_setting[16 + equipIndex].maxValue = option?.sliderMax ?? 0;
             UpdateTypeOptions(equipIndex);
 
             for (int i = 0; i < 4; i++)
@@ -1335,34 +1346,18 @@ namespace PCRCaculator
                 {
                     if (exEquipData.status.Count > 0)
                     {
-                        // 为每个subItem更新typeOption
+                        int unitId = playerData.playrCharacters[selectedCharacterId_setting].unitId;
+                        bool magic = MainManager.Instance.UnitRarityDic[unitId].detailData.atkType == 2;
+                        var keys = exEquipData.status.Keys.ToList();
+                        int typeIndex = keys.IndexOf(exEquipData.DefaultSubStat(magic));
+                        var statusKeys = keys.Select(key => key.GetDescription()).ToList();
+                        statusKeys.Insert(0, "无");
                         for (int i = 0; i < subItems.Length; i++)
                         {
                             var subItem = subItems[i];
-                            int typeIndex = 0;
-                            var statusKeys = exEquipData.status.Keys.Select((k, index) =>
-                            {
-                                if (k is eParamType enumKey)
-                                {
-                                    // 饰品默认攻击，其余装备默认贯通。
-                                    bool isAtkType = enumKey == eParamType.MAGIC_ATK || enumKey == eParamType.ATK;
-                                    bool isPenetrateType = enumKey == eParamType.PHYSICAL_PENETRATE || enumKey == eParamType.MAGIC_PENETRATE;
-
-                                    if ((exEquipData.category > 300 && isAtkType) ||
-                                        (exEquipData.category <= 300 && isPenetrateType))
-                                    {
-                                        typeIndex = index;
-                                    }
-
-                                    return enumKey.GetDescription();
-                                }
-
-                                return k.ToString();
-                            }).ToList();
                             subItem.typeOption.SetActive(true);
                             subItem.valueOption.SetActive(true);
                             subItem.typeOption.ClearOptions();
-                            statusKeys.Insert(0, "无");
                             subItem.typeOption.AddOptions(statusKeys);
 
                             // 添加typeOption变更监听

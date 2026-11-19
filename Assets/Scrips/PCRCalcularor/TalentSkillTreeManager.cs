@@ -91,6 +91,7 @@ namespace PCRCaculator
             paramTypeDict = MainManager.Instance.ParamTypeDic;
             BuildNodeRelationships();
             ApplySavedSkillNodesByEnhance(PlayerGroup.talentSkill);
+            UpdateAllNodeUI();
             UpdateTalentInfoData();
         }
 
@@ -547,7 +548,7 @@ namespace PCRCaculator
             }
             return activeSkills;
         }
-        private Dictionary<int, int> GetHighestActiveTalentSkills()
+        internal Dictionary<int, int> GetHighestActiveTalentSkills()
         {
             var highestSkills = new Dictionary<int, int>();
             var activeSkills = GetActiveTalentSkills();

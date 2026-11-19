@@ -13,7 +13,7 @@ namespace PCRCaculator
         public GameObject extraDetailPrefab;
         public RectTransform Content;
 
-        private static readonly string[] MarkNames = { "加速", "削弱", "暴击", "强化", "守备" };
+        internal static readonly string[] MarkNames = { "加速", "削弱", "暴击", "强化", "守备" };
         private static readonly string[] MarkColors = { "#36BBCB", "#8D4AAF", "#EFC739", "#C65E29", "#73CC4F" };
         private readonly ExtraEffecDetail[] details = new ExtraEffecDetail[MarkNames.Length];
         private readonly float[] minimumHeights = new float[MarkNames.Length];
@@ -59,7 +59,7 @@ namespace PCRCaculator
                 return;
             }
 
-            var effects = MainManager.Instance?.LabyrinthRelicMarkEffectDic;
+            var effects = sourceManager?.MarkEffects;
             var sprites = sourceManager != null ? sourceManager.relicMarkSprites : null;
             for (int i = 0; i < MarkNames.Length; i++)
             {

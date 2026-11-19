@@ -540,6 +540,7 @@ namespace ExcelHelper
                 AppendLine(sb, RoleRankLine(unit));
                 AppendLine(sb, RoleSkillLine(unit));
                 AppendLine(sb, RoleUniqueEqLine(unit));
+                AppendLine(sb, $"连结RANK:{unit.connectRank}");
                 AppendLine(sb, RoleExEquipLine(unit, 0, "EX武器"));
                 AppendLine(sb, RoleExEquipLine(unit, 1, "EX防具"));
                 AppendLine(sb, RoleExEquipLine(unit, 2, "EX首饰"));
@@ -611,6 +612,8 @@ namespace ExcelHelper
                 ? "  副属性:" + subs
                 : "  等级:" + level.ToString(CultureInfo.InvariantCulture);
             string tail = index < 2 ? "  " : string.Empty;
+            if (unit.exEquip != null && index < unit.exEquip.Length && unit.exEquip[index] > 0 && unit.ExceedRank(index) > 0)
+                body += $"/星{unit.ExceedRank(index)}";
             return $"{title}:{name}{body}{tail}";
         }
 

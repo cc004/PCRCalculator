@@ -57,20 +57,15 @@ namespace PCRCaculator.Battle
     {
         public float Time;
         public eDamageEffectType DamageNumType;
-        public float Weight;
+        public double Weight;
         public float DamageNumScale;
 
         public ActionExecTime() { }
-        public ActionExecTime(float time,float weight)
+        public ActionExecTime(float time, double weight)
         {
             Time = time;
             Weight = weight;
         }
-    }
-    public static class StaticAilmentData
-    {
-        public static readonly Dictionary<int, ResistVariationData> resistVariationDataDic =
-            new Dictionary<int, ResistVariationData>();
     }
     public class ResistData
     {

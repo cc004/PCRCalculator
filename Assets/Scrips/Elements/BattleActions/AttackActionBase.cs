@@ -239,8 +239,9 @@ namespace Elements
             if (UseCopyAtkParam)
                 num = CopyAtk;
 
-            LongWithEx num4 = calcTotalDamage(_source, _target, _num, _valueDictionary, num);
-            LongWithEx num5 = calcDamage(_source, _target, _num, _valueDictionary, num);
+            double skillMultiplier = _source.GetSkillDamageRateMultiplier(_skill);
+            LongWithEx num4 = calcTotalDamage(_source, _target, _num, _valueDictionary, num, skillMultiplier);
+            LongWithEx num5 = calcDamage(_source, _target, _num, _valueDictionary, num, skillMultiplier);
             double num6 = 0f;
             double damageUpPrecent = (_isPhysicalForTarget ? _source.PhysicalDamageUpPercentOrMin : _source.MagicDamageUpPercentOrMin) / 100f;
             num6 = (!_isPhysicalForTarget) ? (_target.Owner.MagicReceiveDamagePercentOrMin / 100.0) : (_target.Owner.PhysicalReceiveDamagePercentOrMin / 100.0);
@@ -329,10 +330,11 @@ namespace Elements
             }
             return damageData;
         }
-        private LongWithEx calcTotalDamage(UnitCtrl _source, BasePartsData _target, int _num, ValueDictionary _valueDictionary, LongWithEx _atk)
+        private LongWithEx calcTotalDamage(UnitCtrl _source, BasePartsData _target, int _num, ValueDictionary _valueDictionary, LongWithEx _atk, double skillMultiplier)
         {
             var num = _valueDictionary[eValueNumber.VALUE_1] + (DoubleWithEx)_atk * _valueDictionary[eValueNumber.VALUE_3];
             num *= _target.Owner.GetDebuffDamageUpValue();
+            num *= skillMultiplier;
             if (!_target.Owner.AccumulativeDamageDataDictionary.TryGetValue(_source, out var value))
             {
                 if (_target.Owner.IsOther == _source.IsOther ||
@@ -355,7 +357,7 @@ namespace Elements
                     foreach (var val in _source.AccumulativeDamageSourceDataDictionary.Values)
                     {
                         if (_target.Owner.AccumulativeDamageDataForAllEnemyDictionary.TryGetValue(val, out var val2))
-                            num4 += val2.CalcAdditionalDamage(val2.DamagedCount, num4);
+                            num4 += val2.CalcAdditionalDamage(val2.DamagedCount - _num + i, num4);
                     }
                 }
                 num3 += num4;
@@ -363,9 +365,9 @@ namespace Elements
             return num3;
         }
 
-        private LongWithEx calcDamage(UnitCtrl _source, BasePartsData _target, int _num, ValueDictionary _valueDictionary, LongWithEx _atk)
+        private LongWithEx calcDamage(UnitCtrl _source, BasePartsData _target, int _num, ValueDictionary _valueDictionary, LongWithEx _atk, double skillMultiplier)
         {
-            LongWithEx num = BattleUtil.DoubleToLong((_valueDictionary[eValueNumber.VALUE_1] + (DoubleWithEx)_atk * _valueDictionary[eValueNumber.VALUE_3]) * base.ActionExecTimeList[_num].Weight / base.ActionWeightSum);
+            LongWithEx num = BattleUtil.DoubleToLong((_valueDictionary[eValueNumber.VALUE_1] + (DoubleWithEx)_atk * _valueDictionary[eValueNumber.VALUE_3]) * skillMultiplier * base.ActionExecTimeList[_num].Weight / base.ActionWeightSum);
             if (_target.Owner.AccumulativeDamageDataDictionary.TryGetValue(_source, out var value))
             {
                 num += value.CalcAdditionalDamage(value.DamagedCount, num);

@@ -47,15 +47,16 @@ namespace Elements
         {
             base.ExecAction(_source, _target, _num, _sourceActionController, _skill, _starttime, _enabledChildAction, _valueDictionary);
             // double judgeNum = (double)(_valueDictionary[eValueNumber.VALUE_3] * 0.01f) * BattleUtil.GetDodgeByLevelDiff(_skill.Level, _target);
-            double judgeNum = BattleUtil.CalcDodgeByLevelDiffUseParam(_skill.Level, _source, _target, IsExEquipSkillAction, (float)(_valueDictionary[eValueNumber.VALUE_3] * 0.01f));
+            float judgeNum = BattleUtil.CalcDodgeByLevelDiffUseParam(_skill.Level, _source, _target, IsExEquipSkillAction, (float)_valueDictionary[eValueNumber.VALUE_3] * 0.01f);
             var randomData = new RandomData(_source, _target.Owner, ActionId, 5, (float)judgeNum);
-            double randomNum = BattleManager.Random(0.0f, 1f, ref randomData);
+            float randomNum = BattleManager.Random(0.0f, 1f, ref randomData);
 
             if (MyGameCtrl.Instance.tempData.isGuildBattle && MyGameCtrl.Instance.tempData.randomData.TryJudgeRandomSpecialSetting(_source, _target.Owner, _skill, eActionType.BLIND, BattleHeaderController.CurrentFrameCount, out float fix))
             {
                 randomNum = 1-fix;
             }
-            if (randomNum <=judgeNum)
+            bool forceHit = _target.Owner.ConsumeForceHit(ActionType, ActionDetail2);
+            if (BattleUtil.LessThanOrApproximately(randomNum, judgeNum) || forceHit)
             {
                 AppendIsAlreadyExeced(_target.Owner, _num);
                 _target.Owner.SetAbnormalState(_source, AbnormalStateDic[(eBlindType)base.ActionDetail2], (base.AbnormalStateFieldAction == null) ? (float)_valueDictionary[eValueNumber.VALUE_1] : 90f, this, _skill, base.ActionDetail1);

@@ -56,7 +56,7 @@ namespace PCRCaculator
 
         private void UpdateRoleMasteryData(int? level, int? star, bool isUIOperation = false)
         {
-            var playerGroup = GuildManager.Instance?.SettingData?.GetCurrentPlayerGroup();
+            var playerGroup = TalentEnhanceContext.ActiveConfiguration;
             if (playerGroup?.roleMastery == null) return;
 
             if (!playerGroup.roleMastery.ContainsKey(masteryId))
@@ -82,6 +82,25 @@ namespace PCRCaculator
         {
             if (!UnitRoleMasterySlotEnhanceDataDic.TryGetValue(masteryId, out var slotEnhanceData)) return;
 
+            // 等级/星级上限改成从数据库读取：
+            // 等级上限 = 该槽位 slot_level_info 的最大键；星级上限 = 当前等级下 enhance_level_info 的最大键。
+            int maxSlotLevel = slotEnhanceData.slot_level_info != null && slotEnhanceData.slot_level_info.Count > 0
+                ? slotEnhanceData.slot_level_info.Keys.Max()
+                : level;
+            level = Mathf.Clamp(level, 0, Mathf.Max(0, maxSlotLevel));
+
+            int maxEnhanceLevel = 0;
+            if (level > 0 && slotEnhanceData.slot_level_info != null &&
+                slotEnhanceData.slot_level_info.TryGetValue(level, out var selectedLevelInfo) &&
+                selectedLevelInfo?.enhance_level_info != null && selectedLevelInfo.enhance_level_info.Count > 0)
+            {
+                maxEnhanceLevel = selectedLevelInfo.enhance_level_info.Keys.Max();
+            }
+
+            star = Mathf.Clamp(star, 0, Mathf.Max(0, maxEnhanceLevel));
+            if (roleSlotLevelSlider != null) roleSlotLevelSlider.maxValue = Mathf.Max(0, maxSlotLevel);
+            if (roleSlotStarSlider != null) roleSlotStarSlider.maxValue = Mathf.Max(0, maxEnhanceLevel);
+
             // 获取图标ID和名称
             int iconId = 0;
             string name = "";
@@ -102,6 +121,24 @@ namespace PCRCaculator
 
             string iconName = level > 0 ? $"icon_item_{iconId:D5}" : $"icon_item_invalid_{iconId:D5}";
             Sprite icon = Resources.Load<Sprite>($"item/{iconName}");
+            if (icon == null && iconId > 0)
+            {
+                // 职能精通 6 级以上的图标没有打进 Resources（只到 5 级），改为从 AB 包动态取
+                icon = ABExTool.GetSprites(
+                    level > 0 ? ABExTool.SpriteType.道具图标 : ABExTool.SpriteType.道具图标无效,
+                    iconId);
+            }
+
+            if (icon == null && level > 5 && iconId > 0)
+            {
+                // 当前角色数据版本对应的 AB manifest 里可能还没有 6 级以上的图标（旧版本资源包），
+                // 退回同系列 5 级图标占位；把角色数据版本更新到最新后即可显示真实图标。
+                int fallbackIconId = iconId / 100 * 100 + 5;
+                if (fallbackIconId != iconId)
+                {
+                    icon = ABExTool.GetSprites(ABExTool.SpriteType.道具图标, fallbackIconId);
+                }
+            }
 
             // 查找对应等级和星级的增强数据
             unit_role_mastery_enhance_data enhanceData = null;
@@ -139,15 +176,15 @@ namespace PCRCaculator
             roleSlotStarText.text = star.ToString();
             roleSlotIcon.sprite = icon;
 
-            roleSlotLevelSlider.value = level;
-            roleSlotStarSlider.value = star;
+            roleSlotLevelSlider.SetValueWithoutNotify(level);
+            roleSlotStarSlider.SetValueWithoutNotify(star);
         }
 
         public void SetRoleSlotData(int level, int star, int masteryId)
         {
             this.masteryId = masteryId;
 
-            var playerGroup = GuildManager.Instance?.SettingData?.GetCurrentPlayerGroup();
+            var playerGroup = TalentEnhanceContext.ActiveConfiguration;
             if (playerGroup?.roleMastery != null)
             {
                 playerGroup.roleMastery[masteryId] = (level, star);

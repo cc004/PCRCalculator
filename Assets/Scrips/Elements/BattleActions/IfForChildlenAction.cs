@@ -92,6 +92,9 @@ namespace Elements
                 case eIfType.SLIP_DAMAGE:
                     flag = _target.Owner.IsSlipDamageState();
                     break;
+                case eIfType.NEGATIVE_EFFECT_COUNT:
+                    flag = _target.Owner.GetNegativeEffectCount() >= _valueDictinary[eValueNumber.VALUE_3];
+                    break;
                 case eIfType.ALONE:
                     List<UnitCtrl> unitCtrlList = _source.IsOther ? battleManager.UnitList : battleManager.EnemyList;
                     flag = !unitCtrlList.Exists(e => e.IsPartsBoss && !e.IsDead) && unitCtrlList.FindAll(e => (!e.IsDead && (long)e.Hp > 0L || e.HasUnDeadTime) && !e.IsStealth && !e.JudgeIsEtherialization(_source)).Count == 1;
@@ -129,6 +132,15 @@ namespace Elements
                     }
                 case eIfType.MULTI_BOSS:
                     flag = _target.Owner.IsPartsBoss;
+                    break;
+                case eIfType.BARRIER_COUNT:
+                case eIfType.BARRIER_ATK:
+                case eIfType.BARRIER_MGC:
+                case eIfType.BARRIER_ATK_DRAIN:
+                case eIfType.BARRIER_MGC_DRAIN:
+                case eIfType.BARRIER_BOTH_ANY:
+                case eIfType.BARRIER_BOTH_DRAIN:
+                    flag = _target.Owner.CheckBarrierCondition((eIfType)ActionDetail1, _valueDictinary[eValueNumber.VALUE_3]);
                     break;
                 case eIfType.BARRIER:
                     flag = _target.Owner.IsBarrierState();

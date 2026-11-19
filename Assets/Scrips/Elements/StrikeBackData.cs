@@ -63,7 +63,7 @@ namespace Elements
     {
       IsDieing = true;
       bool flag = false; // use in effect, ignore
-      if (!_target.IsStealth)
+      if (!_target.IsStealth && _target.IsOther != _source.IsOther)
       {
         if (Damage > 0)
         {

@@ -83,7 +83,7 @@ namespace Elements
 
         public List<ActionExecTime> ActionExecTimeList { get; set; }
 
-        public float ActionWeightSum { get; set; }
+        public double ActionWeightSum { get; set; }
 
         public int DepenedActionId { set; get; }
 
@@ -172,6 +172,8 @@ namespace Elements
 
         public ValueDictionary AdditionalValue { get; set; }
 
+        /// <summary>运行期惰性追加值（按消费那一刻的战场状态计算，如「目の前の敵の弱体種数」）。</summary>
+
         public ValueDictionary MultipleValue { get; set; }
 
         public ValueDictionary DivideValue { get; set; }
@@ -187,6 +189,7 @@ namespace Elements
         public double AllSealDamageCutValueForCountZero { get; set; } = -1.0;
         // public bool AlreadyTriggerCause { get; set; } // no longer used
         public HashSet<TriggerAction> AlreadyTriggeredActions { get; set; }
+        public Dictionary<TriggerAction, HashSet<UnitCtrl>> SlipTriggerTargets { get; } = new Dictionary<TriggerAction, HashSet<UnitCtrl>>();
         public bool IgnoreTriggerCausedByTrigger { get; set; }
 
 
@@ -289,7 +292,13 @@ namespace Elements
             ExecedMultiBossList.Clear();
             AllSealDamageCutExecValueDic.Clear();
             AlreadyTriggeredActions.Clear();
-            ExecedMultiBossList.Clear();
+            SlipTriggerTargets.Clear();
+            ReductionDamageDictionaryAtk.Clear();
+            ReductionDamageDictionaryAtkForEnergy.Clear();
+            ReductionDamageDictionaryMgc.Clear();
+            ReductionDamageDictionaryMgcForEnergy.Clear();
+            ReductionDamageDictionaryAll.Clear();
+            ReductionDamageDictionaryAllForEnergy.Clear();
             AllSealDamageCutValueForCountZero = -1.0;
             ResetHitData();
         }

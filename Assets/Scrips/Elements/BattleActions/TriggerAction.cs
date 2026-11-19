@@ -479,6 +479,29 @@ namespace Elements
 
                     };
                     break;
+                case 15:
+                    foreach (var action in _skill.ActionParameters)
+                        action.IgnoreTriggerCausedByTrigger = true;
+                    target.OnSlipDamageForEnemy += (enemy, cause) =>
+                    {
+                        if ((ActionDetail3 != 0 && actionCountWaveReset == ActionDetail3) || judgeSilenceOrToad(_source)
+                            || cause.IgnoreTriggerCausedByTrigger || !IsFrontEnemy(_source, enemy))
+                            return;
+                        if (!cause.SlipTriggerTargets.TryGetValue(this, out var triggered))
+                            cause.SlipTriggerTargets[this] = triggered = new HashSet<UnitCtrl>();
+                        if (triggered.Contains(enemy) || DamagedHpTriggerRandom() > (double)Value[eValueNumber.VALUE_1] / 100.0)
+                            return;
+                        triggered.Add(enemy);
+                        actionCountWaveReset++;
+                        Action<bool> execute = _ => _sourceActionController.ExecSkillWithTargetParts(_skill, enemy.GetIndexSmallestParts());
+                        if (_source.CurrentState == UnitCtrl.ActionState.SKILL_1)
+                            _source.AppendCoroutine(waitStateIdle(execute, _source), ePauseType.SYSTEM, _source);
+                        else if (battleManager.ChargeSkillTurn != eChargeSkillTurn.NONE)
+                            _source.AppendCoroutine(waitChargeSkillTurnNone(execute, _source), ePauseType.SYSTEM, _source);
+                        else
+                            execute(false);
+                    };
+                    break;
                 default:
                     UnityEngine.Debug.LogError("未知的Trigger类型: " + ActionDetail1);
                     return;
@@ -486,7 +509,34 @@ namespace Elements
             }
         }
 
-        private bool judgeSilenceOrToad(UnitCtrl _unitCtrl) => _unitCtrl.IsAbnormalState(UnitCtrl.eAbnormalState.SILENCE) || _unitCtrl.ToadDatas.Count > 0;
+        private bool IsFrontEnemy(UnitCtrl source, UnitCtrl enemy)
+        {
+            var sign = source.IsLeftDir ? -1f : 1f;
+            var origin = source.GetFirstParts().GetLocalPositionX() * sign;
+            var first = enemy.GetFirstParts();
+            var targetX = first.GetLocalPositionX() * sign;
+            if (targetX < origin)
+                return false;
+            var edge = targetX - first.GetBodyWidth() / 2f;
+            foreach (var other in enemy.IsOther ? battleManager.EnemyList : battleManager.UnitList)
+            {
+                if (other == enemy || other.Hp == 0 || other.IsStealth)
+                    continue;
+                bool blocks(BasePartsData parts)
+                {
+                    var x = parts.GetLocalPositionX() * sign;
+                    if (x < origin)
+                        return false;
+                    var otherEdge = x - parts.GetBodyWidth() / 2f;
+                    return BattleUtil.Approximately(edge, otherEdge) ? other.UnitInstanceId < enemy.UnitInstanceId : otherEdge < edge;
+                }
+                if (other.IsPartsBoss ? other.BossPartsListForBattle.Exists(parts => blocks(parts)) : blocks(other.GetFirstParts()))
+                    return false;
+            }
+            return true;
+        }
+
+        private bool judgeSilenceOrToad(UnitCtrl _unitCtrl) => _unitCtrl.IsSilencedOrBerserk || _unitCtrl.ToadDatas.Count > 0;
 
         private IEnumerator waitStateIdle(Action<bool> _callback, UnitCtrl _source)
         {
@@ -566,7 +616,8 @@ namespace Elements
             ALL_BREAK = 11, // 0x0000000B
             DAMAGED_2 = 12,
             DAMAGED_HP = 13,
-            DAMAGED_FOR_EXEC_TO_SOURCE = 14
+            DAMAGED_FOR_EXEC_TO_SOURCE = 14,
+            SLIP_DAMAGE_FOR_ENEMY = 15
         }
     }
 }

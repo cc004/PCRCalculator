@@ -90,6 +90,8 @@ namespace PCRCaculator
             paramTypeDict = MainManager.Instance.ParamTypeDic;
             BuildNodeRelationships();
             ApplySavedSkillNodesByEnhance(PlayerGroup.teamSkill);
+            UpdateAllNodeUI();
+            UpdateMasterPointInput();
             UpdateTalentInfoData();
         }
         private void SetupMasterPointInput()
@@ -119,7 +121,7 @@ namespace PCRCaculator
                 }
             }
         }
-        private int GetMasterNodeId()
+        internal int GetMasterNodeId()
         {
             if (skillLevels.Count > 0)
             {
@@ -136,7 +138,11 @@ namespace PCRCaculator
             if (masterPointInput != null)
             {
                 int masterNodeId = GetMasterNodeId();
+#if UNITY_5_3_OR_NEWER
+                masterPointInput.SetTextWithoutNotify(masterNodeId.ToString());
+#else
                 masterPointInput.text = masterNodeId.ToString();
+#endif
             }
         }
         private void BuildNodeRelationships()

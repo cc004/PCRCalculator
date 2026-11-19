@@ -82,6 +82,7 @@ namespace PCRCaculator.Guild
         public long totalDamage;
         public long totalDamageCriEX;
         public LongWithEx totalDamageExcept = 0;
+        private double expectedHitSum;
         public bool isFinishCalc;
         public eBattleResult BattleResult => BattleManager.Instance.battleResult;
         public Text seedText;
@@ -158,7 +159,7 @@ namespace PCRCaculator.Guild
 
         public long GetTotalDamageExpect()
         {
-            return totalDamageExcept.Expect;
+            return (long)Math.Round(expectedHitSum);
         }
 
         public void Initialize(List<UnitCtrl> players, List<UnitCtrl> boss)
@@ -173,6 +174,7 @@ namespace PCRCaculator.Guild
             totalDamage = 0;
             totalDamageCriEX = 0;
             totalDamageExcept = 0;
+            expectedHitSum = 0;
             allUnitLastStateDic.Clear();
             playerIds.Clear();
             bossId.Clear();
@@ -785,12 +787,14 @@ namespace PCRCaculator.Guild
             totalDamage = 0;
             totalDamageCriEX = 0;
             totalDamageExcept = 0;
+            expectedHitSum = 0;
         }
 
-        public void RefreshTotalDamage(bool byAttack, long value, bool critical, long criticalEXdamage, LongWithEx exvalue)
+        public void RefreshTotalDamage(bool byAttack, long value, bool critical, long criticalEXdamage, LongWithEx exvalue, double expectedHit = 0)
         {
             totalDamage += value;
             totalDamageExcept += exvalue;
+            expectedHitSum += expectedHit;
             if (critical)
             {
                 totalDamageCriEX += criticalEXdamage;
@@ -866,8 +870,7 @@ namespace PCRCaculator.Guild
                 backTime = 0;
             }
 
-            var n = GuildManager.StaticsettingData.n1;
-            expectedDamage = totalDamageExcept.Expected(n);
+            expectedDamage = GetTotalDamageExpect();
             string damageStr =
                 $"{totalDamage}({(totalDamage - totalDamageCriEX)}+<color=#FF9900>{totalDamageCriEX}</color>)\n<color=#56A0FF>{expectedDamage}({totalDamageExcept.Expect})±{(long)totalDamageExcept.Stddev}</color>";
             if (MyGameCtrl.Instance.tempData.SettingData.limitTime != 90)
@@ -1275,7 +1278,7 @@ namespace PCRCaculator.Guild
             return new OnceResultData
             {
                 id = id,
-                exceptDamage = totalDamageExcept.Expect,
+                exceptDamage = GetTotalDamageExpect(),
                 criticalEX = totalDamageCriEX,
                 currentDamage = totalDamage,
                 randomSeed = MyGameCtrl.Instance.CurrentSeedForSave,

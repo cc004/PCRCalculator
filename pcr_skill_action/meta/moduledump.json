@@ -1,0 +1,8 @@
+{
+  "module": "GameAssembly.dll",
+  "base": "0x7FFE762A0000",
+  "size": 192155648,
+  "methods": 463025,
+  "methods_with_rva": 461564,
+  "classes": 36505
+}

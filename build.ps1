@@ -554,10 +554,20 @@ if (Test-Path -LiteralPath $settingsDir) {
 }
 
 # Unity.exe is a GUI subsystem binary, so & does not wait and $LASTEXITCODE stays unset.
-# -Wait -PassThru can also leave ExitCode empty, so wait explicitly and refresh the handle.
-$process = Start-Process -FilePath $editorPath -ArgumentList $unityCommandLine -NoNewWindow -PassThru
-if (-not $process) { Stop-Build "Could not start $editorPath." }
-$process.WaitForExit()
+# Start the process directly so Windows PowerShell 5.1 retains its native handle.
+$startInfo = New-Object System.Diagnostics.ProcessStartInfo
+$startInfo.FileName = $editorPath
+$startInfo.Arguments = $unityCommandLine
+$startInfo.UseShellExecute = $false
+$startInfo.CreateNoWindow = $true
+$startInfo.WorkingDirectory = $ProjectRoot
+$process = [System.Diagnostics.Process]::Start($startInfo)
+try {
+    $process.WaitForExit()
+    $exitCode = $process.ExitCode
+} finally {
+    $process.Dispose()
+}
 $stopwatch.Stop()
 
 $restoredSettings = @()
@@ -573,20 +583,9 @@ foreach ($settingsFile in $settingsFiles) {
 }
 if (Test-Path -LiteralPath $settingsBackup) { Remove-Item -LiteralPath $settingsBackup -Recurse -Force -ErrorAction SilentlyContinue }
 
-$exitCode = $null
-try {
-    $process.Refresh()
-    $exitCode = $process.ExitCode
-} catch {
-    $exitCode = $null
-}
 $elapsed = $stopwatch.Elapsed.ToString('hh\:mm\:ss')
 
-if ($null -eq $exitCode) {
-    Write-Detail "exit code : unavailable (process handle was closed)"
-} else {
-    Write-Detail "exit code : $exitCode"
-}
+Write-Detail "exit code : $exitCode"
 
 if ($restoredSettings.Count -gt 0) {
     Write-Detail "settings  : restored $($restoredSettings -join ', ') (Unity rewrote them during the build)"
@@ -594,11 +593,7 @@ if ($restoredSettings.Count -gt 0) {
 
 if ($exitCode -ne 0) {
     Write-Host ''
-    if ($null -eq $exitCode) {
-        Write-Host "Unity exited without a readable code after $elapsed." -ForegroundColor Red
-    } else {
-        Write-Host "Unity exited with code $exitCode after $elapsed." -ForegroundColor Red
-    }
+    Write-Host "Unity exited with code $exitCode after $elapsed." -ForegroundColor Red
     $hint = Find-LogHint $Log
     if ($hint) { Write-Host "  hint: $hint" -ForegroundColor Yellow }
     Show-BuildLog $Log

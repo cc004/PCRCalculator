@@ -70,6 +70,9 @@ namespace Elements
     SEVEN_SPECIAL_BOSS = 58,
     LABYRINTH = 59,
     LABYRINTH_EX = 60,
+    INVASION_SINGLE = 63,
+    INVASION_TRIPLE = 65,
+    HUNT_QUEST = 70,
 
   }
 }

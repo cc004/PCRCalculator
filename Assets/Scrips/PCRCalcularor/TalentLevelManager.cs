@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -65,11 +65,20 @@ namespace PCRCaculator
             }
 
             var normalizedLevels = BuildTalentLevels(PlayerGroup.talentLevel);
+            int talentLevelLimit = ResolveTalentLevelLimit();
             loadSliderEvents = true;
             for (int i = 0; i < talentLevelSliders.Count; i++)
             {
                 int key = i + 1;
-                talentLevelSliders[i].value = normalizedLevels.TryGetValue(key, out int savedValue) ? savedValue : 0;
+                int savedValue = normalizedLevels.TryGetValue(key, out int value) ? value : 0;
+                if (talentLevelLimit > 0)
+                {
+                    talentLevelSliders[i].maxValue = talentLevelLimit;
+                    savedValue = Mathf.Clamp(savedValue, 0, talentLevelLimit);
+                    normalizedLevels[key] = savedValue;
+                }
+
+                talentLevelSliders[i].value = savedValue;
             }
 
             loadSliderEvents = false;
@@ -97,10 +106,22 @@ namespace PCRCaculator
             }
 
             var talentLevels = new Dictionary<int, int>(TalentElementCount);
+            int talentLevelLimit = ResolveTalentLevelLimit();
             for (int i = 0; i < talentLevelSliders.Count; i++)
             {
                 int key = i + 1;
-                talentLevels[key] = (int)talentLevelSliders[i].value;
+                int level = (int)talentLevelSliders[i].value;
+                if (talentLevelLimit > 0)
+                {
+                    int clamped = Mathf.Clamp(level, 0, talentLevelLimit);
+                    if (clamped != level)
+                    {
+                        talentLevelSliders[i].value = clamped;
+                        level = clamped;
+                    }
+                }
+
+                talentLevels[key] = level;
             }
 
             ApplyTalentLevels(talentLevels, true);
@@ -162,6 +183,19 @@ namespace PCRCaculator
             {
                 OnTalentLevelChanged?.Invoke();
             }
+        }
+
+        /// <summary>
+        /// 属性等级上限（来自数据库 experience_talent_level 的最大 talent_level）。
+        /// 返回 0 表示当前数据库里没有这张表，此时保持滑动条原有上限。
+        /// </summary>
+        private int ResolveTalentLevelLimit()
+        {
+#if UNITY_5_3_OR_NEWER
+            return MainManager.Instance != null ? MainManager.Instance.TalentLevelLimit : 0;
+#else
+            return 0;
+#endif
         }
 
         private Dictionary<int, int> BuildTalentLevels(Dictionary<int, int> source)

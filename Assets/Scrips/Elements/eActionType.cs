@@ -173,6 +173,9 @@ namespace Elements
         ENCHANT_UB_TRIGGER_SEAL = 133,
         FOLLOW_UP_DAMAGE = 134,
 
+        [Description("技能伤害倍率变化")]
+        CHANGE_SKILL_DAMAGE_RATE = 135,
+
         EX_START_PASSIVE = 901,
         EX_CONDITION_PASSIVE = 902,
     }

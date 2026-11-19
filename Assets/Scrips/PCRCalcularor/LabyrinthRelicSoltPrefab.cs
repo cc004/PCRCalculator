@@ -91,12 +91,12 @@ namespace PCRCaculator
             }
         }
 
-        public void SetData(labyrinth_relic relic)
+        public void SetData(labyrinth_relic relic, bool showRarity = false)
         {
             RelicId = relic?.relic_id ?? 0;
 
             if (relicNameText != null)
-                relicNameText.text = relic?.name ?? string.Empty;
+                relicNameText.text = showRarity && relic != null ? $"{relic.rarity}★ {relic.name}" : relic?.name ?? string.Empty;
 
             if (relicEffectText != null)
                 relicEffectText.text = (relic?.effect_description ?? string.Empty).Replace("\\n", "\n");

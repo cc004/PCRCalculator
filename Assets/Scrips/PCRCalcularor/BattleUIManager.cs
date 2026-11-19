@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -34,6 +34,7 @@ namespace PCRCaculator.Battle
     public class BattleUIManager : MonoBehaviour
     {
         public static BattleUIManager Instance;
+        private readonly HashSet<eStateIconType> reportedMissingAbnormalIcons = new HashSet<eStateIconType>();
         public GameObject OldManager;
         public GameObject NewManager;
         public SpriteRenderer backGroundImage;
@@ -121,6 +122,10 @@ namespace PCRCaculator.Battle
         public void Awake()
         {
             Instance = this;
+#if UNITY_5_3_OR_NEWER
+            // 进战斗时后台取一次游戏内的异常状态图集（manifest 里有这个包），成功就替换内置 buff/debuff 图标
+            BuffIconAtlasUpdater.RequestUpdate(this);
+#endif
             /*if (MainManager.Instance.UseNewBattleSystem)
             {
                 NewManager.SetActive(true);
@@ -762,17 +767,36 @@ namespace PCRCaculator.Battle
         }
         public Sprite GetAbnormalIconSprite(eStateIconType stateIconType)
         {
+            // 永续BUFF 只是显示开关（枚举值 100000），本来就没有专属图标
+            if (stateIconType == eStateIconType.EVERLAST_BUFF)
+            {
+                return buffDebuffIcons.Count > 0 ? buffDebuffIcons[0] : null;
+            }
+
+            string description = stateIconType.GetDescription();
             int index;
-            try
+            if (!int.TryParse(description, out index) || index < 0)
             {
-                index = int.Parse(stateIconType.GetDescription());
-                return buffDebuffIcons[index];
+                // 没有 [Description("N")] 的成员（REDUCTION_* / TRANSCEND_DAMAGE / *_FOLLOW_UP 等）用枚举值当状态号
+                index = (int)stateIconType;
             }
-            catch
+
+            if (index >= 0 && index < buffDebuffIcons.Count)
             {
-                LogMessage("未设置" + stateIconType.GetDescription() + "的技能图标！", eLogMessageType.ERROR, false);
+                Sprite sprite = buffDebuffIcons[index];
+                if (sprite != null)
+                {
+                    return sprite;
+                }
             }
-            return buffDebuffIcons[0];
+
+            // 同一个状态只报一次，避免战斗里每帧刷屏
+            if (reportedMissingAbnormalIcons.Add(stateIconType))
+            {
+                LogMessage("未设置" + description + "的技能图标！", eLogMessageType.ERROR, false);
+            }
+
+            return buffDebuffIcons.Count > 0 ? buffDebuffIcons[0] : null;
         }
         public void SetDamageNumber(Vector3 pos, long value, eDamageType damageType, eDamageEffectType effectType, bool isCritical = false, bool isTotal = false)
         {
@@ -965,7 +989,8 @@ namespace PCRCaculator.Battle
                     {
                         exEquipSubsData = myGameCtrl.tempData.playerList[i].exEquipSubs[j];
                     }
-                    screenshootEx.SetExEquipmentIcon(myGameCtrl.tempData.playerList[i].unitId, myGameCtrl.tempData.playerList[i].exEquip[j], myGameCtrl.tempData.playerList[i].exEquipLevel[j], exEquipSubsData, j);
+                    var unit = myGameCtrl.tempData.playerList[i];
+                    screenshootEx.SetExEquipmentIcon(unit.unitId, unit.exEquip[j], unit.exEquipLevel[j], exEquipSubsData, j, unit.ExceedRank(j));
                     yield return null;
                     yield return new WaitForEndOfFrame();
                     byte[] equipBytes = SaveRenderTexture(screenShootTx);

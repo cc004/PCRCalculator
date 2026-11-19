@@ -182,6 +182,7 @@ namespace PCRCaculator
             request.RoleMastery = group.roleMastery;
             request.NeedOnceResult = true;
             request.LabyrinthEnhancedNodeIds = group.labyrinthEnhancedNodeIds;
+            request.InvasionRelicIds = group.invasionRelicIds;
             request.LabyrinthRelicIds = group.labyrinthRelicIds;
             request.LabyrinthAlphaRupee = group.labyrinthAlphaRupee;
             request.LabyrinthOwnedUnitsCount = group.labyrinthOwnedUnitsCount;

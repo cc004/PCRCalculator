@@ -516,6 +516,7 @@ namespace Elements
         CONVERT_DAMAGE_OVER_TIME = 204,
         [Description("龙之果实\n斑比")]
         LONGZHIGUOSHI = 205,
+        BERSERK = 206,
         [Description("忌火\n紫罗兰")]
         JIHUO = 207,
         [Description("翡翠的葬歌\n兰法")]
@@ -606,6 +607,10 @@ namespace Elements
         [Description("战乙女的圣枪·义\n武猪妹")]
         SHENGQIANGYI = 265,
         // Token: 0x0400885F RID: 34911
+        UB_DAMAGE_UP = 801,
+        UB_DAMAGE_DOWN = 802,
+        SKILL_DAMAGE_UP = 803,
+        SKILL_DAMAGE_DOWN = 804,
         EX_PASSIVE_1 = 999,
         // Token: 0x04008860 RID: 34912
         NUM = 1000,

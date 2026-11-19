@@ -16,12 +16,21 @@ namespace Elements
 {
     public class AttackAction : AttackActionBase
     {
+        private readonly Dictionary<BasePartsData, long> damageDealt = new Dictionary<BasePartsData, long>();
+
+        public override void ReadyAction(UnitCtrl source, UnitActionController controller, Skill skill)
+        {
+            base.ReadyAction(source, controller, skill);
+            damageDealt.Clear();
+        }
+
         private const int DAMAGE_BASE = 100;
         private enum eDecideTargetAtkType
         {
             SELECT_ATTACK_TYPE,
             TARGET_LOWER_DEF_TYPE
         }
+
         public override void ExecAction(
           UnitCtrl _source,
           BasePartsData _target,
@@ -110,7 +119,8 @@ namespace Elements
                 for (int index = 0; index < ActionExecTimeList.Count; ++index)
                 {
                     double criticalRate = damageData.CriticalRate;
-                    if ((double)x == index + 1 || x < 0)
+                    bool guaranteedCritical = x < 0 || x == index + 1;
+                    if (guaranteedCritical)
                     {
                         criticalRate = 1f;
                     }
@@ -135,7 +145,7 @@ namespace Elements
                     criticalData.ExpectedDamageForEnergyCalc = criticalData.ExpectedDamage = BattleUtil.DoubleToLong(damageData.TotalDamageForLogBarrier * ActionExecTimeList[index].Weight / ActionWeightSum);
 
                     //if (num2 <= criticalRate && damageData.CriticalDamageRate != 0.0)
-                    if (_valueDictionary[eValueNumber.VALUE_5] == (double)(index + 1))
+                    if (guaranteedCritical)
                     {
                         criticalData.critVar = 1.0;
                         criticalData.IsCritical = true;
@@ -257,9 +267,32 @@ namespace Elements
             }
 
             _target.Owner.lastBarrier = null;
-            if (_target.Owner.SetDamage(damageData, true, ActionId, OnDamageHit, _skill: _skill, _onDefeat: OnDefeatEnemy, _damageWeight: ActionExecTimeList[_num].Weight, _damageWeightSum: ActionWeightSum, _energyChargeMultiple: EnergyChargeMultiple, callBack: action, _usedChargeEnergyByReceiveDamage: UsedChargeEnergyByReceiveDamage) != 0L)
+            long dealt = _target.Owner.SetDamage(damageData, true, ActionId, OnDamageHit, _skill: _skill, _onDefeat: OnDefeatEnemy, _damageWeight: ActionExecTimeList[_num].Weight, _damageWeightSum: ActionWeightSum, _energyChargeMultiple: EnergyChargeMultiple, callBack: action, _usedChargeEnergyByReceiveDamage: UsedChargeEnergyByReceiveDamage);
+            if (dealt != 0)
                 HitOnceDic[_target] = true;
             HitOnceProbDic[_target] = _target.Owner.lastBarrier;
+
+            damageDealt.TryGetValue(_target, out long previous);
+            damageDealt[_target] = previous + dealt;
+            if (_num == ActionExecTimeList.Count - 1 && damageDealt[_target] > 0)
+            {
+                var effects = damageData.DamageType == DamageData.eDamageType.ATK ? _source.PhysicalFollowUp : _source.MagicFollowUp;
+                double extra = 0;
+                foreach (var effect in effects)
+                    extra += effect.Calculate(damageDealt[_target]);
+                if (extra > 0)
+                {
+                    var followUp = new DamageData
+                    {
+                        Damage = BattleUtil.DoubleToLong(extra), DamageType = damageData.DamageType,
+                        Source = _source, SourceForDamageNumEffect = _source, Target = _target,
+                        ActionType = eActionType.FOLLOW_UP_DAMAGE, IgnoreDef = true, LifeSteal = damageData.LifeSteal
+                    };
+                    _target.Owner.SetDamage(followUp, false, ActionId, _skill: _skill, _energyAdd: false,
+                        _onDefeat: OnDefeatEnemy, _energyChargeMultiple: EnergyChargeMultiple,
+                        _usedChargeEnergyByReceiveDamage: UsedChargeEnergyByReceiveDamage);
+                }
+            }
             //if (_skill.AnimId != eSpineCharacterAnimeId.ATTACK)
             //    return;
             //_target.ShowHitEffect(_source.ToadDatas.Count > 0 ? _skill.WeaponType : _source.WeaponSeType, _skill, _source.IsLeftDir);

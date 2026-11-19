@@ -2,7 +2,7 @@ name: Build and release
 
 on:
   push:
-    branches: ['**']
+    branches-ignore: ['jp']
   pull_request:
     branches: ['**']
   workflow_dispatch:

@@ -13,7 +13,7 @@ namespace Elements
     {
         public float Time;
         public eDamageEffectType DamageNumType;
-        public float Weight = 1f;
+        public double Weight = 1.0;
         public float DamageNumScale = 1f;
     }
 }
