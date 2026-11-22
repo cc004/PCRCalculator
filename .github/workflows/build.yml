@@ -39,7 +39,7 @@ jobs:
   version:
     name: Check package version
     if: >-
-      (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/jp') ||
       github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     outputs:
@@ -63,7 +63,7 @@ jobs:
     name: Package Linux .NET server
     needs: [compile, version]
     if: >-
-      (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/jp') ||
       (github.event_name == 'workflow_dispatch' && (inputs.target == 'all' || inputs.target == 'linux'))
     runs-on: ubuntu-latest
     steps:
@@ -91,7 +91,7 @@ jobs:
     name: ${{ github.ref_name }} windows desktop
     needs: [compile, version]
     if: >-
-      (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/jp') ||
       (github.event_name == 'workflow_dispatch' && inputs.target != 'linux')
     timeout-minutes: 45
     runs-on: windows-2022
@@ -133,7 +133,7 @@ jobs:
   release:
     name: Publish release
     needs: [version, server, desktop]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/jp'
     runs-on: ubuntu-latest
     permissions:
       contents: write
