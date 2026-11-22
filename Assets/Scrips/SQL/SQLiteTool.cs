@@ -72,6 +72,19 @@ namespace PCRCaculator.SQL
 #endif
                 File.Copy(path, dbPath, true);
 
+                string patchSql = sql;
+                if (mgr is JpDatabaseManager { Mirror: JpDatabaseMirror.Taiwan, Version: 620008 })
+                {
+                    // The published TW 620008 mirror labels enemy skill levels 3 and 4 in reverse.
+                    // Match the file itself in case the publisher replaces it under the same version.
+                    using var file = File.OpenRead(dbPath);
+                    using var sha = SHA256.Create();
+                    if (BitConverter.ToString(sha.ComputeHash(file)).Replace("-", "") ==
+                        "3C12373C8D8B75B4D181B8C56038A50E2B29A48A835FD6711A6EEEB391C74630")
+                        patchSql = "UPDATE enemy_parameter SET main_skill_lv_3 = main_skill_lv_4, " +
+                                   "main_skill_lv_4 = main_skill_lv_3 WHERE main_skill_lv_3 <> main_skill_lv_4;\n" + sql;
+                }
+
                 string connectingPath = "Data Source=" + dbPath;
                 //MainManager.Instance.debugtext.text += connectingPath;
                 //构造数据库连接
@@ -81,7 +94,7 @@ namespace PCRCaculator.SQL
                 var trans = dbConnection.BeginTransaction();
 #if UNITY_5_3_OR_NEWER
                 var num = UnsafeNativeMethods.sqlite3_exec((dbConnection._sql as Mono.Data.Sqlite.SQLite3)!._sql,
-                    SqliteConvert.ToUTF8(sql),
+                    SqliteConvert.ToUTF8(patchSql),
                     IntPtr.Zero, IntPtr.Zero, out var intPtr);
                 var flag = num != 0;
                 if (flag)
@@ -92,7 +105,7 @@ namespace PCRCaculator.SQL
 #else
                 new Mono.Data.Sqlite.SqliteCommand(dbConnection)
                 {
-                    CommandText = sql
+                    CommandText = patchSql
                 }.ExecuteNonQuery();
 #endif
 

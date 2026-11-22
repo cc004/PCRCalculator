@@ -166,7 +166,8 @@ namespace Elements
 
 		public SkillEffectCtrl Effect { get; set; }
 
-		public int GetCurrentCount() => Mathf.Min(Count, Max);
+		// A consumed seal leaves the active list before its coroutine updates Count.
+		public int GetCurrentCount() => Mathf.Min(Mathf.Min(Count, Max), enableSealIdList?.Count ?? 0);
 
 		public int Count { get; set; }
 

@@ -25,7 +25,7 @@ namespace PCRCaculator
     public static class DatabaseCacheContract
     {
         // 15: DatabaseCache 增加 talentLevelLimit / roleMasterySlotLevelLimit / roleMasteryEnhanceLevelLimit
-        public const int CurrentSchemaVersion = 25;
+        public const int CurrentSchemaVersion = 26;
 
         public static T ResolveSharedDatabase<T>(T primary, Func<T> createSeparate, bool sharesPrimary)
             where T : class
