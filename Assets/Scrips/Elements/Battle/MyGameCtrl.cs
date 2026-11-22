@@ -627,13 +627,6 @@ namespace Elements
                 }
             }
 
-            var labyrinthOwnedUnits = (req.LabyrinthOwnedUnitIds ?? new List<int>())
-                .Where(unitId => unitId > 0)
-                .Distinct()
-                .Select(unitId => new PCRCaculator.UnitData { unitId = unitId })
-                .ToList();
-            if (labyrinthOwnedUnits.Count == 0)
-                labyrinthOwnedUnits = tempData.playerList;
             tempData.skipping = req.IsSkipping;
 
             if (req.IsGuildBattle)
@@ -665,6 +658,13 @@ namespace Elements
                     tempData.guildEnemy.Add(enemyData);
                 }
                 ConfigureLabyrinthContext(tempData, req.LabyrinthQuestId, req.LabyrinthDifficulty);
+                var labyrinthOwnedUnits = (req.LabyrinthOwnedUnitIds ?? new List<int>())
+                    .Where(unitId => unitId > 0)
+                    .Distinct()
+                    .Select(unitId => new PCRCaculator.UnitData { unitId = unitId })
+                    .ToList();
+                if (labyrinthOwnedUnits.Count == 0)
+                    labyrinthOwnedUnits = tempData.playerList;
                 ConfigureBattleRelics(tempData, req.InvasionRelicIds, req.LabyrinthRelicIds, labyrinthOwnedUnits, req.LabyrinthAlphaRupee, req.LabyrinthEnhancedNodeIds);
                 AppendExtraEffectEnemies(tempData);
                 tempData.enemyList = tempData.guildEnemy.Select(x => x.CreateUnitData()).ToList();
