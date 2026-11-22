@@ -366,10 +366,20 @@ namespace Elements
                     tempData,
                     playerGroup.labyrinthQuestId,
                     playerGroup.labyrinthDifficulty);
-                tempData.LabyrinthRelicBattleSkillSpecs = LabyrinthRelicTempData.Instance.CreateBattleSkillSpecs(
-                    playerGroup.labyrinthRelicIds);
-                tempData.LabyrinthRelicMarkCounts = LabyrinthRelicTempData.Instance.CreateRelicMarkCountDictionary(
-                    playerGroup.labyrinthRelicIds);
+                if (tempData.IsLabyrinthBattle)
+                {
+                    tempData.LabyrinthRelicBattleSkillSpecs = LabyrinthRelicTempData.Instance.CreateBattleSkillSpecs(
+                        playerGroup.labyrinthRelicIds);
+                    tempData.LabyrinthRelicMarkCounts = LabyrinthRelicTempData.Instance.CreateRelicMarkCountDictionary(
+                        playerGroup.labyrinthRelicIds);
+                    tempData.LabyrinthEnhanceParameter = LabyrinthEnhanceTempData.Instance.CreateBuffParameterDictionary(
+                        playerGroup.labyrinthEnhancedNodeIds);
+                    tempData.LabyrinthRelicPassiveParameter = LabyrinthRelicTempData.Instance.CreatePassiveParameterDictionary(
+                        playerGroup.labyrinthRelicIds,
+                        LabyrinthRelicTempData.Instance.CreateOwnedUnitList(playerGroup.labyrinthOwnedUnitsCount,
+                            playerGroup.labyrinthOwnedUnitRoleCounts, playerGroup.labyrinthOwnedUnitTalentCounts),
+                        playerGroup.labyrinthAlphaRupee);
+                }
                 AppendExtraEffectEnemies(tempData);
 
                 tempData.MPartsDataDic = mainManager.GuildBattleData.MPartsDataDic;
@@ -386,13 +396,6 @@ namespace Elements
                 tempData.randomData = tempData.SettingData.GetCurrentRandomData();
                 tempData.skipping = mainManager.GuildBattleData.skipping;
                 stopFrame = mainManager.GuildBattleData.stopFrame;
-                tempData.LabyrinthEnhanceParameter = LabyrinthEnhanceTempData.Instance.CreateBuffParameterDictionary(
-                    playerGroup.labyrinthEnhancedNodeIds);
-                tempData.LabyrinthRelicPassiveParameter = LabyrinthRelicTempData.Instance.CreatePassiveParameterDictionary(
-                    playerGroup.labyrinthRelicIds,
-                    LabyrinthRelicTempData.Instance.CreateOwnedUnitList(playerGroup.labyrinthOwnedUnitsCount,
-                        playerGroup.labyrinthOwnedUnitRoleCounts, playerGroup.labyrinthOwnedUnitTalentCounts),
-                    playerGroup.labyrinthAlphaRupee);
                 tempData.CreateAllUnitParameters(playerGroup.useLogBarrierNew);
             }
             else
@@ -444,10 +447,20 @@ namespace Elements
                         tempData,
                         playerGroup.labyrinthQuestId,
                         playerGroup.labyrinthDifficulty);
-                    tempData.LabyrinthRelicBattleSkillSpecs = LabyrinthRelicTempData.Instance.CreateBattleSkillSpecs(
-                        playerGroup.labyrinthRelicIds);
-                    tempData.LabyrinthRelicMarkCounts = LabyrinthRelicTempData.Instance.CreateRelicMarkCountDictionary(
-                        playerGroup.labyrinthRelicIds);
+                    if (tempData.IsLabyrinthBattle)
+                    {
+                        tempData.LabyrinthRelicBattleSkillSpecs = LabyrinthRelicTempData.Instance.CreateBattleSkillSpecs(
+                            playerGroup.labyrinthRelicIds);
+                        tempData.LabyrinthRelicMarkCounts = LabyrinthRelicTempData.Instance.CreateRelicMarkCountDictionary(
+                            playerGroup.labyrinthRelicIds);
+                        tempData.LabyrinthEnhanceParameter = LabyrinthEnhanceTempData.Instance.CreateBuffParameterDictionary(
+                            playerGroup.labyrinthEnhancedNodeIds);
+                        tempData.LabyrinthRelicPassiveParameter = LabyrinthRelicTempData.Instance.CreatePassiveParameterDictionary(
+                            playerGroup.labyrinthRelicIds,
+                            LabyrinthRelicTempData.Instance.CreateOwnedUnitList(playerGroup.labyrinthOwnedUnitsCount,
+                                playerGroup.labyrinthOwnedUnitRoleCounts, playerGroup.labyrinthOwnedUnitTalentCounts),
+                            playerGroup.labyrinthAlphaRupee);
+                    }
                     AppendExtraEffectEnemies(tempData);
 
                     tempData.MPartsDataDic = mainManager.GuildBattleData.MPartsDataDic;
@@ -464,13 +477,6 @@ namespace Elements
                     tempData.randomData = tempData.SettingData.GetCurrentRandomData();
                     tempData.skipping = mainManager.GuildBattleData.skipping;
                     stopFrame = stopFrameText.text == "" ? -1 : int.Parse(stopFrameText.text);
-                    tempData.LabyrinthEnhanceParameter = LabyrinthEnhanceTempData.Instance.CreateBuffParameterDictionary(
-                        playerGroup.labyrinthEnhancedNodeIds);
-                    tempData.LabyrinthRelicPassiveParameter = LabyrinthRelicTempData.Instance.CreatePassiveParameterDictionary(
-                        playerGroup.labyrinthRelicIds,
-                        LabyrinthRelicTempData.Instance.CreateOwnedUnitList(playerGroup.labyrinthOwnedUnitsCount,
-                            playerGroup.labyrinthOwnedUnitRoleCounts, playerGroup.labyrinthOwnedUnitTalentCounts),
-                        playerGroup.labyrinthAlphaRupee);
                     tempData.CreateAllUnitParameters(playerGroup.useLogBarrierNew);
                 }
                 else
@@ -604,24 +610,6 @@ namespace Elements
                 }
             }
 
-            tempData.LabyrinthEnhanceParameter = LabyrinthEnhanceTempData.Instance.CreateBuffParameterDictionary(
-                req.LabyrinthEnhancedNodeIds);
-            var labyrinthOwnedUnits = (req.LabyrinthOwnedUnitIds ?? new List<int>())
-                .Where(unitId => unitId > 0)
-                .Distinct()
-                .Select(unitId => new PCRCaculator.UnitData { unitId = unitId })
-                .ToList();
-            if (labyrinthOwnedUnits.Count == 0)
-                labyrinthOwnedUnits = tempData.playerList;
-            tempData.LabyrinthRelicPassiveParameter = LabyrinthRelicTempData.Instance.CreatePassiveParameterDictionary(
-                req.LabyrinthRelicIds,
-                labyrinthOwnedUnits,
-                req.LabyrinthAlphaRupee);
-            tempData.LabyrinthRelicBattleSkillSpecs = LabyrinthRelicTempData.Instance.CreateBattleSkillSpecs(
-                req.LabyrinthRelicIds);
-            tempData.LabyrinthRelicMarkCounts = LabyrinthRelicTempData.Instance.CreateRelicMarkCountDictionary(
-                req.LabyrinthRelicIds);
-
             tempData.skipping = req.IsSkipping;
 
             if (req.IsGuildBattle)
@@ -653,6 +641,26 @@ namespace Elements
                     tempData.guildEnemy.Add(enemyData);
                 }
                 ConfigureLabyrinthContext(tempData, req.LabyrinthQuestId, req.LabyrinthDifficulty);
+                if (tempData.IsLabyrinthBattle)
+                {
+                    tempData.LabyrinthEnhanceParameter = LabyrinthEnhanceTempData.Instance.CreateBuffParameterDictionary(
+                        req.LabyrinthEnhancedNodeIds);
+                    var labyrinthOwnedUnits = (req.LabyrinthOwnedUnitIds ?? new List<int>())
+                        .Where(unitId => unitId > 0)
+                        .Distinct()
+                        .Select(unitId => new PCRCaculator.UnitData { unitId = unitId })
+                        .ToList();
+                    if (labyrinthOwnedUnits.Count == 0)
+                        labyrinthOwnedUnits = tempData.playerList;
+                    tempData.LabyrinthRelicPassiveParameter = LabyrinthRelicTempData.Instance.CreatePassiveParameterDictionary(
+                        req.LabyrinthRelicIds,
+                        labyrinthOwnedUnits,
+                        req.LabyrinthAlphaRupee);
+                    tempData.LabyrinthRelicBattleSkillSpecs = LabyrinthRelicTempData.Instance.CreateBattleSkillSpecs(
+                        req.LabyrinthRelicIds);
+                    tempData.LabyrinthRelicMarkCounts = LabyrinthRelicTempData.Instance.CreateRelicMarkCountDictionary(
+                        req.LabyrinthRelicIds);
+                }
                 AppendExtraEffectEnemies(tempData);
                 tempData.enemyList = tempData.guildEnemy.Select(x => x.CreateUnitData()).ToList();
                 tempData.UBExecTimeList = req.UBExecTimeList;
