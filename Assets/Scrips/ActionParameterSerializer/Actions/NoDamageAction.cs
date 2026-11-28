@@ -11,7 +11,8 @@ namespace ActionParameterSerializer.Actions
             dodgeAll = 3,
             abnormal = 4,
             debuff = 5,
-            Break = 6
+            Break = 6,
+            noDamageSecond = 7
         }
 
         private NoDamageType noDamageType;
@@ -29,6 +30,7 @@ namespace ActionParameterSerializer.Actions
             switch (noDamageType)
             {
                 case NoDamageType.noDamage:
+                case NoDamageType.noDamageSecond:
                     return Utils.JavaFormat(Utils.GetString("Make_s1_to_be_invulnerable_for_s2_sec"),
                         targetParameter.buildTargetClause(),
                         buildExpression(level, RoundingMode.UNNECESSARY, property));

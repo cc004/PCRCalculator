@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace ActionParameterSerializer.Actions
@@ -26,31 +25,13 @@ namespace ActionParameterSerializer.Actions
         public
             override string localizedDetail(int level, Property property)
         {
-            try
-            {
-                if (speedChangeType == SpeedChangeType.slow)
-                {
-                    return Utils.JavaFormat(Utils.GetString("Decrease_s1_ATK_SPD_by_s2_for_s3_sec"),
-                        targetParameter.buildTargetClause(),
-                        ((double.Parse(buildExpression(level, RoundingMode.UNNECESSARY, property))) * ((100.0))).ToString(),
-                        buildExpression(level, durationValues, RoundingMode.UNNECESSARY, property));
-                }
-                else if (speedChangeType == SpeedChangeType.haste)
-                {
-                    return Utils.JavaFormat(Utils.GetString("Increase_s1_ATK_SPD_by_s2_for_s3_sec"),
-                        targetParameter.buildTargetClause(),
-                        ((double.Parse(buildExpression(level, RoundingMode.UNNECESSARY, property))) * ((100.0))).ToString(),
-                        buildExpression(level, durationValues, RoundingMode.UNNECESSARY, property));
-                }
-                else
-                {
-                    return base.localizedDetail(level, property);
-                }
-            }
-            catch (Exception)
-            {
+            if (speedChangeType != SpeedChangeType.haste && speedChangeType != SpeedChangeType.slow)
                 return base.localizedDetail(level, property);
-            }
+
+            string key = speedChangeType == SpeedChangeType.haste ? "Increase_s1_ATK_SPD_by_s2_for_s3_sec"
+                : "Decrease_s1_ATK_SPD_by_s2_for_s3_sec";
+            return Utils.JavaFormat(Utils.GetString(key), targetParameter.buildTargetClause(),
+                describePercent(level, actionValues, property), buildExpression(level, durationValues, RoundingMode.UNNECESSARY, property));
         }
     }
 }

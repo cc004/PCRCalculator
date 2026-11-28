@@ -13,13 +13,18 @@ namespace ActionParameterSerializer.Actions
         {
             if (actionDetail2 != 0 && actionDetail3 != 0)
             {
-                return Utils.JavaFormat(Utils.GetString("Condition_if_the_specific_field_exists_then_use_d1_otherwise_d2"),
-                    actionDetail2 % 10, actionDetail3 % 10);
+                return Utils.JavaFormat(Utils.GetString("Condition_field_d1_exists_then_use_d2_otherwise_d3"),
+                    actionDetail1, describeActionSlot(actionDetail2), describeActionSlot(actionDetail3));
             }
             else if (actionDetail2 != 0)
             {
-                return Utils.JavaFormat(Utils.GetString("Condition_if_the_specific_field_exists_then_use_d"),
-                    actionDetail2 % 10);
+                return Utils.JavaFormat(Utils.GetString("Condition_field_d1_exists_then_use_d2"),
+                    actionDetail1, describeActionSlot(actionDetail2));
+            }
+            else if (actionDetail3 != 0)
+            {
+                return Utils.JavaFormat(Utils.GetString("Condition_field_d1_does_not_exist_then_use_d2"),
+                    actionDetail1, describeActionSlot(actionDetail3));
             }
             else
             {

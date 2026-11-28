@@ -28,7 +28,7 @@ namespace ActionParameterSerializer.Actions
                         actionDetail3,
                         auraActionType.description(),
                         targetParameter.buildTargetClause(),
-                        buildExpression(level, RoundingMode.UP, property),
+                        describeValueReference(buildExpression(level, RoundingMode.UP, property)),
                         percentModifier.description(),
                         auraType.description());
                 default:

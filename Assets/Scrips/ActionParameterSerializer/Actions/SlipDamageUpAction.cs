@@ -1,66 +1,25 @@
-using static ActionParameterSerializer.Actions.EveryAttackCriticalAction;
+using System.Linq;
 
 namespace ActionParameterSerializer.Actions
 {
     public class SlipDamageUpAction : ActionParameter
     {
-        public override void childInit()
-        {
-            base.childInit();
-        }
-
-        public enum eSlipDamageType
-        {
-            NO_EFFECT,
-            POISONE,
-            BURN,
-            CURSE,
-            VENOM,
-            HEX,
-            COMPENSATION,
-            POISON2,
-            CURSE2,
-            BLACK_FRAME,
-            WORLD_LIGHTNING
-        }
-
         public override string localizedDetail(int level, Property property)
         {
-            if (actionValue3.value == -1)
+            string damageType = Utils.GetString("all_abnormal_damage");
+            if (actionValue3.value != -1)
             {
-                return Utils.JavaFormat(Utils.GetString("all_slip_damage_up"),
-                        (int)(1 + actionValue1.value / 100),
-                        actionValue7.value,
-                        actionValue2.value);
+                var types = new[] { actionValue3.value, actionValue4.value, actionValue5.value, actionValue6.value };
+                damageType = string.Join("、", types.Where(value => value != -1)
+                    .Select(value => ((Ailment.DotDetail)(int)value).description()));
             }
-            else
-            {
-                string slipDamageType = "";
-                if (actionValue3.value != -1)
-                {
-                    slipDamageType += ((eSlipDamageType)actionValue3.value).ToString();
-                }
-                if (actionValue4.value != -1)
-                {
-                    slipDamageType += ", ";
-                    slipDamageType += ((eSlipDamageType)actionValue4.value).ToString();
-                }
-                if (actionValue5.value != -1)
-                {
-                    slipDamageType += ", ";
-                    slipDamageType += ((eSlipDamageType)actionValue5.value).ToString();
-                }
-                if (actionValue6.value != -1)
-                {
-                    slipDamageType += ", ";
-                    slipDamageType += ((eSlipDamageType)actionValue6.value).ToString();
-                }
-                return Utils.JavaFormat(Utils.GetString("special_slip_damage_up"),
-                                slipDamageType,
-                                (int)(1 + actionValue1.value / 100),
-                                actionValue7.value,
-                                actionValue2.value);
-            }
+
+            string detail = Utils.JavaFormat(Utils.GetString("Multiply_s1_slip_damage_s2_by_s3_for_s4_sec"),
+                targetParameter.buildTargetClause(), damageType, Utils.roundIfNeed(1 + actionValue1.value / 100),
+                actionValue2.valueString());
+            if (actionValue7.value != 0)
+                detail += Utils.JavaFormat(Utils.GetString("Slip_damage_effect_limit_s"), actionValue7.valueString());
+            return detail;
         }
     }
 }

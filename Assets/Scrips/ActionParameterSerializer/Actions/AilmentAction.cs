@@ -38,22 +38,9 @@ namespace ActionParameterSerializer.Actions
                         //                        break;
                         case Ailment.ActionDetail.haste:
                         case Ailment.ActionDetail.slow:
-                            if (UserSettings.get().getExpression() == UserSettings.EXPRESSION_ORIGINAL)
-                            {
-                                str.Append(Utils.JavaFormat(Utils.GetString("Multiple_attack_speed_of_s1_with_s2_for_s3_sec"),
-                                    targetParameter.buildTargetClause(),
-                                    buildExpression(level, actionValues, RoundingMode.UNNECESSARY, property) + " * 100",
-                                    buildExpression(level, durationValues, RoundingMode.UNNECESSARY, property)
-                                ));
-                            }
-                            else
-                            {
-                                str.Append(Utils.JavaFormat(Utils.GetString("Multiple_attack_speed_of_s1_with_s2_for_s3_sec"),
-                                    targetParameter.buildTargetClause(),
-                                    Utils.roundIfNeed(double.Parse(buildExpression(level, actionValues, RoundingMode.UNNECESSARY, property)) * 100),
-                                    buildExpression(level, durationValues, RoundingMode.UNNECESSARY, property)
-                                ));
-                            }
+                            str.Append(Utils.JavaFormat(Utils.GetString("Multiple_attack_speed_of_s1_with_s2_for_s3_sec"),
+                                targetParameter.buildTargetClause(), describePercent(level, actionValues, property),
+                                buildExpression(level, durationValues, RoundingMode.UNNECESSARY, property)));
                             break;
                         case Ailment.ActionDetail.sleep:
                             str.Append(Utils.JavaFormat(Utils.GetString("Make_s1_fall_asleep_for_s2_sec"),
@@ -74,7 +61,12 @@ namespace ActionParameterSerializer.Actions
                     }
                     if (actionDetail2 == 1)
                     {
-                        str.Append(Utils.JavaFormat(Utils.GetString("This_effect_will_be_released_when_taking_damaged")));
+                        str.Append(Utils.GetString("This_effect_will_be_released_when_taking_attack_damage"));
+                    }
+                    else if (actionDetail2 == 2)
+                    {
+                        str.Append(Utils.JavaFormat(Utils.GetString("Release_control_on_max_HP_change_at_s_percent"),
+                            actionValue6.valueString()));
                     }
                     break;
                 case Ailment.AilmentType.dot:
@@ -90,7 +82,7 @@ namespace ActionParameterSerializer.Actions
                             break;
                         case Ailment.DotDetail.raio_damage:
                             str.Append(Utils.JavaFormat(Utils.GetString("s1_and_deal_s2_present_damage_up_to_s3_per_second_for_s4_sec"),
-                                targetParameter.buildTargetClause(), actionValue1.value, actionValue5.value, buildExpression(level, durationValues, RoundingMode.HALF_UP, property)));
+                                targetParameter.buildTargetClause(), buildExpression(level, RoundingMode.UNNECESSARY, property), actionValue5.value, buildExpression(level, durationValues, RoundingMode.HALF_UP, property)));
                             break;
                         case Ailment.DotDetail.stackable:
                             str.Append(Utils.JavaFormat(Utils.GetString("Stackable_slip_s1_and_deal_s2_damage_per_second_for_s3_sec_max_s4_stacks_each_stack_adds_s5_times_base_damage"),
@@ -107,14 +99,25 @@ namespace ActionParameterSerializer.Actions
                     }
                     if ((Ailment.DotDetail)ailment.ailmentDetail.detail != Ailment.DotDetail.raio_damage
                         && (Ailment.DotDetail)ailment.ailmentDetail.detail != Ailment.DotDetail.stackable
-                        && (int)actionValue5.value > 0)
+                        && actionValue5.value > 0)
                     {
                         str.Append(Utils.JavaFormat(Utils.GetString("DMG_shall_be_increased_by_s_percents_of_base_DMG_through_each_tick"), actionValue5.valueString()));
                     }
+                    if (actionDetail2 == 2 && (Ailment.DotDetail)ailment.ailmentDetail.detail != Ailment.DotDetail.stackable)
+                    {
+                        str.Append(Utils.JavaFormat(Utils.GetString("Slip_damage_is_released_at_s_percent_HP"),
+                            actionValue7.valueString()));
+                    }
                     break;
                 case Ailment.AilmentType.silence:
-                    str.Append(Utils.JavaFormat(Utils.GetString("Silence_s1_with_s2_chance_for_s3_sec"),
-                        targetParameter.buildTargetClause(), buildExpression(level, chanceValues, RoundingMode.UNNECESSARY, property), buildExpression(level, property)));
+                    str.Append(Utils.JavaFormat(Utils.GetString("Apply_s2_to_s1_for_s3_sec"),
+                        targetParameter.buildTargetClause(), Utils.GetString(actionDetail1 == 1 ? "UB_silence" : "Silence"),
+                        buildExpression(level, RoundingMode.UNNECESSARY, property)));
+                    if (actionValue3.value != 1 || actionValue4.value != 0)
+                    {
+                        str.Append(Utils.JavaFormat(Utils.GetString("Abnormal_base_coefficient_s"),
+                            buildExpression(level, chanceValues, RoundingMode.UNNECESSARY, property)));
+                    }
                     break;
                 case Ailment.AilmentType.darken:
                     str.Append(Utils.JavaFormat(Utils.GetString("Blind_s1_with_s2_chance_for_s3_sec_physical_attack_has_d4_chance_to_miss"),

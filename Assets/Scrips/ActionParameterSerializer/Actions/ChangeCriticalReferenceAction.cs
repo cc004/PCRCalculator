@@ -20,7 +20,7 @@ namespace ActionParameterSerializer.Actions
         {
             base.childInit();
             refType = (eCriticalReference) actionDetail2;
-            actionId = actionDetail1 % 10;
+            actionId = describeActionSlot(actionDetail1);
         }
 
         public override string localizedDetail(int level, Property property)

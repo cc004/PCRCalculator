@@ -15,9 +15,7 @@ namespace ActionParameterSerializer.Actions
         public DirectionType direction;
         public TargetCount targetCount;
 
-        private readonly SkillAction dependAction;
-
-        public TargetParameter(int targetAssignment, int targetNumber, int targetType, int targetRange, int targetArea, int targetCount, SkillAction dependAction)
+        public TargetParameter(int targetAssignment, int targetNumber, int targetType, int targetRange, int targetArea, int targetCount)
         {
             this.targetAssignment = (TargetAssignment)(targetAssignment);
             this.targetNumber = (TargetNumber)(targetNumber);
@@ -27,7 +25,6 @@ namespace ActionParameterSerializer.Actions
             direction = (DirectionType)(targetArea);
             this.targetCount = (TargetCount)(targetCount);
             if (!Enum.IsDefined(typeof(TargetCount), this.targetCount)) this.targetCount = TargetCount.all;
-            this.dependAction = dependAction;
             setBooleans();
         }
 
@@ -37,15 +34,6 @@ namespace ActionParameterSerializer.Actions
         private bool hasNthModifier;
         private bool hasDirectionPhrase;
         private bool hasTargetType;
-        private bool hasDependAction()
-        {
-            return dependAction != null && (
-                dependAction.getActionId() != 0
-                && targetType != TargetType.absolute
-                && dependAction.parameter.actionType != ActionType.chooseArea
-            );
-        }
-
         private void setBooleans()
         {
             hasRelationPhrase = targetType != TargetType.self
@@ -53,7 +41,10 @@ namespace ActionParameterSerializer.Actions
             hasCountPhrase = targetType != TargetType.self
                              && !(targetType == TargetType.none && targetCount == TargetCount.zero);
 
-            hasRangePhrase = targetRange.rangeType == TargetRange.FINITE;
+            hasRangePhrase = targetRange.rangeType == TargetRange.FINITE
+                && direction != DirectionType.all
+                && direction != DirectionType.ALL_INCLUDE_FLIGHT
+                && direction != DirectionType.ALL_WITHOUT_SUMMON;
 
             hasNthModifier = targetNumber == TargetNumber.second
                              || targetNumber == TargetNumber.third
@@ -93,18 +84,7 @@ namespace ActionParameterSerializer.Actions
 
         public string _buildTargetClause()
         {
-            if (hasDependAction())
-            {
-                if (dependAction.parameter.actionType == ActionType.damage)
-                {
-                    return Utils.JavaFormat(Utils.GetString("targets_those_damaged_by_effect_d"), dependAction.getActionId() % 100);
-                }
-                else
-                {
-                    return Utils.JavaFormat(Utils.GetString("targets_of_effect_d"), dependAction.getActionId() % 100);
-                }
-            }
-            else if (!hasRelationPhrase)
+            if (!hasRelationPhrase)
             {
                 return targetType.description();
             }
@@ -118,7 +98,9 @@ namespace ActionParameterSerializer.Actions
                 {
                     if (targetType.exclusiveWithAll() == ExclusiveAllType.exclusive)
                     {
-                        return Utils.JavaFormat(Utils.GetString("all_s_targets"), targetAssignment.description());
+                        return targetAssignment == TargetAssignment.all
+                            ? targetAssignment.description()
+                            : Utils.JavaFormat(Utils.GetString("all_s_targets"), targetAssignment.description());
                     }
                     else if (targetType.exclusiveWithAll() == ExclusiveAllType.not)
                     {
@@ -284,7 +266,7 @@ namespace ActionParameterSerializer.Actions
 
         private TargetNumber getUntilNumber()
         {
-            TargetNumber tUntil = targetNumber + (int)targetCount;
+            TargetNumber tUntil = targetNumber + (int)targetCount - 1;
             if (tUntil == TargetNumber.other || !Enum.IsDefined(typeof(TargetNumber), tUntil))
             {
                 return TargetNumber.fifth;

@@ -19,7 +19,7 @@ namespace ActionParameterSerializer.Actions
             override void childInit()
         {
             damageClass = (ClassModifier)(actionDetail1);
-            criticalModifier = Math.Abs((int)actionValue5.value) == 1 ? CriticalModifier.critical : CriticalModifier.normal;
+            criticalModifier = (actionValue5.value < 0 || actionValue5.value > 0 && actionValue5.value == Math.Truncate(actionValue5.value)) ? CriticalModifier.critical : CriticalModifier.normal;
             decideTargetAtkType = (DecideTargetAtkType)actionDetail2;
 
             switch (damageClass)
@@ -42,14 +42,13 @@ namespace ActionParameterSerializer.Actions
             override string localizedDetail(int level, Property property)
         {
             StringBuilder str = new StringBuilder();
-            switch (criticalModifier)
+            str.Append(Utils.JavaFormat(Utils.GetString("Deal_s1_s2_damage_to_s3"),
+                buildExpression(level, property), damageClass.description(), targetParameter.buildTargetClause()));
+            if (criticalModifier == CriticalModifier.critical)
             {
-                case CriticalModifier.normal:
-                    str.Append(Utils.JavaFormat(Utils.GetString("Deal_s1_s2_damage_to_s3"), buildExpression(level, property), damageClass.description(), targetParameter.buildTargetClause()));
-                    break;
-                case CriticalModifier.critical:
-                    str.Append(Utils.JavaFormat(Utils.GetString("Deal_s1_s2_damage_to_s3_and_this_attack_is_ensured_critical"), buildExpression(level, property), damageClass.description(), targetParameter.buildTargetClause(), Utils.roundIfNeed(actionValue5.value)));
-                    break;
+                str.Append(actionValue5.value < 0
+                    ? Utils.GetString("All_hits_are_ensured_critical")
+                    : Utils.JavaFormat(Utils.GetString("Hit_d_is_ensured_critical"), actionValue5.valueString()));
             }
             if (actionValue6.value != 0)
             {

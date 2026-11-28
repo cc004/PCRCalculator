@@ -40,7 +40,7 @@ namespace ActionParameterSerializer.Actions
             {
                 case ConditionType.hit:
                     return Utils.JavaFormat(Utils.GetString("Use_d1_s2_every_s3_hits_in_next_s4_sec"),
-                        actionDetail2 % 10,
+                        describeActionSlot(actionDetail2),
                         limitation,
                         Utils.roundIfNeed(actionValue1.value),
                         buildExpression(level, durationValues, RoundingMode.UNNECESSARY, property)

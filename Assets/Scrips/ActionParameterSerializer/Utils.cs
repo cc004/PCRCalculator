@@ -22,6 +22,8 @@ namespace ActionParameterSerializer
             {
                 case PropertyKey.atk:
                     return this.atk;
+                case PropertyKey.sourceAttack:
+                    return attackType == ClassModifier.magical ? magicStr : atk;
                 case PropertyKey.def:
                     return this.def;
 
@@ -143,6 +145,7 @@ namespace ActionParameterSerializer
         public double hp;
         public double atk;
         public double magicStr;
+        public ClassModifier attackType;
         public double def;
         public double magicDef;
         public double physicalCritical;
@@ -160,12 +163,57 @@ namespace ActionParameterSerializer
 
     }
 
-    public class SkillAction
+    public class ActionDescriptionContext
     {
-        public ActionParameter parameter;
-        public int getActionId()
+        private readonly Dictionary<int, int> actionSlots = new();
+        private readonly Dictionary<int, List<int>> children = new();
+
+        public ActionDescriptionContext(IEnumerable<(int actionId, int parentId)> actions)
         {
-            return 0;
+            int slot = 0;
+            foreach (var (actionId, parentId) in actions)
+            {
+                slot++;
+                if (actionId <= 0 || actionSlots.ContainsKey(actionId))
+                    continue;
+
+                actionSlots.Add(actionId, slot);
+                if (parentId <= 0)
+                    continue;
+
+                if (!children.TryGetValue(parentId, out var childActions))
+                {
+                    childActions = new List<int>();
+                    children.Add(parentId, childActions);
+                }
+                childActions.Add(actionId);
+            }
+        }
+
+        public int GetActionSlotOrId(int actionId)
+        {
+            return actionSlots.TryGetValue(actionId, out var slot) ? slot : actionId;
+        }
+
+        public IEnumerable<int> GetDescendants(int actionId)
+        {
+            var pending = new Queue<int>();
+            var visited = new HashSet<int> { actionId };
+            pending.Enqueue(actionId);
+            while (pending.Count > 0)
+            {
+                if (!children.TryGetValue(pending.Dequeue(), out var childActions))
+                    continue;
+
+                foreach (int child in childActions)
+                {
+                    if (visited.Add(child))
+                    {
+                        pending.Enqueue(child);
+                        yield return child;
+                    }
+                }
+            }
         }
     }
 
@@ -362,6 +410,16 @@ namespace ActionParameterSerializer
         {
             return GetString(re2.Replace(t.GetDescription(), match => "_" + match.Groups[0].Value.ToLower()));
         }
+        public static string describeAbnormalState(int id)
+        {
+            var state = (Elements.UnitCtrl.eAbnormalState)id;
+            string key = state.ToString().ToLowerInvariant();
+            string localized = GetString(key);
+            if (localized != key)
+                return localized;
+            return Utils.JavaFormat(GetString("Abnormal_state_ID_d"), id);
+        }
+
         public static string rawDescription(this Enum t)
         {
             return GetString(t.GetDescription());
@@ -424,6 +482,7 @@ namespace ActionParameterSerializer
             switch (key)
             {
                 case PropertyKey.atk: return Utils.GetString("ATK");
+                case PropertyKey.sourceAttack: return Utils.GetString("Attack_of_source_type");
                 case PropertyKey.def: return Utils.GetString("DEF");
                 case PropertyKey.dodge: return Utils.GetString("Dodge");
                 case PropertyKey.energyRecoveryRate: return Utils.GetString("Energy_Recovery_Rate");
@@ -579,9 +638,9 @@ namespace ActionParameterSerializer
                     switch (target_type)
                     {
                         case TargetType.NEAR_WITHOUT_TARGET_ABNORMAL_STATE:
-                            return Utils.JavaFormat(Utils.GetString("near_without_s_abnormal_state"), ((eAbnormalState)target_val).description());
+                            return Utils.JavaFormat(Utils.GetString("near_with_s_abnormal_state"), describeAbnormalState(target_val));
                         case TargetType.FAR_WITHOUT_TARGET_ABNORMAL_STATE:
-                            return Utils.JavaFormat(Utils.GetString("far_without_s_abnormal_state"), ((eAbnormalState)target_val).description());
+                            return Utils.JavaFormat(Utils.GetString("far_with_s_abnormal_state"), describeAbnormalState(target_val));
                         case TargetType.NEAR_SEAL_ENCHANTED:
                             return Utils.JavaFormat(Utils.GetString("near_with_s_sealed_state"), ((eStateIconType)target_val).description());
                         case TargetType.NEAR_TALENT:

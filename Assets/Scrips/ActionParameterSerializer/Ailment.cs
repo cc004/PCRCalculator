@@ -34,13 +34,16 @@
 
         public enum DotDetail
         {
-            detain = 0,
+            slip_damage_only = 0,
             poison = 1,
             burn = 2,
             curse = 3,
             violentPoison = 4,
             hex = 5,
             compensation = 6,
+            poison_second = 7,
+            curse_second = 8,
+            black_flame = 9,
             world_lightning = 10,
             raio_damage = 11,
             stackable = 12,
@@ -66,7 +69,10 @@
             detain = 9,
             faint = 10,
             timeStop = 11,
-            unknown = 12
+            npc_stun = 12,
+            crystalize = 13,
+            stun_second = 14,
+            unknown = -1
         }
 
         public enum AilmentType

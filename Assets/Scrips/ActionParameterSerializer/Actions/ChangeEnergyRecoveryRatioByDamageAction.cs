@@ -1,37 +1,23 @@
-using System.Text;
+using System.Linq;
 
 namespace ActionParameterSerializer.Actions
 {
     public class ChangeEnergyRecoveryRatioByDamageAction : ActionParameter
     {
 
-        public
-            override void childInit()
+        public override string localizedDetail(int level, Property property)
         {
-            base.childInit();
-        }
-
-        public string getChildrenActionString()
-        {
-            StringBuilder childrenActionString = new StringBuilder();
-            // TODO
-            /*
-            if (childrenAction != null) {
-                for (SkillAction action : childrenAction) {
-                    childrenActionString.Append(action.getActionId() % 10).Append(", ");
+            string ratio = Utils.roundIfNeed(actionValue1.value * 100);
+            if (descriptionContext != null)
+            {
+                var children = descriptionContext.GetDescendants(actionId).Select(id => describeActionSlot(id)).ToArray();
+                if (children.Length > 0)
+                {
+                    return Utils.JavaFormat(Utils.GetString("Scale_hit_TP_from_related_actions"),
+                        string.Join("、", children), ratio);
                 }
-                childrenActionString.delete(childrenActionString.lastIndexOf(", "), childrenActionString.Count);
-            }*/
-            return childrenActionString.ToString();
-        }
-
-        public
-            override string localizedDetail(int level, Property property)
-        {
-            return Utils.JavaFormat(Utils.GetString("change_energy_recovery_ratio_of_action_s1_to_s2_when_s3_get_damage"),
-                getChildrenActionString(),
-                actionValue1.valueString(),
-                targetParameter.buildTargetClause());
+            }
+            return Utils.JavaFormat(Utils.GetString("Scale_hit_TP_from_related_damage"), ratio);
         }
     }
 }

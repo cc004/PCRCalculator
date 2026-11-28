@@ -1533,47 +1533,30 @@ namespace PCRCaculator
         public string GetSkillDetails(int pos, UnitData data)
         {
             float atk = MainManager.Instance.UnitRarityDic[data.unitId].GetAtk(data);
-            string detail = "释放时间：" + casttime + "s\n";
-            int i = 0;
-            foreach (int action in skillactions)
-            {
-                if (action != 0)
-                {
-                    string acdetail = MainManager.Instance.SkillActionDic[action].GetDetail(data.skillLevel[pos], atk);
-                    if (acdetail != "")
-                    {
-                        detail += num[i] + acdetail + "\n";
-                        i++;
-                    }
-                }
-            }
-            return detail;
+            return GetSkillDetails(data.skillLevel[pos], atk, false);
         }
-        /// <summary>
-        /// 获取技能描述文字
-        /// </summary>
-        /// <param name="lv">技能等级</param>
-        /// <returns>描述字符串</returns>
+
         public string GetSkillDetailsEnemy(int lv, float atk)
         {
+            return GetSkillDetails(lv, atk, true);
+        }
+
+        private string GetSkillDetails(int level, float atk, bool isEnemy)
+        {
+            int[] parents = dependactions ?? Array.Empty<int>();
+            var context = new ActionDescriptionContext(skillactions.Select((actionId, slot) =>
+                (actionId, slot < parents.Length ? parents[slot] : 0)));
             string detail = "释放时间：" + casttime + "s\n";
-            int i = 0;
-            foreach (int action in skillactions)
+            for (int slot = 0; slot < skillactions.Length; slot++)
             {
-                if (action != 0)
-                {
-                    string acdetail = MainManager.Instance.SkillActionDic[action].GetDetail(lv, atk, dependactions[i]);
-                    if (dependactions[i] > 0)
-                    {
-                        List<int> list = new List<int>(skillactions);
-                        acdetail = $"依赖{num[list.FindIndex(a => a == dependactions[i])]}" + acdetail;
-                    }
-                    if (acdetail != "")
-                    {
-                        detail += num[i] + acdetail + "\n";
-                        i++;
-                    }
-                }
+                int actionId = skillactions[slot];
+                if (actionId == 0)
+                    continue;
+
+                int parentId = slot < parents.Length ? parents[slot] : 0;
+                string actionDetail = MainManager.Instance.SkillActionDic[actionId].GetDetail(level, atk, parentId, context, isEnemy);
+                if (!string.IsNullOrEmpty(actionDetail))
+                    detail += num[slot] + actionDetail + "\n";
             }
             return detail;
         }
@@ -1711,15 +1694,15 @@ namespace PCRCaculator
         /// <param name="skilllevel">技能等级</param>
         /// <param name="atk">角色攻击力（物理/魔法）</param>
         /// <returns>技能详情描述字符串</returns>
-        public string GetDetail(int skilllevel, float atk, int depend = 0)
+        public string GetDetail(int skilllevel, float atk, int depend = 0, ActionDescriptionContext context = null, bool isEnemy = false)
         {
             var param = ActionParameterSerializer.Actions.ActionParameter.type(this.type);
-            param.init(false, actionid, depend, classid, type, details[0],
+            param.init(isEnemy, actionid, depend, classid, type, details[0],
                 details[1], details[2], values[0], values[1], values[2], values[3],
                 values[4], values[5], values[6], target_assigment, target_area, target_range,
-                target_type, target_number, target_count, null, new List<ActionParameterSerializer.SkillAction>());
+                target_type, target_number, target_count, context);
             UserSettings.expression = UserSettings.EXPRESSION_VALUE;
-            return param.localizedDetail(skilllevel, new Property()
+            return param.describe(skilllevel, new Property()
             {
                 atk = atk,
                 magicStr = atk
