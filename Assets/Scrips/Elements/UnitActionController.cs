@@ -1835,7 +1835,7 @@ namespace Elements
                     }
 
 #if !REDUCE_ANALYSE
-                    var detail = action.GetSkillDetail(Owner);
+                    var detail = action.GetSkillDetail(Owner, skill);
                     if (!string.IsNullOrEmpty(detail))
                         actionExecData.describe += $"<color=#c080ff><size=10>{detail}\n</size></color>";
 #endif

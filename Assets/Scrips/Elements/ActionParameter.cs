@@ -444,20 +444,20 @@ namespace Elements
 
         private int _level;
 
-        public string GetSkillDetail(UnitCtrl owner)
+        public string GetSkillDetail(UnitCtrl owner, Skill skill)
         {
 #if UNITY_5_3_OR_NEWER
             if (MasterData == null) return null;
+            var context = new ActionDescriptionContext(skill.ActionParameters.ConvertAll(action => (action.ActionId, action.DepenedActionId)));
             var param = ActionParameterSerializer.Actions.ActionParameter.type(MasterData.action_type);
-            param.init(owner.IsOther, MasterData.action_id, DepenedActionId, MasterData.class_id,  MasterData.action_type, MasterData.action_detail_1,
+            param.init(owner.IsOther, ActionId, DepenedActionId, MasterData.class_id,  MasterData.action_type, MasterData.action_detail_1,
                 MasterData.action_detail_2, MasterData.action_detail_3, MasterData.action_value_1, MasterData.action_value_2, MasterData.action_value_3,
                 MasterData.action_value_4, MasterData.action_value_5, MasterData.action_value_6, MasterData.action_value_7,
-                MasterData.target_assignment, MasterData.target_area, MasterData.target_range, MasterData.target_type, MasterData.target_number, MasterData.target_count, 
-                null, new List<SkillAction>());
+                MasterData.target_assignment, MasterData.target_area, MasterData.target_range, MasterData.target_type, MasterData.target_number, MasterData.target_count, context);
             UserSettings.expression = UserSettings.EXPRESSION_VALUE;
-            return param.localizedDetail(_level, new Property()
+            return param.describe(_level, new Property()
             {
-                atk = owner.Atk, magicStr = owner.MagicStr
+                atk = owner.Atk, magicStr = owner.MagicStr, attackType = (ClassModifier)owner.AtkType
             });
 #else
             return string.Empty;

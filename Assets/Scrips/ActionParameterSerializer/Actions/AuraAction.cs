@@ -73,7 +73,7 @@ namespace ActionParameterSerializer.Actions
             {
                 auraType = AuraType.DEBUFF_ENHANCE;
             }
-            else if (actionDetail1 >= 1000)
+            else if (actionDetail1 / 1000 == 1)
             {
                 auraType = (AuraType)(actionDetail1 % 1000 / 10);
                 isConstant = true;
@@ -136,7 +136,8 @@ namespace ActionParameterSerializer.Actions
                         percentModifier.description(),
                         auraType.description(),
                         buildExpression(level, durationValues, RoundingMode.UNNECESSARY, property),
-                        isConstant ? Utils.JavaFormat(Utils.GetString("this_buff_is_constant")) : "");
+                        (isConstant ? Utils.GetString("this_buff_is_additional") : "") +
+                        (actionValue7.value == 2 ? Utils.GetString("this_buff_cannot_be_dispelled") : ""));
                 }
             }
         }

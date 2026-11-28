@@ -5,10 +5,12 @@ namespace ActionParameterSerializer.Actions
         public override string localizedDetail(int level, Property property)
         {
             return Utils.JavaFormat(
-                Utils.GetString("Add_s1_d2_mark_stacks_and_on_ub_remove_1_mark_stack_and_use_action_d3"),
+                Utils.GetString("Set_s1_mark_d2_count_s3_and_trigger_on_UB"),
                 targetParameter.buildTargetClause(),
-                Utils.roundDownDouble(actionValue3.value),
-                actionDetail1 % 10);
+                actionValue1.valueString(),
+                actionValue3.valueString(),
+                actionValue4.valueString(),
+                describeActionSlot(actionDetail1));
         }
     }
 }

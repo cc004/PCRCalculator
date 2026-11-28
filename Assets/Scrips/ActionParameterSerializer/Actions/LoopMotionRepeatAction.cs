@@ -12,12 +12,12 @@ namespace ActionParameterSerializer.Actions
             base.childInit();
             if (actionDetail2 != 0)
             {
-                successClause = Utils.JavaFormat(Utils.GetString("use_d_after_time_up"), actionDetail2 % 10);
+                successClause = Utils.JavaFormat(Utils.GetString("use_d_after_time_up"), describeActionSlot(actionDetail2));
             }
 
             if (actionDetail3 != 0)
             {
-                failureClause = Utils.JavaFormat(Utils.GetString("use_d_after_break"), actionDetail3 % 10);
+                failureClause = Utils.JavaFormat(Utils.GetString("use_d_after_break"), describeActionSlot(actionDetail3));
             }
         }
 
@@ -25,7 +25,7 @@ namespace ActionParameterSerializer.Actions
             override string localizedDetail(int level, Property property)
         {
             string mainClause = Utils.JavaFormat(Utils.GetString("Repeat_effect_d1_every_s2_sec_up_to_s3_sec_break_if_taken_more_than_s4_damage"),
-                actionDetail1 % 10, actionValue2.valueString(), actionValue1.valueString(), actionValue3.valueString());
+                describeActionSlot(actionDetail1), actionValue2.valueString(), actionValue1.valueString(), actionValue3.valueString());
             if (successClause != null && failureClause != null)
             {
                 return mainClause + successClause + failureClause;

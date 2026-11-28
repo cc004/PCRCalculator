@@ -19,7 +19,7 @@ namespace ActionParameterSerializer.Actions
         public override void childInit()
         {
             propType = (eAtkType) actionDetail1;
-            targetAction = actionDetail2 % 10;
+            targetAction = describeActionSlot(actionDetail2);
             base.childInit();
         }
 

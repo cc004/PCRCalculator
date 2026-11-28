@@ -9,18 +9,23 @@ namespace ActionParameterSerializer.Actions
             thundering = 137
         }
 
-        private EnvironmentType environmentType;
+        public static string describeEnvironment(int id)
+        {
+            return id == (int)EnvironmentType.thundering
+                ? EnvironmentType.thundering.description()
+                : Utils.JavaFormat(Utils.GetString("Environment_ID_d"), id);
+        }
+
         public override void childInit()
         {
-            base.childInit();
-            environmentType = (EnvironmentType) actionDetail2;
+            actionValues.Add(new ActionValue(actionValue1, actionValue2, null));
         }
 
         public override string localizedDetail(int level, Property property)
         {
             return Utils.JavaFormat(Utils.GetString("Summon_field_of_s1_environment_for_s2_sec"),
-                environmentType.description(),
-                actionValue1.value);
+                describeEnvironment(actionDetail2), buildExpression(level, RoundingMode.UNNECESSARY, property))
+                + Utils.GetString("Environment_ends_when_source_leaves");
         }
     }
 }

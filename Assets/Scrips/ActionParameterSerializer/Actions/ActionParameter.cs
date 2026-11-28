@@ -151,6 +151,10 @@ namespace ActionParameterSerializer.Actions
                     return new PassiveDamageUpAction();
                 case 79:
                     return new DamageByBehaviourAction();
+                case 81:
+                    return new SpecialIdleAction();
+                case 82:
+                    return new ChangeResistIdAction();
                 case 83:
                     return new ChangeSpeedOverlapAction();
                 case 90:
@@ -191,6 +195,8 @@ namespace ActionParameterSerializer.Actions
                     return new ChangeCriticalReferenceAction();
                 case 108:
                     return new IfContainsUnitGroupAction();
+                case 109:
+                    return new LimitEnergyRecoveryRateAction();
                 case 110:
                     return new SlipDamageUpAction();
                 case 111:
@@ -199,18 +205,30 @@ namespace ActionParameterSerializer.Actions
                     return new AddAbnormalEffectTimeAction();
                 case 114:
                     return new AllUnitSealDamageCutAction();
+                case 115:
+                    return new SealBuffDebuffAction();
+                case 116:
+                    return new TauntAction();
                 case 117:
                     return new ForceChangeSpeedAction();
                 case 118:
                     return new GutsAction();
+                case 119:
+                    return new AbnormalStateForceHitAction();
+                case 121:
+                    return new AutoRevivalAction();
                 case 122:
                     return new HpLowerLimitAction();
+                case 123:
+                    return new DamageCutForSpecialNullificationAction();
                 case 124:
                     return new EnchantProtectAction();
                 case 125:
                     return new EtherealizationAction();
                 case 126:
                     return new TalentBonusEnhanceBuffDebuffAction();
+                case 127:
+                    return new LabyrinthAdditiveAction();
                 case 128:
                     return new ExtendSlipDamageAction();
                 case 129:
@@ -233,7 +251,7 @@ namespace ActionParameterSerializer.Actions
 
         public bool isEnemySkill;
         public int dependActionId;
-        public List<SkillAction> childrenAction;
+        protected ActionDescriptionContext descriptionContext;
 
         public int actionId;
         public int classId;
@@ -287,7 +305,7 @@ namespace ActionParameterSerializer.Actions
 
         public TargetParameter targetParameter;
 
-        public ActionParameter init(bool isEnemySkill, int actionId, int dependActionId, int classId, int actionType, int actionDetail1, int actionDetail2, int actionDetail3, double actionValue1, double actionValue2, double actionValue3, double actionValue4, double actionValue5, double actionValue6, double actionValue7, int targetAssignment, int targetArea, int targetRange, int targetType, int targetNumber, int targetCount, SkillAction dependAction, List<SkillAction> childrenAction)
+        public ActionParameter init(bool isEnemySkill, int actionId, int dependActionId, int classId, int actionType, int actionDetail1, int actionDetail2, int actionDetail3, double actionValue1, double actionValue2, double actionValue3, double actionValue4, double actionValue5, double actionValue6, double actionValue7, int targetAssignment, int targetArea, int targetRange, int targetType, int targetNumber, int targetCount, ActionDescriptionContext descriptionContext = null)
         {
             this.isEnemySkill = isEnemySkill;
             this.actionId = actionId;
@@ -355,17 +373,36 @@ namespace ActionParameterSerializer.Actions
                 rawActionValues.Add(actionValue7);
             }
 
-            if (childrenAction != null)
-            {
-                this.childrenAction = childrenAction;
-            }
-            targetParameter = new TargetParameter(targetAssignment, targetNumber, targetType, targetRange, targetArea, targetCount, dependAction);
+            this.descriptionContext = descriptionContext;
+            targetParameter = new TargetParameter(targetAssignment, targetNumber, targetType, targetRange, targetArea, targetCount);
             childInit();
             return this;
         }
 
         public virtual void childInit()
         {
+        }
+
+        protected int describeActionSlot(int actionId)
+        {
+            return descriptionContext?.GetActionSlotOrId(actionId) ?? actionId;
+        }
+
+        public string describe(int level, Property property)
+        {
+            string detail = localizedDetail(level, property);
+            if (dependActionId <= 0 || string.IsNullOrEmpty(detail))
+                return detail;
+
+            return Utils.JavaFormat(Utils.GetString("Depends_on_action_d1_s2"), describeActionSlot(dependActionId), detail);
+        }
+
+        protected string describePercent(int level, List<ActionValue> values, Property property)
+        {
+            if (UserSettings.expression == UserSettings.EXPRESSION_VALUE)
+                return Utils.roundIfNeed(double.Parse(buildExpression(level, values, RoundingMode.UNNECESSARY, property)) * 100);
+
+            return Utils.JavaFormat("(%s) * 100", buildExpression(level, values, RoundingMode.UNNECESSARY, property));
         }
 
         private string bracesIfNeeded(string content)
@@ -680,6 +717,7 @@ namespace ActionParameterSerializer.Actions
         waveEnergyRecovery,
         waveHpRecovery,
         accuracy,
+        sourceAttack,
         tp,
         unknown
     }

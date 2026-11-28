@@ -13,12 +13,15 @@ namespace ActionParameterSerializer.Actions
         {
             if (actionValue4.value >= 0)
             {
-                return Utils.JavaFormat(Utils.GetString("Add_s1_mark_stacks_max_s2_ID_s3_on_s4_for_s5_sec"),
+                string detail = Utils.JavaFormat(Utils.GetString("Add_s1_mark_stacks_max_s2_ID_s3_on_s4_for_s5_sec"),
                     Utils.roundDownDouble(actionValue4.value),
                     Utils.roundDownDouble(actionValue1.value),
                     Utils.roundDownDouble(actionValue2.value),
                     targetParameter.buildTargetClause(),
-                    Utils.roundDouble(actionValue3.value));
+                    actionValue3.valueString());
+                if (actionDetail3 == 1)
+                    detail += Utils.JavaFormat(Utils.GetString("Remove_mark_stack_every_s_damage_events"), actionValue5.valueString());
+                return detail;
             }
             else
             {

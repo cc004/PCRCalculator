@@ -8,7 +8,7 @@ namespace ActionParameterSerializer.Actions
         {
             return Utils.JavaFormat(Utils.GetString("extend_s1_slip_damage_last_and_interval_by_s2_in_s3_time"),
                 targetParameter.buildTargetClause(),
-                actionValue1.value / 100,
+                Utils.roundIfNeed(1 + actionValue1.value / 100),
                 actionValue2.value);
         }
     }

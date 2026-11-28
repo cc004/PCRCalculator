@@ -24,17 +24,10 @@ namespace ActionParameterSerializer.Actions
                 fieldType = FieldType.repeat;
             }
 
-            switch (damageClass)
-            {
-                case ClassModifier.magical:
-                    actionValues.Add(new ActionValue(actionValue1, actionValue2, null));
-                    actionValues.Add(new ActionValue(actionValue3, actionValue4, PropertyKey.magicStr));
-                    break;
-                case ClassModifier.physical:
-                    actionValues.Add(new ActionValue(actionValue1, actionValue2, null));
-                    actionValues.Add(new ActionValue(actionValue3, actionValue4, PropertyKey.atk));
-                    break;
-            }
+            actionValues.Add(new ActionValue(actionValue1, actionValue2, null));
+            var attackKey = actionDetail1 == 5 ? PropertyKey.sourceAttack
+                : damageClass == ClassModifier.magical ? PropertyKey.magicStr : PropertyKey.atk;
+            actionValues.Add(new ActionValue(actionValue3, actionValue4, attackKey));
             durationValues.Add(new ActionValue(actionValue5, actionValue6, null));
         }
 
@@ -42,6 +35,7 @@ namespace ActionParameterSerializer.Actions
             override string localizedDetail(int level, Property property)
         {
             StringBuilder str = new StringBuilder();
+            string damageType = actionDetail1 == 5 ? "" : damageClass.description();
             switch (fieldType)
             {
                 case FieldType.repeat:
@@ -50,7 +44,7 @@ namespace ActionParameterSerializer.Actions
                         str.Append(Utils.JavaFormat(Utils.GetString("Summon_a_field_of_radius_d1_to_deal_s2_s3_damage_per_second_for_s4_sec_to_s5"),
                             (int)actionValue7.value,
                             buildExpression(level, property),
-                            damageClass.description(),
+                            damageType,
                             buildExpression(level, durationValues, RoundingMode.UNNECESSARY, property),
                             targetParameter.buildTargetClause()));
                     }
@@ -60,7 +54,7 @@ namespace ActionParameterSerializer.Actions
                             (int)actionValue7.value,
                             targetParameter.buildTargetClause(),
                             buildExpression(level, property),
-                            damageClass.description(),
+                            damageType,
                             buildExpression(level, durationValues, RoundingMode.UNNECESSARY, property)));
                     }
                     break;
@@ -68,6 +62,9 @@ namespace ActionParameterSerializer.Actions
                     str.Append(base.localizedDetail(level, property));
                     break;
             }
+            if (actionDetail1 == 5)
+                str.Append(Utils.GetString("Attack_field_uses_lower_defense"));
+
             if (actionDetail3 != 0)
             {
                 str.Append(Utils.JavaFormat(Utils.GetString("recover_tp_by_damage_divided_by_s1"), 100 - actionDetail3));

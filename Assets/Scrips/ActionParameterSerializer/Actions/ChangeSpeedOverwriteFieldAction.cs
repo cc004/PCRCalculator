@@ -25,11 +25,13 @@ namespace ActionParameterSerializer.Actions
         public
             override string localizedDetail(int level, Property property)
         {
-            return Utils.JavaFormat(Utils.GetString("Deploys_a_filed_of_radius_d1_which_s2_attack_speed_of_s3_for_s4_sec"),
-                (int)actionValue5.value,
-                speedChangeType.description(),
-                Utils.roundDouble(double.Parse(buildExpression(level, RoundingMode.UNNECESSARY, property, true)) * 100),
-                buildExpression(level, durationValues, RoundingMode.UNNECESSARY, property));
+            if (speedChangeType != SpeedChangeType.haste && speedChangeType != SpeedChangeType.slow)
+                return base.localizedDetail(level, property);
+
+            string side = Utils.GetString(speedChangeType == SpeedChangeType.haste ? "friendly" : "enemy");
+            return Utils.JavaFormat(Utils.GetString("Speed_field_sets_s1_speed_to_s2_percent"),
+                side, describePercent(level, actionValues, property), actionValue5.valueString(),
+                targetParameter.buildTargetClause(), buildExpression(level, durationValues, RoundingMode.UNNECESSARY, property));
         }
     }
 }
